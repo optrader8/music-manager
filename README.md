@@ -176,6 +176,8 @@ MIT License
 
 ## 기여하기
 
+프로젝트 기여를 위한 자세한 가이드는 [AGENTS.md](AGENTS.md)에서 확인할 수 있습니다.
+
 1. Fork the repository
 2. Create a feature branch
 3. Commit your changes

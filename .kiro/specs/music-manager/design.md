@@ -358,9 +358,16 @@ CREATE VIRTUAL TABLE tracks_fts USING fts5(
 CREATE INDEX idx_tracks_artist_id ON tracks(artist_id);
 CREATE INDEX idx_tracks_album_id ON tracks(album_id);
 CREATE INDEX idx_tracks_file_hash ON tracks(file_hash);
+CREATE INDEX idx_tracks_disc_number ON tracks(album_id, disc_number, track_number);
 CREATE INDEX idx_albums_artist_id ON albums(artist_id);
+CREATE INDEX idx_albums_album_artist ON albums(album_artist);
+CREATE INDEX idx_albums_disc_id ON albums(disc_id);
 CREATE INDEX idx_playlist_tracks_playlist_id ON playlist_tracks(playlist_id);
 CREATE INDEX idx_playlist_tracks_position ON playlist_tracks(playlist_id, position);
+CREATE INDEX idx_album_metadata_files_album_id ON album_metadata_files(album_id);
+CREATE INDEX idx_album_metadata_files_type ON album_metadata_files(file_type);
+CREATE INDEX idx_external_identifiers_entity ON external_identifiers(entity_type, entity_id);
+CREATE INDEX idx_external_identifiers_type ON external_identifiers(identifier_type, identifier_value);
 ```
 
 ### API Models
@@ -372,6 +379,9 @@ class TrackBase(BaseModel):
     track_number: Optional[int] = None
     disc_number: int = 1
     duration: Optional[int] = None
+    performer: Optional[str] = None
+    composer: Optional[str] = None
+    comment: Optional[str] = None
 
 class TrackCreate(TrackBase):
     file_path: str
@@ -387,9 +397,50 @@ class Track(TrackBase):
     format: Optional[str] = None
     play_count: int = 0
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
+
+class AlbumBase(BaseModel):
+    title: str
+    album_artist: Optional[str] = None
+    year: Optional[int] = None
+    genre: Optional[str] = None
+    description: Optional[str] = None
+    total_discs: int = 1
+
+class AlbumCreate(AlbumBase):
+    artist_id: int
+
+class Album(AlbumBase):
+    id: int
+    artist: Artist
+    cover_art_path: Optional[str] = None
+    back_cover_path: Optional[str] = None
+    booklet_path: Optional[str] = None
+    disc_id: Optional[str] = None
+    total_tracks: Optional[int] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class AlbumMetadataFile(BaseModel):
+    id: int
+    album_id: int
+    file_type: str
+    file_path: str
+    file_name: str
+    file_size: Optional[int] = None
+    created_at: datetime
+
+class ExternalIdentifier(BaseModel):
+    id: int
+    entity_type: str
+    entity_id: int
+    identifier_type: str
+    identifier_value: str
+    created_at: datetime
 
 class PlaylistCreate(BaseModel):
     name: str

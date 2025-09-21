@@ -38,7 +38,10 @@ SSHFS로 연결된 원격 음악 서버를 효율적으로 관리하고, 사용�
 #### 2.1.2 메타데이터 추출 및 저장
 **우선순위: HIGH**
 - 기본 태그 정보 추출 (제목, 아티스트, 앨범, 장르, 년도)
+- 확장 태그 정보 추출 (album_artist, performer, composer, comment)
 - 앨범 아트워크 추출 및 저장
+- 추가 파일 감지 (folder.info.md, booklet.pdf, back.jpg)
+- 외부 식별자 추출 (DISCID, MusicBrainz ID)
 - 오디오 특성 정보 (비트레이트, 샘플레이트, 길이)
 - 파일 정보 (경로, 크기, 수정일)
 
