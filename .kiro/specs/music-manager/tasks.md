@@ -38,7 +38,7 @@
   - Write unit tests with mocked external APIs
   - _Requirements: 2.1, 4.3, 4.5, 6.4_
 
-- [ ] 6. Create streaming service for audio playback
+- [x] 6. Create streaming service for audio playback
   - Implement StreamingService class with HTTP range request support
   - Create audio file serving endpoints with proper headers
   - Implement audio transcoding using FFmpeg for format compatibility
@@ -46,7 +46,7 @@
   - Write unit tests for streaming functionality
   - _Requirements: 3.1, 3.2, 3.5_
 
-- [ ] 7. Implement search and library browsing API endpoints
+- [x] 7. Implement search and library browsing API endpoints
   - Create full-text search endpoints using SQLite FTS5
   - Implement filtering and sorting for library browsing
   - Create pagination for large result sets
@@ -54,7 +54,7 @@
   - Write unit tests for search functionality and performance
   - _Requirements: 2.3, 2.4, 2.5_
 
-- [ ] 8. Create playlist management system
+- [x] 8. Create playlist management system
   - Implement playlist CRUD operations and API endpoints
   - Create playlist track management with position ordering
   - Implement smart playlist functionality with criteria-based filtering

@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import (
     Boolean,
     DateTime,
     ForeignKey,
     Integer,
+    JSON,
     String,
     UniqueConstraint,
     func,
@@ -28,8 +31,10 @@ class Playlist(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     is_public: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_smart: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    smart_filter: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -39,7 +44,10 @@ class Playlist(Base):
 
     owner: Mapped["User"] = relationship("User", back_populates="playlists")
     tracks: Mapped[list["PlaylistTrack"]] = relationship(
-        "PlaylistTrack", back_populates="playlist", cascade="all,delete-orphan"
+        "PlaylistTrack",
+        back_populates="playlist",
+        cascade="all,delete-orphan",
+        order_by="PlaylistTrack.position",
     )
 
 

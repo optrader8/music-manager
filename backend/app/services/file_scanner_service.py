@@ -8,6 +8,7 @@ import mutagen
 from sqlalchemy.orm import Session
 
 from app.db.models import Album, Artist, Track
+from app.utils import AlbumRepository, ArtistRepository
 
 SUPPORTED_EXTENSIONS = {".mp3", ".flac", ".aac", ".ogg", ".m4a"}
 
@@ -46,6 +47,8 @@ class FileScannerService:
     def __init__(self, session: Session, library_path: Path):
         self.session = session
         self.library_path = Path(library_path)
+        self.artist_repo = ArtistRepository(session)
+        self.album_repo = AlbumRepository(session)
 
     def scan(self) -> ScanResult:
         scanned_files = created_tracks = updated_tracks = skipped_files = 0
@@ -70,9 +73,9 @@ class FileScannerService:
 
             track = existing or self.session.query(Track).filter(Track.file_path == str(file_path)).one_or_none()
 
-            artist = self._get_or_create_artist(metadata.artist_name) if metadata.artist_name else None
+            artist = self.artist_repo.get_or_create(metadata.artist_name) if metadata.artist_name else None
             album = (
-                self._get_or_create_album(artist, metadata.album_title, metadata.release_year, metadata.genre)
+                self.album_repo.get_or_create(artist, metadata.album_title, metadata.release_year, metadata.genre)
                 if artist and metadata.album_title
                 else None
             )
@@ -185,36 +188,6 @@ class FileScannerService:
         except ValueError:
             return None
 
-    def _get_or_create_artist(self, name: str) -> Artist:
-        artist = self.session.query(Artist).filter(Artist.name == name).one_or_none()
-        if not artist:
-            artist = Artist(name=name)
-            self.session.add(artist)
-            self.session.flush()
-        return artist
-
-    def _get_or_create_album(
-        self,
-        artist: Artist,
-        title: str,
-        release_year: int | None,
-        genre: str | None,
-    ) -> Album:
-        album = (
-            self.session.query(Album)
-            .filter(Album.artist_id == artist.id, Album.title == title)
-            .one_or_none()
-        )
-        if not album:
-            album = Album(artist=artist, title=title, release_year=release_year, genre=genre)
-            self.session.add(album)
-            self.session.flush()
-        else:
-            if release_year and not album.release_year:
-                album.release_year = release_year
-            if genre and not album.genre:
-                album.genre = genre
-        return album
 
 
 __all__ = [

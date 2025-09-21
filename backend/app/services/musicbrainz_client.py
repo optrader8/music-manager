@@ -23,6 +23,12 @@ class MusicBrainzClient:
         self.user_agent = user_agent or settings.musicbrainz_user_agent
         self._client = httpx.Client(base_url=self.base_url, headers={"User-Agent": self.user_agent})
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     def close(self) -> None:
         self._client.close()
 

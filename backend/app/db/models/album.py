@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -20,8 +22,8 @@ class Album(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     artist_id: Mapped[int] = mapped_column(ForeignKey("artists.id", ondelete="CASCADE"), index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    release_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    genre: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    release_year: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    genre: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

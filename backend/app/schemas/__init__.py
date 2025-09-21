@@ -1,5 +1,15 @@
 from .album import AlbumBase, AlbumCreate, AlbumRead, AlbumUpdate, AlbumWithArtist
 from .artist import ArtistBase, ArtistCreate, ArtistRead, ArtistUpdate
+from .library import LibraryBrowseResponse, LibrarySearchResponse, PaginatedResponse
+from .playlist import (
+    PlaylistCreate,
+    PlaylistDetail,
+    PlaylistRead,
+    PlaylistTrackRead,
+    PlaylistTrackReorderRequest,
+    PlaylistTrackRequest,
+    PlaylistUpdate,
+)
 from .token import Token, TokenPayload
 from .track import (
     MetadataSuggestion,
@@ -7,6 +17,7 @@ from .track import (
     TrackCreate,
     TrackMetadataUpdate,
     TrackRead,
+    TrackSearchResult,
     TrackUpdate,
     TrackWithRelations,
 )
@@ -22,6 +33,16 @@ __all__ = [
     "ArtistCreate",
     "ArtistRead",
     "ArtistUpdate",
+    "LibraryBrowseResponse",
+    "LibrarySearchResponse",
+    "PaginatedResponse",
+    "PlaylistCreate",
+    "PlaylistDetail",
+    "PlaylistRead",
+    "PlaylistTrackRead",
+    "PlaylistTrackReorderRequest",
+    "PlaylistTrackRequest",
+    "PlaylistUpdate",
     "Token",
     "TokenPayload",
     "MetadataSuggestion",
@@ -29,6 +50,7 @@ __all__ = [
     "TrackCreate",
     "TrackMetadataUpdate",
     "TrackRead",
+    "TrackSearchResult",
     "TrackUpdate",
     "TrackWithRelations",
     "UserCreate",

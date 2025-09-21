@@ -2,7 +2,7 @@ from .album import Album
 from .artist import Artist
 from .playlist import Playlist, PlaylistTrack
 from .track import Track
-from .user import User
+from .user import User, UserRole
 
 __all__ = [
     "Album",
@@ -11,4 +11,5 @@ __all__ = [
     "PlaylistTrack",
     "Track",
     "User",
+    "UserRole",
 ]

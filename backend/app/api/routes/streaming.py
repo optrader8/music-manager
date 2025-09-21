@@ -1,64 +1,62 @@
-from fastapi import APIRouter, Depends, Request
+from __future__ import annotations
+
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query, Request, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user, get_session
-from app.db.models import User
-from app.services.streaming_service import StreamingService
+from app.core.dependencies import get_db
+from app.services import StreamingService
 
-router = APIRouter(prefix="/stream", tags=["streaming"])
+router = APIRouter(prefix="/stream", tags=["stream"])
 
 
-@router.get("/track/{track_id}")
+@router.get("/tracks/{track_id}")
 async def stream_track(
     track_id: int,
     request: Request,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
-):
-    """Stream a track by ID with range request support."""
-    streaming_service = StreamingService(session)
-
-    # Get the track file path
-    file_path = await streaming_service.get_track_file(track_id)
-
-    # Get range header if present
+    db: Session = Depends(get_db),
+) -> StreamingResponse:
+    service = StreamingService(db)
+    track, file_path = service.get_track_with_file(track_id)
     range_header = request.headers.get("range")
 
-    # Stream the file
-    file_obj, start, end, content_type = await streaming_service.stream_file(
+    iterator, start, end, file_size, content_type, partial = await service.stream_file(
         file_path, range_header
     )
 
-    file_size = file_path.stat().st_size
-    content_length = end - start + 1
+    status_code = status.HTTP_206_PARTIAL_CONTENT if partial else status.HTTP_200_OK
+    response = StreamingResponse(iterator, media_type=content_type, status_code=status_code)
+    content_length = max(0, end - start + 1) if file_size else file_size
+    response.headers["Accept-Ranges"] = "bytes"
+    response.headers["Content-Length"] = str(content_length)
+    response.headers["Cache-Control"] = "public, max-age=60"
+    response.headers["ETag"] = track.file_hash
+    response.headers["Vary"] = "Accept-Encoding"
+    if partial and file_size:
+        response.headers["Content-Range"] = f"bytes {start}-{end}/{file_size}"
 
-    headers = {
-        "Content-Type": content_type,
-        "Accept-Ranges": "bytes",
-        "Content-Length": str(content_length),
-    }
+    return response
 
-    if range_header:
-        headers["Content-Range"] = f"bytes {start}-{end}/{file_size}"
-        status_code = 206  # Partial Content
-    else:
-        status_code = 200
 
-    async def iterfile():
-        remaining = content_length
-        while remaining > 0:
-            chunk_size = min(8192, remaining)
-            chunk = await file_obj.read(chunk_size)
-            if not chunk:
-                break
-            remaining -= len(chunk)
-            yield chunk
-        await file_obj.close()
-
-    return StreamingResponse(
-        iterfile(),
-        status_code=status_code,
-        headers=headers,
-        media_type=content_type,
+@router.get("/tracks/{track_id}/transcode")
+async def transcode_track(
+    track_id: int,
+    format: Annotated[str, Query(alias="format", pattern=r"^(mp3|aac|ogg|flac|wav)$")]="mp3",
+    bitrate: Annotated[str, Query(pattern=r"^\d+k$")]="192k",
+    db: Session = Depends(get_db),
+) -> StreamingResponse:
+    service = StreamingService(db)
+    iterator, media_type, track = await service.transcode_track(
+        track_id, target_format=format, bitrate=bitrate
     )
+
+    response = StreamingResponse(iterator, media_type=media_type)
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["ETag"] = track.file_hash
+    response.headers["Vary"] = "Accept-Encoding"
+    return response
+
+
+__all__ = ["router"]

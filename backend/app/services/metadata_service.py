@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.db.models import Album, Artist, Track
 from app.schemas import MetadataSuggestion, TrackMetadataUpdate
 from app.services.musicbrainz_client import MusicBrainzClient, MusicBrainzRecording
+from app.utils import AlbumRepository, ArtistRepository
 
 
 class MetadataService:
@@ -17,6 +18,8 @@ class MetadataService:
     ) -> None:
         self.session = session
         self.musicbrainz_client = musicbrainz_client or MusicBrainzClient()
+        self.artist_repo = ArtistRepository(session)
+        self.album_repo = AlbumRepository(session)
 
     def update_track_metadata(self, track_id: int, update: TrackMetadataUpdate) -> Track:
         track = self.session.get(Track, track_id)
@@ -27,12 +30,12 @@ class MetadataService:
         album = track.album
 
         if update.artist_name is not None:
-            artist = self._get_or_create_artist(update.artist_name) if update.artist_name else None
+            artist = self.artist_repo.get_or_create(update.artist_name) if update.artist_name else None
             track.artist = artist
 
         if update.album_title is not None:
             if update.album_title and artist:
-                album = self._get_or_create_album(
+                album = self.album_repo.get_or_create(
                     artist,
                     title=update.album_title,
                     release_year=update.release_year,
@@ -89,36 +92,6 @@ class MetadataService:
             score=recording.score,
         )
 
-    def _get_or_create_artist(self, name: str) -> Artist:
-        artist = self.session.query(Artist).filter(Artist.name == name).one_or_none()
-        if not artist:
-            artist = Artist(name=name)
-            self.session.add(artist)
-            self.session.flush()
-        return artist
-
-    def _get_or_create_album(
-        self,
-        artist: Artist,
-        title: str,
-        release_year: int | None,
-        genre: str | None,
-    ) -> Album:
-        album = (
-            self.session.query(Album)
-            .filter(Album.artist_id == artist.id, Album.title == title)
-            .one_or_none()
-        )
-        if not album:
-            album = Album(artist=artist, title=title, release_year=release_year, genre=genre)
-            self.session.add(album)
-            self.session.flush()
-        else:
-            if release_year and not album.release_year:
-                album.release_year = release_year
-            if genre and not album.genre:
-                album.genre = genre
-        return album
 
 
 __all__ = ["MetadataService"]

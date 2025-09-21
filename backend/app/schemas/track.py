@@ -76,12 +76,20 @@ from .artist import ArtistRead  # noqa: E402
 TrackWithRelations.model_rebuild()
 
 
+class TrackSearchResult(TrackWithRelations):
+    score: float
+
+
+TrackSearchResult.model_rebuild()
+
+
 __all__ = [
     "MetadataSuggestion",
     "TrackBase",
     "TrackCreate",
     "TrackMetadataUpdate",
     "TrackRead",
+    "TrackSearchResult",
     "TrackUpdate",
     "TrackWithRelations",
 ]

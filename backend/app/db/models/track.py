@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import (
     DateTime,
@@ -28,21 +30,21 @@ class Track(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    artist_id: Mapped[int | None] = mapped_column(
+    artist_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("artists.id", ondelete="SET NULL"), nullable=True, index=True
     )
-    album_id: Mapped[int | None] = mapped_column(
+    album_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("albums.id", ondelete="SET NULL"), nullable=True, index=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    track_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    disc_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    duration_seconds: Mapped[float | None] = mapped_column(Float, nullable=True)
-    genre: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    track_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    disc_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    duration_seconds: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    genre: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
     file_path: Mapped[str] = mapped_column(String(1024), nullable=False)
     file_hash: Mapped[str] = mapped_column(String(64), nullable=False)
-    bit_rate: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    sample_rate: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    bit_rate: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    sample_rate: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -50,8 +52,8 @@ class Track(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    artist: Mapped["Artist" | None] = relationship("Artist", back_populates="tracks")
-    album: Mapped["Album" | None] = relationship("Album", back_populates="tracks")
+    artist: Mapped[Optional["Artist"]] = relationship("Artist", back_populates="tracks")
+    album: Mapped[Optional["Album"]] = relationship("Album", back_populates="tracks")
     playlist_entries: Mapped[list["PlaylistTrack"]] = relationship(
         "PlaylistTrack", back_populates="track", cascade="all,delete"
     )

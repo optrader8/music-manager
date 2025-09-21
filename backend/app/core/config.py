@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     refresh_token_expire_minutes: int = 60 * 24 * 3  # 3 days
     musicbrainz_api_url: str = "https://musicbrainz.org/ws/2"
     musicbrainz_user_agent: str = "MusicManager/0.1.0 (music-manager@local)"
+    log_level: str = "INFO"
 
     class Config:
         env_file = ".env"
