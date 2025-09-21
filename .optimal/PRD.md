@@ -45,16 +45,25 @@ SSHFS로 연결된 원격 음악 서버를 효율적으로 관리하고, 사용�
 **데이터 모델:**
 ```sql
 -- Albums
-id, name, artist_id, year, genre, cover_art_path, created_at, updated_at
+id, title, artist_id, album_artist, year, genre, cover_art_path, back_cover_path,
+booklet_path, description, disc_id, total_tracks, total_discs, created_at, updated_at
 
 -- Artists
 id, name, bio, image_path, created_at, updated_at
 
 -- Tracks
-id, title, album_id, artist_id, track_number, duration, file_path, file_size, bitrate, sample_rate, format, created_at, updated_at
+id, title, album_id, artist_id, track_number, disc_number, duration, file_path,
+file_size, bitrate, sample_rate, format, performer, composer, comment,
+id3v1_comment, created_at, updated_at
 
 -- Playlists
 id, name, description, user_id, is_public, created_at, updated_at
+
+-- Album Metadata Files
+id, album_id, file_type, file_path, file_name, file_size, created_at
+
+-- External Identifiers
+id, entity_type, entity_id, identifier_type, identifier_value, created_at
 ```
 
 ### 2.2 Dejavu 음원 식별 시스템
@@ -256,11 +265,18 @@ CREATE TABLE artists (
 
 CREATE TABLE albums (
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
+    title TEXT NOT NULL,
     artist_id INTEGER REFERENCES artists(id),
+    album_artist TEXT, -- For compilation albums
     year INTEGER,
     genre TEXT,
     cover_art_path TEXT,
+    back_cover_path TEXT, -- Back cover image
+    booklet_path TEXT, -- PDF booklet or additional docs
+    description TEXT, -- Album description
+    disc_id TEXT, -- CD DISCID for tracking
+    total_tracks INTEGER,
+    total_discs INTEGER DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -271,16 +287,43 @@ CREATE TABLE tracks (
     album_id INTEGER REFERENCES albums(id),
     artist_id INTEGER REFERENCES artists(id),
     track_number INTEGER,
+    disc_number INTEGER DEFAULT 1,
     duration INTEGER,
     file_path TEXT UNIQUE NOT NULL,
     file_size INTEGER,
     bitrate INTEGER,
     sample_rate INTEGER,
     format TEXT,
+    performer TEXT, -- Performer information
+    composer TEXT, -- Composer information
+    comment TEXT, -- Additional comments/notes
+    id3v1_comment TEXT, -- ID3v1 comment field
     file_hash TEXT UNIQUE,
     dejavu_fingerprint BLOB,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Album metadata files table (for folder.info.md, booklet.pdf, etc.)
+CREATE TABLE album_metadata_files (
+    id INTEGER PRIMARY KEY,
+    album_id INTEGER REFERENCES albums(id),
+    file_type TEXT NOT NULL, -- 'info', 'booklet', 'back_cover', 'liner_notes'
+    file_path TEXT NOT NULL,
+    file_name TEXT NOT NULL,
+    file_size INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- External identifiers table (for DISCID, MusicBrainz, etc.)
+CREATE TABLE external_identifiers (
+    id INTEGER PRIMARY KEY,
+    entity_type TEXT NOT NULL, -- 'album', 'track', 'artist'
+    entity_id INTEGER NOT NULL,
+    identifier_type TEXT NOT NULL, -- 'discid', 'musicbrainz', 'spotify', 'lastfm'
+    identifier_value TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(entity_type, entity_id, identifier_type)
 );
 
 -- FTS 검색 테이블

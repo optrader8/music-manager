@@ -214,11 +214,17 @@ CREATE TABLE albums (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     artist_id INTEGER NOT NULL,
+    album_artist TEXT, -- For compilation albums
     year INTEGER,
     genre TEXT,
     cover_art_path TEXT,
+    back_cover_path TEXT, -- Back cover image
+    booklet_path TEXT, -- PDF booklet or additional docs
+    description TEXT, -- Album description
     musicbrainz_id TEXT UNIQUE,
+    disc_id TEXT, -- CD DISCID for tracking
     total_tracks INTEGER,
+    total_discs INTEGER DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
@@ -239,6 +245,10 @@ CREATE TABLE tracks (
     bitrate INTEGER,
     sample_rate INTEGER,
     format TEXT,
+    performer TEXT, -- Performer information
+    composer TEXT, -- Composer information
+    comment TEXT, -- Additional comments/notes
+    id3v1_comment TEXT, -- ID3v1 comment field
     dejavu_fingerprint BLOB,
     play_count INTEGER DEFAULT 0,
     last_played DATETIME,
@@ -312,6 +322,29 @@ CREATE TABLE broadcast_sessions (
     listener_count INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (playlist_id) REFERENCES playlists(id)
+);
+
+-- Album metadata files table (for folder.info.md, booklet.pdf, etc.)
+CREATE TABLE album_metadata_files (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    album_id INTEGER NOT NULL,
+    file_type TEXT NOT NULL, -- 'info', 'booklet', 'back_cover', 'liner_notes'
+    file_path TEXT NOT NULL,
+    file_name TEXT NOT NULL,
+    file_size INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE
+);
+
+-- External identifiers table (for DISCID, MusicBrainz, etc.)
+CREATE TABLE external_identifiers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    entity_type TEXT NOT NULL, -- 'album', 'track', 'artist'
+    entity_id INTEGER NOT NULL,
+    identifier_type TEXT NOT NULL, -- 'discid', 'musicbrainz', 'spotify', 'lastfm'
+    identifier_value TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(entity_type, entity_id, identifier_type)
 );
 
 -- Full-text search virtual table
