@@ -1,3 +1,105 @@
 2025-09-21 07:58:45,042 - INFO - Mutagen version: 1.47.0
 2025-09-21 07:58:45,050 - INFO - 📁 Scanning library: /mnt/nas-music
 2025-09-21 07:58:45,071 - INFO - Counting audio files...
+2025-09-21 08:01:01,626 - INFO - Mutagen version: 1.47.0
+2025-09-21 08:01:01,627 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 08:01:01,627 - INFO - Counting audio files...
+2025-09-21 08:01:45,707 - INFO - Mutagen version: 1.47.0
+2025-09-21 08:01:45,722 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 08:01:45,744 - INFO - Counting audio files...
+2025-09-21 08:02:55,384 - INFO - Mutagen version: 1.47.0
+2025-09-21 08:02:55,385 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 08:02:55,401 - INFO - Counting audio files...
+2025-09-21 08:18:41,498 - INFO - Found approximately 58622 audio files
+2025-09-21 08:18:41,498 - INFO - 🎵 Starting music library scan...
+2025-09-21 08:20:57,704 - INFO - Found approximately 58622 audio files
+2025-09-21 08:20:57,704 - INFO - 🎵 Starting music library scan...
+2025-09-21 08:21:03,506 - ERROR - Scan failed: (sqlite3.OperationalError) database is locked
+[SQL: INSERT INTO artists (name, sort_name) VALUES (?, ?) RETURNING id, created_at]
+[parameters: ('V.A', None)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+Traceback (most recent call last):
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1971, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 919, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: database is locked
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/optrader/dev/music-manager/backend/scripts/scan_music_library.py", line 92, in scan_library_optimized
+    result = scanner.scan()
+             ^^^^^^^^^^^^^^
+  File "/home/optrader/dev/music-manager/backend/app/services/file_scanner_service.py", line 76, in scan
+    artist = self.artist_repo.get_or_create(metadata.artist_name) if metadata.artist_name else None
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/optrader/dev/music-manager/backend/app/utils/repository.py", line 20, in get_or_create
+    self.session.flush()
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4296, in flush
+    self._flush(objects)
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4431, in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4392, in _flush
+    flush_context.execute()
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1422, in execute
+    return meth(
+           ^^^^^
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 514, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1644, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1850, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1990, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2357, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1971, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/optrader/miniconda3/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 919, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) database is locked
+[SQL: INSERT INTO artists (name, sort_name) VALUES (?, ?) RETURNING id, created_at]
+[parameters: ('V.A', None)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-09-21 08:59:37,051 - INFO - Mutagen version: 1.47.0
+2025-09-21 08:59:37,052 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 08:59:37,104 - INFO - Counting audio files...
+2025-09-21 09:09:22,412 - INFO - Mutagen version: 1.47.0
+2025-09-21 09:09:22,412 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 09:09:22,436 - INFO - Counting audio files...
+2025-09-21 09:12:40,339 - INFO - Found approximately 58620 audio files
+2025-09-21 09:12:40,341 - INFO - 🎵 Starting music library scan...
+2025-09-21 09:22:26,669 - INFO - Scan interrupted by user
+2025-09-21 09:25:06,228 - INFO - Mutagen version: 1.47.0
+2025-09-21 09:25:06,236 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 09:25:06,256 - INFO - Counting audio files...
+2025-09-21 09:27:26,569 - INFO - Mutagen version: 1.47.0
+2025-09-21 09:27:26,583 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 09:27:26,604 - INFO - 🎵 Starting music library scan...
+2025-09-21 09:28:46,919 - INFO - Mutagen version: 1.47.0
+2025-09-21 09:28:46,926 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 09:28:46,943 - INFO - 🎵 Starting music library scan...
+2025-09-21 09:33:52,724 - INFO - Mutagen version: 1.47.0
+2025-09-21 09:33:52,725 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 09:33:52,746 - INFO - Counting audio files...
+2025-09-21 09:36:53,824 - INFO - Found approximately 58620 audio files
+2025-09-21 09:36:53,826 - INFO - 🎵 Starting music library scan...
+2025-09-21 12:57:30,522 - INFO - Scan completed successfully in 12036.7s
+2025-09-21 12:57:30,523 - INFO - Created: 7228, Updated: 0

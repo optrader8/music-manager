@@ -50,60 +50,129 @@ class FileScannerService:
         self.artist_repo = ArtistRepository(session)
         self.album_repo = AlbumRepository(session)
 
-    def scan(self) -> ScanResult:
+    def scan(self, limit_files: int = None) -> ScanResult:
         scanned_files = created_tracks = updated_tracks = skipped_files = 0
         duplicates: list[DuplicateTrack] = []
+        batch_size = 100  # Commit every 100 files
+        batch_count = 0
 
+        print("🎵 Processing files...")
         for file_path in self.iter_audio_files(self.library_path):
             scanned_files += 1
-            metadata = self.extract_metadata(file_path)
-            file_hash = self.calculate_file_hash(file_path)
 
-            existing = self.session.query(Track).filter(Track.file_hash == file_hash).one_or_none()
-            if existing and Path(existing.file_path) != file_path:
-                duplicates.append(
-                    DuplicateTrack(
-                        track_id=existing.id,
-                        existing_path=Path(existing.file_path),
-                        duplicate_path=file_path,
-                    )
+            # Limit files for testing
+            if limit_files and scanned_files > limit_files:
+                print(f"🛑 Stopping at {limit_files} files for testing")
+                break
+
+            # Progress output every 50 files
+            if scanned_files % 50 == 0:
+                print(f"📂 Processed {scanned_files:,} files... (Created: {created_tracks}, Updated: {updated_tracks}, Skipped: {skipped_files})")
+
+            try:
+                # Check if file already exists in database (by path first for speed)
+                existing_track = self.session.query(Track).filter(Track.file_path == str(file_path)).first()
+                if existing_track:
+                    print(f"⏭️  Already processed: {file_path.name}")
+                    skipped_files += 1
+                    continue
+
+                metadata = self.extract_metadata(file_path)
+                file_hash = self.calculate_file_hash(file_path)
+
+                # Check for duplicates by hash - ensure session is clean first
+                try:
+                    duplicate_track = self.session.query(Track).filter(Track.file_hash == file_hash).first()
+                    if duplicate_track:
+                        duplicates.append(
+                            DuplicateTrack(
+                                track_id=duplicate_track.id,
+                                existing_path=Path(duplicate_track.file_path),
+                                duplicate_path=file_path,
+                            )
+                        )
+                        print(f"🔄 Duplicate found: {file_path.name}")
+                        skipped_files += 1
+                        continue
+                except Exception as e:
+                    print(f"❌ Error checking for duplicates: {e}")
+                    self.session.rollback()
+                    skipped_files += 1
+                    continue
+
+                # Get or create artist and album
+                artist = self.artist_repo.get_or_create(metadata.artist_name) if metadata.artist_name else None
+                album = (
+                    self.album_repo.get_or_create(artist, metadata.album_title, metadata.release_year, metadata.genre)
+                    if artist and metadata.album_title
+                    else None
                 )
-                skipped_files += 1
-                continue
 
-            track = existing or self.session.query(Track).filter(Track.file_path == str(file_path)).one_or_none()
-
-            artist = self.artist_repo.get_or_create(metadata.artist_name) if metadata.artist_name else None
-            album = (
-                self.album_repo.get_or_create(artist, metadata.album_title, metadata.release_year, metadata.genre)
-                if artist and metadata.album_title
-                else None
-            )
-
-            if track is None:
+                # Create new track
                 track = Track(
                     title=metadata.title,
                     file_path=str(file_path),
                     file_hash=file_hash,
+                    artist=artist,
+                    album=album,
+                    genre=metadata.genre,
+                    track_number=metadata.track_number,
+                    disc_number=metadata.disc_number,
+                    duration_seconds=metadata.duration_seconds,
+                    bit_rate=metadata.bit_rate,
+                    sample_rate=metadata.sample_rate,
                 )
+
                 self.session.add(track)
                 created_tracks += 1
-            else:
-                updated_tracks += 1
+                batch_count += 1
 
-            track.title = metadata.title
-            track.artist = artist
-            track.album = album
-            track.genre = metadata.genre
-            track.track_number = metadata.track_number
-            track.disc_number = metadata.disc_number
-            track.duration_seconds = metadata.duration_seconds
-            track.bit_rate = metadata.bit_rate
-            track.sample_rate = metadata.sample_rate
-            track.file_path = str(file_path)
-            track.file_hash = file_hash
+                print(f"➕ Added: {metadata.title} by {metadata.artist_name or 'Unknown'}")
 
-        self.session.commit()
+                # Commit every batch_size files
+                if batch_count >= batch_size:
+                    try:
+                        self.session.commit()
+                        print(f"💾 Saved batch of {batch_count} files to database")
+                        batch_count = 0
+                    except Exception as e:
+                        print(f"❌ Error committing batch: {e}")
+                        self.session.rollback()
+                        # Reset batch count but continue
+                        batch_count = 0
+
+            except Exception as e:
+                print(f"❌ Error processing {file_path}: {e}")
+                # Check if it's a duplicate file_hash error
+                if "UNIQUE constraint failed: tracks.file_hash" in str(e):
+                    print(f"🔄 Duplicate file detected during processing: {file_path.name}")
+                    # Add to duplicates list if we can find the hash
+                    try:
+                        file_hash = self.calculate_file_hash(file_path)
+                        existing_track = self.session.query(Track).filter(Track.file_hash == file_hash).first()
+                        if existing_track:
+                            duplicates.append(
+                                DuplicateTrack(
+                                    track_id=existing_track.id,
+                                    existing_path=Path(existing_track.file_path),
+                                    duplicate_path=file_path,
+                                )
+                            )
+                    except Exception:
+                        pass  # Just skip if we can't process the duplicate
+
+                self.session.rollback()  # Ensure session is clean
+                skipped_files += 1
+                continue
+
+        # Final commit for remaining files in batch
+        if batch_count > 0:
+            try:
+                self.session.commit()
+                print(f"💾 Final save: {batch_count} files to database")
+            except Exception as e:
+                print(f"❌ Error in final commit: {e}")
+                self.session.rollback()
 
         return ScanResult(
             scanned_files=scanned_files,

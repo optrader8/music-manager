@@ -1,16 +1,56 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from 'react-router-dom';
+
+import { useAuth } from '../hooks';
+
+const navItems = [
+  { to: '/', label: '대시보드' },
+  { to: '/library', label: '라이브러리' },
+  { to: '/playlists', label: '플레이리스트' },
+  { to: '/metadata', label: '메타데이터' },
+];
 
 export function Header(): JSX.Element {
+  const { user, ability, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
-    <header style={{ padding: "1rem 2rem", borderBottom: "1px solid #3a3a3a" }}>
-      <nav style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-        <Link to="/" style={{ fontWeight: 600, fontSize: "1.1rem" }}>
+    <header className="app-header">
+      <div className="app-header__left">
+        <Link className="app-logo" to="/">
           Music Manager
         </Link>
-        <span style={{ color: "#9ca3af", fontSize: "0.9rem" }}>
-          SSHFS 라이브러리와 FFmpeg 스트리밍을 위한 웹 콘솔
-        </span>
-      </nav>
+        <nav className="app-nav" aria-label="주요 메뉴">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => (isActive ? 'nav-link nav-link--active' : 'nav-link')}
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+      <div className="app-header__right">
+        {user ? (
+          <div className="user-menu">
+            <div className="user-meta">
+              <span className="user-name">{user.displayName}</span>
+              <span className="user-role">{ability.isAdmin ? '관리자' : '사용자'}</span>
+            </div>
+            <button type="button" className="ghost-button" onClick={handleSignOut}>
+              로그아웃
+            </button>
+          </div>
+        ) : (
+          <Link to="/login" className="ghost-button">
+            로그인
+          </Link>
+        )}
+      </div>
     </header>
   );
 }

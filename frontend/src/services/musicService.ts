@@ -1,0 +1,92 @@
+import { apiClient } from './apiClient';
+import type {
+  PaginationParams,
+  PaginationResponse,
+  SearchFilters,
+  SearchResponse,
+  Album,
+  Artist,
+  Track,
+  LibraryStats,
+} from '../types/api';
+
+export const musicService = {
+  // Library stats
+  async getLibraryStats(): Promise<LibraryStats> {
+    const response = await apiClient.get<LibraryStats>('/library/stats');
+    return response.data;
+  },
+
+  // Albums
+  async getAlbums(params: PaginationParams & SearchFilters): Promise<PaginationResponse<Album>> {
+    const response = await apiClient.get<PaginationResponse<Album>>('/albums', { params });
+    return response.data;
+  },
+
+  async getAlbum(id: number): Promise<Album> {
+    const response = await apiClient.get<Album>(`/albums/${id}`);
+    return response.data;
+  },
+
+  async searchAlbums(params: PaginationParams & SearchFilters): Promise<SearchResponse<Album>> {
+    const response = await apiClient.get<SearchResponse<Album>>('/albums/search', { params });
+    return response.data;
+  },
+
+  // Artists
+  async getArtists(params: PaginationParams & SearchFilters): Promise<PaginationResponse<Artist>> {
+    const response = await apiClient.get<PaginationResponse<Artist>>('/artists', { params });
+    return response.data;
+  },
+
+  async getArtist(id: number): Promise<Artist> {
+    const response = await apiClient.get<Artist>(`/artists/${id}`);
+    return response.data;
+  },
+
+  // Tracks
+  async getTracks(params: PaginationParams & SearchFilters): Promise<PaginationResponse<Track>> {
+    const response = await apiClient.get<PaginationResponse<Track>>('/tracks', { params });
+    return response.data;
+  },
+
+  async getTrack(id: number): Promise<Track> {
+    const response = await apiClient.get<Track>(`/tracks/${id}`);
+    return response.data;
+  },
+
+  async getAlbumTracks(
+    albumId: number,
+    params?: PaginationParams
+  ): Promise<PaginationResponse<Track>> {
+    const response = await apiClient.get<PaginationResponse<Track>>(`/albums/${albumId}/tracks`, {
+      params,
+    });
+    return response.data;
+  },
+
+  // Streaming
+  getStreamUrl(trackId: number): string {
+    return `${apiClient.defaults.baseURL}/stream/tracks/${trackId}`;
+  },
+
+  // Album artwork
+  getAlbumArtworkUrl(albumId: number, size: 'small' | 'medium' | 'large' = 'medium'): string {
+    return `${apiClient.defaults.baseURL}/albums/${albumId}/artwork?size=${size}`;
+  },
+
+  // Library scanning
+  async scanLibrary(): Promise<{ message: string; task_id: string }> {
+    const response = await apiClient.post<{ message: string; task_id: string }>('/library/scan');
+    return response.data;
+  },
+
+  async getScanStatus(
+    taskId: string
+  ): Promise<{ status: string; progress?: number; message?: string }> {
+    const response = await apiClient.get<{ status: string; progress?: number; message?: string }>(
+      `/library/scan/${taskId}`
+    );
+    return response.data;
+  },
+};

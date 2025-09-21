@@ -13,29 +13,49 @@ sys.path.insert(0, str(backend_dir))
 
 import subprocess
 from app.core.security import hash_password
-from app.db.models import User, UserRole
+from app.db.models.user import User, UserRole
 from app.db.session import SessionLocal
 
 def run_migrations():
     """Run database migrations."""
     print("🗄️  Setting up database schema...")
     try:
-        # Run alembic upgrade
-        result = subprocess.run(
-            ["alembic", "upgrade", "head"],
-            cwd=backend_dir,
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        print("✅ Database schema created successfully")
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Migration failed: {e}")
-        print(f"Error output: {e.stderr}")
+        # First try to create tables directly if migration fails
+        try:
+            # Run alembic upgrade
+            result = subprocess.run(
+                ["alembic", "upgrade", "head"],
+                cwd=backend_dir,
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            print("✅ Database schema created successfully via Alembic")
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+            print(f"⚠️  Alembic migration failed: {e}")
+            print("🔧 Attempting to create tables directly...")
+            return create_tables_directly()
+
+    except Exception as e:
+        print(f"❌ Database setup failed: {e}")
         return False
-    except FileNotFoundError:
-        print("❌ Alembic not found. Please install requirements.txt")
+
+def create_tables_directly():
+    """Create database tables directly using SQLAlchemy."""
+    try:
+        from app.db.base import Base
+        from app.db.session import engine
+        # Import all models to register them with Base
+        from app.db.models import *  # noqa: F403, F401
+
+        # Create all tables
+        Base.metadata.create_all(bind=engine)
+        print("✅ Database tables created directly")
+        return True
+
+    except Exception as e:
+        print(f"❌ Direct table creation failed: {e}")
         return False
 
 def create_admin_user():
@@ -79,6 +99,11 @@ def check_environment():
     """Check if environment is properly configured."""
     print("🔍 Checking environment...")
 
+    # Override database URL to use absolute path from backend directory
+    import os
+    os.environ['DATABASE_URL'] = f"sqlite:///{backend_dir}/music_manager.db"
+    print(f"   Database URL: {os.environ['DATABASE_URL']}")
+
     # Check if .env exists
     env_file = backend_dir / ".env"
     if not env_file.exists():
@@ -92,6 +117,7 @@ def check_environment():
 
     # Check music library path
     from app.core.config import settings
+
     if not settings.music_library_path.exists():
         print(f"⚠️  Music library path not found: {settings.music_library_path}")
         print("   Make sure /mnt/nas-music is mounted")

@@ -14,6 +14,10 @@ from typing import List, Set
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
+# Set database URL to use absolute path
+import os
+os.environ['DATABASE_URL'] = f"sqlite:///{backend_dir}/music_manager.db"
+
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.services import FileScannerService
@@ -32,18 +36,23 @@ logger = logging.getLogger(__name__)
 SUPPORTED_EXTENSIONS = {".mp3", ".flac", ".aac", ".ogg", ".m4a", ".wav"}
 
 def count_audio_files(library_path: Path) -> int:
-    """Quick count of audio files for progress tracking."""
+    """Quick count of audio files using find command."""
     logger.info("Counting audio files...")
-    count = 0
+    print("📊 Counting audio files... (this may take a moment)")
+
     try:
-        for ext in SUPPORTED_EXTENSIONS:
-            # Use glob for faster counting
-            count += len(list(library_path.rglob(f"*{ext}")))
+        import subprocess
+        # Use find command which is much faster than Python glob
+        cmd = ["find", str(library_path), "-type", "f", "-name", "*.mp3", "-o", "-name", "*.flac", "-o", "-name", "*.aac", "-o", "-name", "*.ogg", "-o", "-name", "*.m4a", "-o", "-name", "*.wav"]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        count = len(result.stdout.strip().split('\n')) if result.stdout.strip() else 0
     except Exception as e:
         logger.warning(f"Error counting files: {e}")
+        print(f"⚠️  Could not count files quickly, proceeding with scan...")
         return 0
 
     logger.info(f"Found approximately {count} audio files")
+    print(f"📊 Found {count:,} audio files")
     return count
 
 def scan_library_optimized():
