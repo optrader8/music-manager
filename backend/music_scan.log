@@ -103,3 +103,10 @@ sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) database is locked
 2025-09-21 09:36:53,826 - INFO - 🎵 Starting music library scan...
 2025-09-21 12:57:30,522 - INFO - Scan completed successfully in 12036.7s
 2025-09-21 12:57:30,523 - INFO - Created: 7228, Updated: 0
+2025-09-21 13:52:14,985 - INFO - Mutagen version: 1.47.0
+2025-09-21 13:52:14,985 - INFO - 📁 Scanning library: /mnt/nas-music
+2025-09-21 13:52:15,006 - INFO - Counting audio files...
+2025-09-21 13:55:28,149 - INFO - Found approximately 58620 audio files
+2025-09-21 13:55:28,151 - INFO - 🎵 Starting music library scan...
+2025-09-22 10:31:54,575 - INFO - Scan completed successfully in 74186.4s
+2025-09-22 10:31:54,576 - INFO - Created: 51422, Updated: 0
