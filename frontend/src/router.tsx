@@ -10,11 +10,11 @@ export const router = createRouter({
   routeTree,
   context: {
     auth: {
-      isAuthenticated: false,
-      user: null,
+      isAuthenticated: true, // Dev mode
+      user: { id: 'dev-user', email: 'dev@test.com', name: 'Dev User' },
       login: async () => {},
       logout: () => {},
-      isLoading: true,
+      isLoading: false,
     },
   } as RouterContext,
 });

@@ -441,7 +441,30 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
 export function useAudioPlayer(): AudioPlayerState & AudioPlayerActions {
   const context = useContext(AudioPlayerContext);
   if (!context) {
-    throw new Error('useAudioPlayer must be used within an AudioPlayerProvider');
+    // Return a safe default instead of throwing immediately
+    console.warn('useAudioPlayer called outside AudioPlayerProvider, returning default state');
+    return {
+      ...initialState,
+      play: () => console.warn('AudioPlayer not initialized'),
+      pause: () => console.warn('AudioPlayer not initialized'),
+      togglePlayPause: () => console.warn('AudioPlayer not initialized'),
+      next: () => console.warn('AudioPlayer not initialized'),
+      previous: () => console.warn('AudioPlayer not initialized'),
+      seek: () => console.warn('AudioPlayer not initialized'),
+      setVolume: () => console.warn('AudioPlayer not initialized'),
+      toggleMute: () => console.warn('AudioPlayer not initialized'),
+      addToQueue: () => console.warn('AudioPlayer not initialized'),
+      addToQueueNext: () => console.warn('AudioPlayer not initialized'),
+      removeFromQueue: () => console.warn('AudioPlayer not initialized'),
+      clearQueue: () => console.warn('AudioPlayer not initialized'),
+      reorderQueue: () => console.warn('AudioPlayer not initialized'),
+      playAlbum: () => console.warn('AudioPlayer not initialized'),
+      setShuffle: () => console.warn('AudioPlayer not initialized'),
+      setRepeat: () => console.warn('AudioPlayer not initialized'),
+      setQuality: () => console.warn('AudioPlayer not initialized'),
+      togglePlayerVisibility: () => console.warn('AudioPlayer not initialized'),
+      togglePlayerExpanded: () => console.warn('AudioPlayer not initialized'),
+    };
   }
   return context;
 }

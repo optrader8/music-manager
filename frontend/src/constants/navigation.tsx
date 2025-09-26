@@ -18,7 +18,7 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     id: 'tracks',
-    label: 'Music Library',
+    label: 'Music',
     icon: <Music size={24} />,
     href: '/tracks',
     active: false,

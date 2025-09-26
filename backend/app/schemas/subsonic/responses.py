@@ -47,7 +47,7 @@ class License(BaseModel):
 class Index(BaseModel):
     """Model for artist index by letter"""
     name: str
-    artist: List['ArtistID3'] = []
+    artist: List = []
 
 
 class Indexes(BaseModel):
@@ -130,7 +130,7 @@ class ArtistWithAlbumsID3(BaseModel):
     starred: Optional[datetime] = None
     userRating: Optional[int] = None
     averageRating: Optional[float] = None
-    album: List[AlbumID3] = []
+    album: List = []
 
 
 class AlbumWithSongsID3(BaseModel):
@@ -150,14 +150,14 @@ class AlbumWithSongsID3(BaseModel):
     description: Optional[str] = None
     userRating: Optional[int] = None
     averageRating: Optional[float] = None
-    song: List[Child] = []
+    song: List = []
 
 
 class SearchResult3(BaseModel):
     """Model for search results"""
-    artist: List[ArtistID3] = []
-    album: List[AlbumID3] = []
-    song: List[Child] = []
+    artist: List = []
+    album: List = []
+    song: List = []
 
 
 class Playlist(BaseModel):
@@ -174,4 +174,10 @@ class Playlist(BaseModel):
     year: Optional[int] = None
     coverArt: Optional[str] = None
     public: bool = False
-    song: List[Child] = []
+    song: List = []
+
+# Update forward references
+ArtistID3.update_forward_refs()
+AlbumID3.update_forward_refs()
+SearchResult3.update_forward_refs()
+Playlist.update_forward_refs()

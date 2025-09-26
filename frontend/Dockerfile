@@ -9,7 +9,7 @@ RUN npm ci --production=false
 # Copy source code
 COPY . .
 
-EXPOSE 3000
+EXPOSE 32001
 
 # Use rsbuild dev with proper host binding
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["npm", "run", "dev"]

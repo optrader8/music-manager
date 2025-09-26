@@ -52,7 +52,17 @@ async def list_albums(
 
     meta = build_pagination_metadata(total=total, params=pagination)
     response.headers["X-Total-Count"] = str(total)
-    response.headers["Cache-Control"] = "public, max-age=30"
+
+    # Conditional caching based on search/filters
+    if filters.search or filters.artist_id or filters.genre or filters.year_from or filters.year_to:
+        # Don't cache filtered results as aggressively
+        response.headers["Cache-Control"] = "public, max-age=60, s-maxage=300"
+    else:
+        # Cache unfiltered results longer
+        response.headers["Cache-Control"] = "public, max-age=300, s-maxage=600"
+
+    response.headers["Vary"] = "Accept-Encoding"
+
     return AlbumListResponse(
         items=items,
         pagination=PaginationMeta(

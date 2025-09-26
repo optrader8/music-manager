@@ -1,47 +1,52 @@
 import React from 'react';
-import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { RouterProvider } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { router } from './router';
 import { AudioPlayerProvider } from './context/AudioPlayerContext';
 import { AuthProvider } from './context/AuthContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
+      gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+      retry: (failureCount, error) => {
+        // Don't retry on 4xx errors
+        if (error && typeof error === 'object' && 'status' in error) {
+          const status = (error as any).status;
+          if (status >= 400 && status < 500) {
+            return false;
+          }
+        }
+        // Retry up to 3 times for other errors
+        return failureCount < 3;
+      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
     },
-  },
-});
-
-// Create router with auth context
-const authContext = {
-  isAuthenticated: true, // Dev mode
-  user: { id: 'dev-user', email: 'dev@test.com', name: 'Dev User' },
-  login: async () => {},
-  logout: () => {},
-  isLoading: false,
-};
-
-const appRouter = createRouter({
-  ...router.options,
-  context: {
-    auth: authContext,
+    mutations: {
+      retry: 1,
+      retryDelay: 1000,
+    },
   },
 });
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AudioPlayerProvider>
-          <RouterProvider router={appRouter} />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </AudioPlayerProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AudioPlayerProvider>
+            <RouterProvider router={router} />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </AudioPlayerProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }

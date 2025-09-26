@@ -23,7 +23,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "32001:3000"
+      - "32001:32001"
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public

@@ -19,7 +19,7 @@ export default defineConfig({
     hmr: true,
   },
   server: {
-    port: 3000,
+    port: 32001,
     host: '0.0.0.0',
   },
   resolve: {

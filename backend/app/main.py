@@ -4,7 +4,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import router as api_router
+# from app.api.routes.subsonic import router as subsonic_router
 from app.core.config import settings
+# from app.core.subsonic_exception_handler import add_exception_handlers
 
 ALLOWED_ORIGINS = [
   "http://localhost:32001",
@@ -25,6 +27,12 @@ def create_application() -> FastAPI:
     )
 
     app.include_router(api_router, prefix="/api/v1")
+    # Include Subsonic API router
+    # app.include_router(subsonic_router)
+
+    # Add Subsonic exception handlers
+    # add_exception_handlers(app)
+    
     return app
 
 
