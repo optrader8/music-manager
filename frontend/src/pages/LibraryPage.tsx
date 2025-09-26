@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { AlbumGrid } from '../components/AlbumGrid';
-import { AlbumDetailModal } from '../components/AlbumDetailModal';
-import { useAlbum } from '../hooks/useMusicLibrary';
-import { useAudioPlayer } from '../context/AudioPlayerContext';
-import type { Album } from '../types/api';
+import React, { useState } from "react";
+import { AlbumGrid } from "../components/AlbumGrid";
+import { AlbumDetailModal } from "../components/AlbumDetailModal";
+import { useAlbum } from "../hooks/useMusicLibrary";
+import { useAudioPlayer } from "../context/AudioPlayerContext";
+import type { Album } from "../types/api";
 
 export function LibraryPage() {
   const [selectedAlbumId, setSelectedAlbumId] = useState<number | null>(null);
@@ -39,7 +39,7 @@ export function LibraryPage() {
 
   const handlePlayTrack = (trackId: number) => {
     // Individual track play would be implemented here
-    console.log('Play track:', trackId);
+    console.log("Play track:", trackId);
   };
 
   return (

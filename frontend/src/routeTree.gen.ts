@@ -8,74 +8,74 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root';
-import { Route as IndexRouteImport } from './routes/index';
-import { Route as SettingsIndexRouteImport } from './routes/settings';
-import { Route as StatisticsIndexRouteImport } from './routes/statistics';
-import { Route as TracksIndexRouteImport } from './routes/tracks';
-import { Route as PlaylistsIndexRouteImport } from './routes/playlists';
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as SettingsIndexRouteImport } from "./routes/settings";
+import { Route as StatisticsIndexRouteImport } from "./routes/statistics";
+import { Route as TracksIndexRouteImport } from "./routes/tracks";
+import { Route as PlaylistsIndexRouteImport } from "./routes/playlists";
 
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
 
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
-  id: '/settings/',
-  path: '/settings/',
+  id: "/settings/",
+  path: "/settings/",
   getParentRoute: () => rootRouteImport,
 } as any);
 
 const StatisticsIndexRoute = StatisticsIndexRouteImport.update({
-  id: '/statistics/',
-  path: '/statistics/',
+  id: "/statistics/",
+  path: "/statistics/",
   getParentRoute: () => rootRouteImport,
 } as any);
 
 const TracksIndexRoute = TracksIndexRouteImport.update({
-  id: '/tracks/',
-  path: '/tracks/',
+  id: "/tracks/",
+  path: "/tracks/",
   getParentRoute: () => rootRouteImport,
 } as any);
 
 const PlaylistsIndexRoute = PlaylistsIndexRouteImport.update({
-  id: '/playlists/',
-  path: '/playlists/',
+  id: "/playlists/",
+  path: "/playlists/",
   getParentRoute: () => rootRouteImport,
 } as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute;
-  '/settings': typeof SettingsIndexRoute;
-  '/statistics': typeof StatisticsIndexRoute;
-  '/tracks': typeof TracksIndexRoute;
-  '/playlists': typeof PlaylistsIndexRoute;
+  "/": typeof IndexRoute;
+  "/settings": typeof SettingsIndexRoute;
+  "/statistics": typeof StatisticsIndexRoute;
+  "/tracks": typeof TracksIndexRoute;
+  "/playlists": typeof PlaylistsIndexRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute;
-  '/settings': typeof SettingsIndexRoute;
-  '/statistics': typeof StatisticsIndexRoute;
-  '/tracks': typeof TracksIndexRoute;
-  '/playlists': typeof PlaylistsIndexRoute;
+  "/": typeof IndexRoute;
+  "/settings": typeof SettingsIndexRoute;
+  "/statistics": typeof StatisticsIndexRoute;
+  "/tracks": typeof TracksIndexRoute;
+  "/playlists": typeof PlaylistsIndexRoute;
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
-  '/': typeof IndexRoute;
-  '/settings/': typeof SettingsIndexRoute;
-  '/statistics/': typeof StatisticsIndexRoute;
-  '/tracks/': typeof TracksIndexRoute;
-  '/playlists/': typeof PlaylistsIndexRoute;
+  "/": typeof IndexRoute;
+  "/settings/": typeof SettingsIndexRoute;
+  "/statistics/": typeof StatisticsIndexRoute;
+  "/tracks/": typeof TracksIndexRoute;
+  "/playlists/": typeof PlaylistsIndexRoute;
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '/settings' | '/statistics' | '/tracks' | '/playlists';
+  fullPaths: "/" | "/settings" | "/statistics" | "/tracks" | "/playlists";
   fileRoutesByTo: FileRoutesByTo;
-  to: '/' | '/settings' | '/statistics' | '/tracks' | '/playlists';
-  id: '__root__' | '/' | '/settings/' | '/statistics/' | '/tracks/' | '/playlists/';
+  to: "/" | "/settings" | "/statistics" | "/tracks" | "/playlists";
+  id: "__root__" | "/" | "/settings/" | "/statistics/" | "/tracks/" | "/playlists/";
   fileRoutesById: FileRoutesById;
 }
 
@@ -87,40 +87,40 @@ export interface RootRouteChildren {
   PlaylistsIndexRoute: typeof PlaylistsIndexRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/': {
-      id: '/';
-      path: '/';
-      fullPath: '/';
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    '/settings/': {
-      id: '/settings/';
-      path: '/settings';
-      fullPath: '/settings';
+    "/settings/": {
+      id: "/settings/";
+      path: "/settings";
+      fullPath: "/settings";
       preLoaderRoute: typeof SettingsIndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    '/statistics/': {
-      id: '/statistics/';
-      path: '/statistics';
-      fullPath: '/statistics';
+    "/statistics/": {
+      id: "/statistics/";
+      path: "/statistics";
+      fullPath: "/statistics";
       preLoaderRoute: typeof StatisticsIndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    '/tracks/': {
-      id: '/tracks/';
-      path: '/tracks';
-      fullPath: '/tracks';
+    "/tracks/": {
+      id: "/tracks/";
+      path: "/tracks";
+      fullPath: "/tracks";
       preLoaderRoute: typeof TracksIndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    '/playlists/': {
-      id: '/playlists/';
-      path: '/playlists';
-      fullPath: '/playlists';
+    "/playlists/": {
+      id: "/playlists/";
+      path: "/playlists";
+      fullPath: "/playlists";
       preLoaderRoute: typeof PlaylistsIndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };

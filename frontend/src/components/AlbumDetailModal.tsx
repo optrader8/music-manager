@@ -1,13 +1,13 @@
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { ScrollArea } from './ui/scroll-area';
-import { Play, Pause, Clock, Calendar, Disc, Music, X } from 'lucide-react';
-import { useAlbumTracks } from '../hooks/useMusicLibrary';
-import { useAudioPlayer } from '../context/AudioPlayerContext';
-import { musicService } from '../services/musicService';
-import type { AlbumWithTracks } from '../types/api';
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { ScrollArea } from "./ui/scroll-area";
+import { Play, Pause, Clock, Calendar, Disc, Music, X } from "lucide-react";
+import { useAlbumTracks } from "../hooks/useMusicLibrary";
+import { useAudioPlayer } from "../context/AudioPlayerContext";
+import { musicService } from "../services/musicService";
+import type { AlbumWithTracks } from "../types/api";
 
 interface AlbumDetailModalProps {
   album: AlbumWithTracks | null;
@@ -35,18 +35,18 @@ const TrackRow: React.FC<TrackRowProps> = ({
   onPause,
 }) => {
   const formatDuration = (seconds: number | null) => {
-    if (!seconds) return '--:--';
+    if (!seconds) return "--:--";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
     <div
       className={`flex items-center gap-4 p-3 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
         isCurrentTrack
-          ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
-          : ''
+          ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+          : ""
       }`}
     >
       {/* Track Number */}
@@ -68,7 +68,7 @@ const TrackRow: React.FC<TrackRowProps> = ({
       <div className="flex-1 min-w-0">
         <h4 className="font-medium text-gray-900 dark:text-gray-100 truncate">{track.title}</h4>
         <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-          {track.artist?.name || 'Unknown Artist'}
+          {track.artist?.name || "Unknown Artist"}
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
         artist_name: track.artist?.name,
       }));
       // This would need to be implemented in the audio player context
-      console.log('Playing album tracks:', playbackTracks);
+      console.log("Playing album tracks:", playbackTracks);
     }
   };
 
@@ -137,9 +137,9 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
     const seconds = Math.floor(totalSeconds % 60);
 
     if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
   const totalDuration = tracks.reduce((sum, track) => sum + (track.duration_seconds || 0), 0);
@@ -163,12 +163,12 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
               {/* Album Cover */}
               <div className="flex-shrink-0">
                 <img
-                  src={musicService.getAlbumArtworkUrl(displayAlbum.id, 'large')}
+                  src={musicService.getAlbumArtworkUrl(displayAlbum.id, "large")}
                   alt={`${displayAlbum.title} cover`}
                   className="w-48 h-48 rounded-lg shadow-lg object-cover"
                   onError={(e) => {
                     const target = e.currentTarget;
-                    target.src = '/placeholder-album.png'; // Fallback image
+                    target.src = "/placeholder-album.png"; // Fallback image
                   }}
                 />
               </div>
@@ -180,7 +180,7 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
                     {displayAlbum.title}
                   </DialogTitle>
                   <p className="text-xl text-gray-200 mb-2">
-                    {displayAlbum.artist?.name || 'Unknown Artist'}
+                    {displayAlbum.artist?.name || "Unknown Artist"}
                   </p>
                 </DialogHeader>
 

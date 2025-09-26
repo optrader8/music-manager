@@ -1,84 +1,84 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Search, Grid, List, SortAsc } from 'lucide-react';
-import * as Select from '@radix-ui/react-select';
-import * as Tabs from '@radix-ui/react-tabs';
-import { MusicCard } from '@/components/MusicCard/MusicCard';
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Search, Grid, List, SortAsc } from "lucide-react";
+import * as Select from "@radix-ui/react-select";
+import * as Tabs from "@radix-ui/react-tabs";
+import { MusicCard } from "@/components/MusicCard/MusicCard";
 
 // Mock API call - replace with actual API
 const fetchMusicLibrary = async () => {
   return {
     albums: [
       {
-        id: '1',
-        title: 'Abbey Road',
-        artist: 'The Beatles',
+        id: "1",
+        title: "Abbey Road",
+        artist: "The Beatles",
         coverArt: undefined,
         trackCount: 17,
         year: 1969,
       },
       {
-        id: '2',
-        title: 'The Dark Side of the Moon',
-        artist: 'Pink Floyd',
+        id: "2",
+        title: "The Dark Side of the Moon",
+        artist: "Pink Floyd",
         coverArt: undefined,
         trackCount: 10,
         year: 1973,
       },
       {
-        id: '3',
-        title: 'Thriller',
-        artist: 'Michael Jackson',
+        id: "3",
+        title: "Thriller",
+        artist: "Michael Jackson",
         coverArt: undefined,
         trackCount: 9,
         year: 1982,
       },
       {
-        id: '4',
-        title: 'Led Zeppelin IV',
-        artist: 'Led Zeppelin',
+        id: "4",
+        title: "Led Zeppelin IV",
+        artist: "Led Zeppelin",
         coverArt: undefined,
         trackCount: 8,
         year: 1971,
       },
       {
-        id: '5',
-        title: 'Rumours',
-        artist: 'Fleetwood Mac',
+        id: "5",
+        title: "Rumours",
+        artist: "Fleetwood Mac",
         coverArt: undefined,
         trackCount: 11,
         year: 1977,
       },
       {
-        id: '6',
-        title: 'Hotel California',
-        artist: 'Eagles',
+        id: "6",
+        title: "Hotel California",
+        artist: "Eagles",
         coverArt: undefined,
         trackCount: 9,
         year: 1976,
       },
     ],
     artists: [
-      { id: '1', name: 'The Beatles', albumCount: 13 },
-      { id: '2', name: 'Pink Floyd', albumCount: 15 },
-      { id: '3', name: 'Michael Jackson', albumCount: 10 },
+      { id: "1", name: "The Beatles", albumCount: 13 },
+      { id: "2", name: "Pink Floyd", albumCount: 15 },
+      { id: "3", name: "Michael Jackson", albumCount: 10 },
     ],
     folders: [
-      { id: '1', name: 'Rock Classics', path: '/music/rock', trackCount: 245 },
-      { id: '2', name: 'Jazz Collection', path: '/music/jazz', trackCount: 189 },
-      { id: '3', name: 'Electronic', path: '/music/electronic', trackCount: 156 },
-      { id: '4', name: 'Classical', path: '/music/classical', trackCount: 98 },
+      { id: "1", name: "Rock Classics", path: "/music/rock", trackCount: 245 },
+      { id: "2", name: "Jazz Collection", path: "/music/jazz", trackCount: 189 },
+      { id: "3", name: "Electronic", path: "/music/electronic", trackCount: 156 },
+      { id: "4", name: "Classical", path: "/music/classical", trackCount: 98 },
     ],
   };
 };
 
 export const MusicPage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState('name');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortBy, setSortBy] = useState("name");
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['music-library'],
+    queryKey: ["music-library"],
     queryFn: fetchMusicLibrary,
     staleTime: 300_000, // 5 minutes
   });
@@ -88,11 +88,11 @@ export const MusicPage: React.FC = () => {
   };
 
   const handleAddToPlaylist = (id: string) => {
-    console.log('Add to playlist:', id);
+    console.log("Add to playlist:", id);
   };
 
   const handleShowDetails = (id: string) => {
-    console.log('Show details:', id);
+    console.log("Show details:", id);
   };
 
   if (isLoading) {
@@ -187,14 +187,14 @@ export const MusicPage: React.FC = () => {
           {/* View Mode */}
           <div className="flex border border-gray-300 rounded-lg overflow-hidden">
             <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              onClick={() => setViewMode("grid")}
+              className={`p-2 ${viewMode === "grid" ? "bg-blue-500 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
             >
               <Grid size={16} />
             </button>
             <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              onClick={() => setViewMode("list")}
+              className={`p-2 ${viewMode === "list" ? "bg-blue-500 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
             >
               <List size={16} />
             </button>
@@ -236,8 +236,8 @@ export const MusicPage: React.FC = () => {
                 subtitle={folder.path}
                 type="folder"
                 trackCount={folder.trackCount}
-                onClick={() => console.log('Open folder:', folder.id)}
-                onPlay={() => handlePlayItem(folder.id, 'folder')}
+                onClick={() => console.log("Open folder:", folder.id)}
+                onPlay={() => handlePlayItem(folder.id, "folder")}
                 onAddToPlaylist={() => handleAddToPlaylist(folder.id)}
                 onShowDetails={() => handleShowDetails(folder.id)}
               />
@@ -257,8 +257,8 @@ export const MusicPage: React.FC = () => {
                 coverArt={album.coverArt}
                 type="album"
                 trackCount={album.trackCount}
-                onClick={() => console.log('Open album:', album.id)}
-                onPlay={() => handlePlayItem(album.id, 'album')}
+                onClick={() => console.log("Open album:", album.id)}
+                onPlay={() => handlePlayItem(album.id, "album")}
                 onAddToPlaylist={() => handleAddToPlaylist(album.id)}
                 onShowDetails={() => handleShowDetails(album.id)}
               />
@@ -276,8 +276,8 @@ export const MusicPage: React.FC = () => {
                 title={artist.name}
                 subtitle={`${artist.albumCount} albums`}
                 type="artist"
-                onClick={() => console.log('Open artist:', artist.id)}
-                onPlay={() => handlePlayItem(artist.id, 'artist')}
+                onClick={() => console.log("Open artist:", artist.id)}
+                onPlay={() => handlePlayItem(artist.id, "artist")}
                 onAddToPlaylist={() => handleAddToPlaylist(artist.id)}
                 onShowDetails={() => handleShowDetails(artist.id)}
               />

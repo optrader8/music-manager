@@ -1,22 +1,22 @@
-import { apiClient } from './apiClient';
+import { apiClient } from "./apiClient";
 
-import type { ApiError, AuthCredentials, AuthSession, AuthUser } from '../types';
+import type { ApiError, AuthCredentials, AuthSession, AuthUser } from "../types";
 
 const demoUser: AuthUser = {
-  id: 'demo-user',
-  email: 'demo@music-manager.local',
-  displayName: 'Demo Admin',
-  roles: ['admin', 'editor'],
-  avatarUrl: 'https://www.gravatar.com/avatar/?d=identicon',
+  id: "demo-user",
+  email: "demo@music-manager.local",
+  displayName: "Demo Admin",
+  roles: ["admin", "editor"],
+  avatarUrl: "https://www.gravatar.com/avatar/?d=identicon",
 };
 
 async function postSignIn(credentials: AuthCredentials): Promise<AuthSession> {
-  const response = await apiClient.post<AuthSession>('/auth/login', credentials);
+  const response = await apiClient.post<AuthSession>("/auth/login", credentials);
   return response.data;
 }
 
 async function getCurrentUser(): Promise<AuthUser> {
-  const response = await apiClient.get<AuthUser>('/auth/me');
+  const response = await apiClient.get<AuthUser>("/auth/me");
   return response.data;
 }
 
@@ -43,7 +43,7 @@ async function signIn(credentials: AuthCredentials): Promise<AuthSession> {
     const apiError = error as ApiError;
     if (shouldUseMock(apiError)) {
       return {
-        token: 'mock-demo-token',
+        token: "mock-demo-token",
         user: demoUser,
       };
     }
@@ -53,7 +53,7 @@ async function signIn(credentials: AuthCredentials): Promise<AuthSession> {
 
 async function signOut(): Promise<void> {
   try {
-    await apiClient.post('/auth/logout');
+    await apiClient.post("/auth/logout");
   } catch (error) {
     const apiError = error as ApiError;
     if (!shouldUseMock(apiError)) {

@@ -1,11 +1,11 @@
 export interface ApiHealth {
-  status: 'ok' | 'degraded' | 'down';
+  status: "ok" | "degraded" | "down";
   message?: string;
   timestamp?: string;
 }
 
 export interface ApiError {
-  name: 'ApiError';
+  name: "ApiError";
   message: string;
   status?: number;
   cause?: unknown;
@@ -18,7 +18,7 @@ export interface PaginationParams {
   page: number;
   limit: number;
   sort_by?: string;
-  sort_order?: 'asc' | 'desc';
+  sort_order?: "asc" | "desc";
 }
 
 export interface PaginationResponse<T> {

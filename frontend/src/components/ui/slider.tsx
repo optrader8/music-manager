@@ -1,5 +1,5 @@
-import React from 'react';
-import { cn } from '../../lib/utils';
+import React from "react";
+import { cn } from "../../lib/utils";
 
 interface SliderProps {
   value?: number[];
@@ -42,8 +42,8 @@ export const Slider: React.FC<SliderProps> = ({
       onMouseDown={onPointerDown}
       onMouseUp={handleMouseUp}
       className={cn(
-        'w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider',
-        className
+        "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider",
+        className,
       )}
     />
   );

@@ -1,9 +1,9 @@
-import React from 'react';
-import { Card, CardContent, CardFooter } from './ui/card';
-import { cn } from '../lib/utils';
-import { musicService } from '../services/musicService';
-import { DEFAULT_ALBUM_PLACEHOLDER } from '../constants';
-import type { Album } from '../types/api';
+import React from "react";
+import { Card, CardContent, CardFooter } from "./ui/card";
+import { cn } from "../lib/utils";
+import { musicService } from "../services/musicService";
+import { DEFAULT_ALBUM_PLACEHOLDER } from "../constants";
+import type { Album } from "../types/api";
 
 interface AlbumCardProps {
   album: Album;
@@ -12,19 +12,19 @@ interface AlbumCardProps {
 }
 
 export function AlbumCard({ album, onClick, className }: AlbumCardProps) {
-  const artworkUrl = musicService.getAlbumArtworkUrl(album.id, 'medium');
+  const artworkUrl = musicService.getAlbumArtworkUrl(album.id, "medium");
 
   return (
     <Card
       className={cn(
-        'cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-white dark:bg-gray-800',
-        className
+        "cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-white dark:bg-gray-800",
+        className,
       )}
       onClick={() => onClick?.(album)}
       role="button"
       tabIndex={0}
       onKeyPress={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === "Enter" || e.key === " ") {
           onClick?.(album);
         }
       }}
@@ -57,10 +57,10 @@ export function AlbumCard({ album, onClick, className }: AlbumCardProps) {
           {album.title}
         </h3>
         <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
-          {album.artist?.name || album.album_artist || 'Unknown Artist'}
+          {album.artist?.name || album.album_artist || "Unknown Artist"}
         </p>
         <div className="flex items-center justify-between w-full text-xs text-gray-500 dark:text-gray-500">
-          <span>{album.year || 'Unknown'}</span>
+          <span>{album.year || "Unknown"}</span>
           {album.total_tracks && <span>{album.total_tracks} tracks</span>}
         </div>
         {album.genre && (

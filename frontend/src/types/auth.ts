@@ -1,4 +1,4 @@
-import type { ApiError } from './api';
+import type { ApiError } from "./api";
 
 export interface AuthUser {
   id: string;

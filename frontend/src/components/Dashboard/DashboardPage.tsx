@@ -1,5 +1,5 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Music,
   Users,
@@ -22,14 +22,14 @@ import {
   Zap,
   Heart,
   AlertCircle,
-} from 'lucide-react';
-import * as Progress from '@radix-ui/react-progress';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import * as Separator from '@radix-ui/react-separator';
+} from "lucide-react";
+import * as Progress from "@radix-ui/react-progress";
+import * as Tooltip from "@radix-ui/react-tooltip";
+import * as Separator from "@radix-ui/react-separator";
 
-import { fetchDashboardData } from '@/services/musicApi';
-import { useAudioPlayer } from '@/context/AudioPlayerContext';
-import type { DashboardData } from '@/types/stats';
+import { fetchDashboardData } from "@/services/musicApi";
+import { useAudioPlayer } from "@/context/AudioPlayerContext";
+import type { DashboardData } from "@/types/stats";
 
 interface StatCardProps {
   title: string;
@@ -44,7 +44,7 @@ interface QuickActionProps {
   label: string;
   icon: React.ReactNode;
   onClick: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: "primary" | "secondary";
 }
 
 interface MusicPlayerWidgetProps {
@@ -68,7 +68,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, color
       <Tooltip.Trigger asChild>
         <div
           className={`group relative overflow-hidden rounded-xl border transition-all duration-200 ${
-            onClick ? 'cursor-pointer hover:scale-[1.02] hover:shadow-lg' : ''
+            onClick ? "cursor-pointer hover:scale-[1.02] hover:shadow-lg" : ""
           } ${color}`}
           onClick={onClick}
         >
@@ -106,7 +106,7 @@ const QuickAction: React.FC<QuickActionProps> = ({
   label,
   icon,
   onClick,
-  variant = 'secondary',
+  variant = "secondary",
 }) => (
   <Tooltip.Provider>
     <Tooltip.Root>
@@ -114,14 +114,14 @@ const QuickAction: React.FC<QuickActionProps> = ({
         <button
           onClick={onClick}
           className={`group flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${
-            variant === 'primary'
-              ? 'bg-gradient-to-r from-blue-500 to-purple-600 border-transparent text-white hover:from-blue-600 hover:to-purple-700'
-              : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+            variant === "primary"
+              ? "bg-gradient-to-r from-blue-500 to-purple-600 border-transparent text-white hover:from-blue-600 hover:to-purple-700"
+              : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
           }`}
         >
           <div
             className={`transition-transform group-hover:scale-110 ${
-              variant === 'primary' ? 'text-white' : 'text-current'
+              variant === "primary" ? "text-white" : "text-current"
             }`}
           >
             {icon}
@@ -163,7 +163,7 @@ const MusicPlayerWidget: React.FC<MusicPlayerWidgetProps> = ({
           <Progress.Root className="relative overflow-hidden bg-white/20 rounded-full w-20 h-1">
             <Progress.Indicator
               className="bg-white h-full transition-transform duration-300"
-              style={{ transform: 'translateX(-40%)' }}
+              style={{ transform: "translateX(-40%)" }}
             />
           </Progress.Root>
         </div>
@@ -183,7 +183,7 @@ const MusicPlayerWidget: React.FC<MusicPlayerWidgetProps> = ({
                 <Disc3
                   size={24}
                   className="text-white animate-spin"
-                  style={{ animationDuration: '3s' }}
+                  style={{ animationDuration: "3s" }}
                 />
               </div>
             )}
@@ -272,7 +272,7 @@ const MusicPlayerWidget: React.FC<MusicPlayerWidgetProps> = ({
 
 export const DashboardPage: React.FC = () => {
   const { data, isLoading, error } = useQuery<DashboardData>({
-    queryKey: ['stats', 'dashboard'],
+    queryKey: ["stats", "dashboard"],
     queryFn: fetchDashboardData,
     staleTime: 30_000,
   });
@@ -284,7 +284,7 @@ export const DashboardPage: React.FC = () => {
   const displayTrack = currentTrack
     ? {
         title: currentTrack.title,
-        artist: currentTrack.artist?.name || 'Unknown Artist',
+        artist: currentTrack.artist?.name || "Unknown Artist",
         album: currentTrack.album?.title,
         duration: currentTrack.duration_seconds || 0,
         coverArt: currentTrack.album?.cover_art_url,
@@ -352,23 +352,23 @@ export const DashboardPage: React.FC = () => {
           <QuickAction
             label="Scan Library"
             icon={<RefreshCw size={18} />}
-            onClick={() => handleQuickAction('scan')}
+            onClick={() => handleQuickAction("scan")}
             variant="primary"
           />
           <QuickAction
             label="Search Music"
             icon={<Search size={18} />}
-            onClick={() => handleQuickAction('search')}
+            onClick={() => handleQuickAction("search")}
           />
           <QuickAction
             label="New Playlist"
             icon={<Plus size={18} />}
-            onClick={() => handleQuickAction('playlist')}
+            onClick={() => handleQuickAction("playlist")}
           />
           <QuickAction
             label="Analytics"
             icon={<TrendingUp size={18} />}
-            onClick={() => handleQuickAction('analytics')}
+            onClick={() => handleQuickAction("analytics")}
           />
         </div>
       </div>
@@ -393,14 +393,14 @@ export const DashboardPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <div
               className={`w-2 h-2 rounded-full ${
-                scanStatus === 'completed' ? 'bg-green-500' : 'bg-yellow-500'
+                scanStatus === "completed" ? "bg-green-500" : "bg-yellow-500"
               }`}
             />
             <span
               className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                scanStatus === 'completed'
-                  ? 'bg-green-50 text-green-700 border-green-200'
-                  : 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                scanStatus === "completed"
+                  ? "bg-green-50 text-green-700 border-green-200"
+                  : "bg-yellow-50 text-yellow-700 border-yellow-200"
               }`}
             >
               {scanStatus}
@@ -414,21 +414,21 @@ export const DashboardPage: React.FC = () => {
             value={overview.total_tracks.toLocaleString()}
             icon={<Music size={20} />}
             color="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200"
-            onClick={() => handleQuickAction('tracks')}
+            onClick={() => handleQuickAction("tracks")}
           />
           <StatCard
             title="Artists"
             value={overview.total_artists.toLocaleString()}
             icon={<Users size={20} />}
             color="bg-gradient-to-br from-green-50 to-green-100 border-green-200"
-            onClick={() => handleQuickAction('artists')}
+            onClick={() => handleQuickAction("artists")}
           />
           <StatCard
             title="Albums"
             value={overview.total_albums.toLocaleString()}
             icon={<Album size={20} />}
             color="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200"
-            onClick={() => handleQuickAction('albums')}
+            onClick={() => handleQuickAction("albums")}
           />
           <StatCard
             title="Duration"
@@ -449,7 +449,7 @@ export const DashboardPage: React.FC = () => {
             value={
               overview.average_track_duration
                 ? `${(overview.average_track_duration / 60).toFixed(1)}m`
-                : '—'
+                : "—"
             }
             icon={<Headphones size={20} />}
             color="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200"
@@ -493,7 +493,7 @@ export const DashboardPage: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-gray-900 text-sm truncate">{album.title}</h3>
                       <p className="text-xs text-gray-600 truncate">
-                        {album.artist?.name ?? 'Unknown Artist'}
+                        {album.artist?.name ?? "Unknown Artist"}
                       </p>
                       {album.release_year && (
                         <p className="text-xs text-gray-400">{album.release_year}</p>
@@ -525,7 +525,7 @@ export const DashboardPage: React.FC = () => {
                 <Progress.Root className="relative overflow-hidden bg-gray-200 rounded-full w-full h-2">
                   <Progress.Indicator
                     className="bg-green-400 h-full transition-transform duration-1000"
-                    style={{ transform: 'translateX(-11%)' }}
+                    style={{ transform: "translateX(-11%)" }}
                   />
                 </Progress.Root>
               </div>
@@ -559,7 +559,7 @@ export const DashboardPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">Top Genres</h3>
             </div>
             <div className="space-y-4">
-              {['Rock', 'Pop', 'Jazz', 'Classical', 'Electronic'].map((genre, index) => {
+              {["Rock", "Pop", "Jazz", "Classical", "Electronic"].map((genre, index) => {
                 const percentage = Math.floor(Math.random() * 60) + 20;
                 const trackCount = Math.floor(Math.random() * 500) + 100;
                 return (
@@ -571,12 +571,12 @@ export const DashboardPage: React.FC = () => {
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                           index === 0
-                            ? 'bg-gradient-to-r from-yellow-400 to-orange-500'
+                            ? "bg-gradient-to-r from-yellow-400 to-orange-500"
                             : index === 1
-                              ? 'bg-gradient-to-r from-gray-400 to-gray-500'
+                              ? "bg-gradient-to-r from-gray-400 to-gray-500"
                               : index === 2
-                                ? 'bg-gradient-to-r from-amber-600 to-amber-700'
-                                : 'bg-gradient-to-r from-blue-500 to-purple-500'
+                                ? "bg-gradient-to-r from-amber-600 to-amber-700"
+                                : "bg-gradient-to-r from-blue-500 to-purple-500"
                         }`}
                       >
                         #{index + 1}
@@ -629,12 +629,12 @@ export const DashboardPage: React.FC = () => {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                     index === 0
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500'
+                      ? "bg-gradient-to-r from-yellow-400 to-orange-500"
                       : index === 1
-                        ? 'bg-gradient-to-r from-gray-400 to-gray-500'
+                        ? "bg-gradient-to-r from-gray-400 to-gray-500"
                         : index === 2
-                          ? 'bg-gradient-to-r from-amber-600 to-amber-700'
-                          : 'bg-gradient-to-r from-blue-500 to-purple-500'
+                          ? "bg-gradient-to-r from-amber-600 to-amber-700"
+                          : "bg-gradient-to-r from-blue-500 to-purple-500"
                   }`}
                 >
                   {index + 1}
@@ -645,8 +645,8 @@ export const DashboardPage: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900 text-sm truncate">{track.title}</h3>
                   <p className="text-xs text-gray-600 truncate">
-                    {track.artist?.name ?? 'Unknown Artist'} ·{' '}
-                    {track.album?.title ?? 'Unknown Album'}
+                    {track.artist?.name ?? "Unknown Artist"} ·{" "}
+                    {track.album?.title ?? "Unknown Album"}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">

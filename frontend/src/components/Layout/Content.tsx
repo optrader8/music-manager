@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import * as Label from '@radix-ui/react-label';
-import { Button } from '@/components/ui2/Button';
-import { Input } from '@/components/ui2/Input';
-import styles from '@/components/Layout/Content.module.scss';
-import type { ContentProps, LoginFormData } from '@/types';
+import React, { useState } from "react";
+import * as Label from "@radix-ui/react-label";
+import { Button } from "@/components/ui2/Button";
+import { Input } from "@/components/ui2/Input";
+import styles from "@/components/Layout/Content.module.scss";
+import type { ContentProps, LoginFormData } from "@/types";
 
 export const Content: React.FC<ContentProps> = ({ onLogin, onSignUp, isLoading = false }) => {
   const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const handleInputChange =
@@ -38,7 +38,7 @@ export const Content: React.FC<ContentProps> = ({ onLogin, onSignUp, isLoading =
             type="email"
             placeholder="Email"
             value={formData.email}
-            onChange={handleInputChange('email')}
+            onChange={handleInputChange("email")}
             disabled={isLoading}
             required
           />
@@ -53,7 +53,7 @@ export const Content: React.FC<ContentProps> = ({ onLogin, onSignUp, isLoading =
             type="password"
             placeholder="Password"
             value={formData.password}
-            onChange={handleInputChange('password')}
+            onChange={handleInputChange("password")}
             disabled={isLoading}
             required
           />
@@ -67,7 +67,7 @@ export const Content: React.FC<ContentProps> = ({ onLogin, onSignUp, isLoading =
             disabled={isLoading}
             className={styles.signInButton}
           >
-            {isLoading ? 'Signing In...' : 'Sign In'}
+            {isLoading ? "Signing In..." : "Sign In"}
           </Button>
         </div>
       </form>

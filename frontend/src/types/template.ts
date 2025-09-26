@@ -28,10 +28,10 @@ export interface LayoutConfig {
   breadcrumbs?: BreadcrumbConfig;
 }
 
-export type LayoutType = 'classic' | 'modern' | 'dashboard';
+export type LayoutType = "classic" | "modern" | "dashboard";
 
 export interface SidebarConfig {
-  position: 'left' | 'right';
+  position: "left" | "right";
   width: string;
   collapsible: boolean;
   overlay: boolean; // mobile only
@@ -44,7 +44,7 @@ export interface HeaderConfig {
   sticky: boolean;
   showLogo: boolean;
   showNav?: boolean;
-  navigation?: 'tabs' | 'pills' | 'underline'; // modern layout
+  navigation?: "tabs" | "pills" | "underline"; // modern layout
   showSearch?: boolean;
 }
 
@@ -69,7 +69,7 @@ export interface SidebarGroup {
 }
 
 export interface ThemeConfig {
-  preset?: 'default' | 'corporate' | 'creative' | 'custom';
+  preset?: "default" | "corporate" | "creative" | "custom";
   colors: ColorConfig;
   typography: TypographyConfig;
   spacing: SpacingConfig;
@@ -126,11 +126,11 @@ export interface FontSizes {
   base: string;
   lg: string;
   xl: string;
-  '2xl': string;
-  '3xl': string;
-  '4xl': string;
-  '5xl': string;
-  '6xl': string;
+  "2xl": string;
+  "3xl": string;
+  "4xl": string;
+  "5xl": string;
+  "6xl": string;
 }
 
 export interface FontWeights {
@@ -205,7 +205,7 @@ export interface ShadowConfig {
   md: string;
   lg: string;
   xl: string;
-  '2xl': string;
+  "2xl": string;
   inner: string;
   none: string;
 }
@@ -217,8 +217,8 @@ export interface BorderRadiusConfig {
   md: string;
   lg: string;
   xl: string;
-  '2xl': string;
-  '3xl': string;
+  "2xl": string;
+  "3xl": string;
   full: string;
 }
 
@@ -242,7 +242,7 @@ export interface PluginConfig {
 }
 
 export interface BuildConfig {
-  target: 'es2020' | 'es2022' | 'esnext';
+  target: "es2020" | "es2022" | "esnext";
   sourceMaps: boolean;
   minify: boolean;
   treeshaking: boolean;
@@ -270,7 +270,7 @@ export interface Breakpoints {
   md: string;
   lg: string;
   xl: string;
-  '2xl': string;
+  "2xl": string;
 }
 
 export interface ZIndexScale {
@@ -318,7 +318,7 @@ export interface GenerationResult {
 export interface ProjectFile {
   path: string;
   content: string;
-  type: 'component' | 'style' | 'config' | 'page' | 'hook' | 'util' | 'type';
+  type: "component" | "style" | "config" | "page" | "hook" | "util" | "type";
 }
 
 export interface GenerationMetadata {
@@ -366,7 +366,7 @@ export interface ComponentManifest {
 
 export interface HookManifest {
   name: string;
-  stage: 'pre-generation' | 'post-generation' | 'pre-install' | 'post-install';
+  stage: "pre-generation" | "post-generation" | "pre-install" | "post-install";
   script: string;
 }
 
@@ -386,7 +386,7 @@ export interface CLIOptions {
 
 export interface PromptStep {
   id: string;
-  type: 'input' | 'select' | 'multiselect' | 'confirm' | 'color';
+  type: "input" | "select" | "multiselect" | "confirm" | "color";
   message: string;
   choices?: Choice[];
   default?: unknown;

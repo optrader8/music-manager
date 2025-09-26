@@ -5,9 +5,9 @@ import React, {
   useRef,
   useCallback,
   useEffect,
-} from 'react';
-import type { TrackWithRelations, AudioQuality } from '../types/api';
-import type { PlaybackTrack } from '../types/playback';
+} from "react";
+import type { TrackWithRelations, AudioQuality } from "../types/api";
+import type { PlaybackTrack } from "../types/playback";
 
 // Audio Player State Types
 export interface AudioPlayerState {
@@ -25,7 +25,7 @@ export interface AudioPlayerState {
   originalQueue: PlaybackTrack[];
   queueIndex: number;
   shuffle: boolean;
-  repeat: 'off' | 'one' | 'all';
+  repeat: "off" | "one" | "all";
 
   // Playback settings
   quality: AudioQuality;
@@ -56,7 +56,7 @@ export interface AudioPlayerActions {
 
   // Settings
   setShuffle: (shuffle: boolean) => void;
-  setRepeat: (repeat: 'off' | 'one' | 'all') => void;
+  setRepeat: (repeat: "off" | "one" | "all") => void;
   setQuality: (quality: AudioQuality) => void;
 
   // UI
@@ -66,25 +66,25 @@ export interface AudioPlayerActions {
 
 // Action Types
 type AudioPlayerAction =
-  | { type: 'SET_CURRENT_TRACK'; payload: TrackWithRelations | null }
-  | { type: 'SET_PLAYING'; payload: boolean }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_VOLUME'; payload: number }
-  | { type: 'SET_MUTED'; payload: boolean }
-  | { type: 'SET_CURRENT_TIME'; payload: number }
-  | { type: 'SET_DURATION'; payload: number }
-  | { type: 'SET_QUEUE'; payload: PlaybackTrack[] }
-  | { type: 'SET_QUEUE_INDEX'; payload: number }
-  | { type: 'SET_SHUFFLE'; payload: boolean }
-  | { type: 'SET_REPEAT'; payload: 'off' | 'one' | 'all' }
-  | { type: 'SET_QUALITY'; payload: AudioQuality }
-  | { type: 'TOGGLE_PLAYER_VISIBILITY' }
-  | { type: 'TOGGLE_PLAYER_EXPANDED' }
-  | { type: 'ADD_TO_QUEUE'; payload: PlaybackTrack[] }
-  | { type: 'ADD_TO_QUEUE_NEXT'; payload: PlaybackTrack[] }
-  | { type: 'REMOVE_FROM_QUEUE'; payload: number }
-  | { type: 'CLEAR_QUEUE' }
-  | { type: 'REORDER_QUEUE'; payload: { fromIndex: number; toIndex: number } };
+  | { type: "SET_CURRENT_TRACK"; payload: TrackWithRelations | null }
+  | { type: "SET_PLAYING"; payload: boolean }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_VOLUME"; payload: number }
+  | { type: "SET_MUTED"; payload: boolean }
+  | { type: "SET_CURRENT_TIME"; payload: number }
+  | { type: "SET_DURATION"; payload: number }
+  | { type: "SET_QUEUE"; payload: PlaybackTrack[] }
+  | { type: "SET_QUEUE_INDEX"; payload: number }
+  | { type: "SET_SHUFFLE"; payload: boolean }
+  | { type: "SET_REPEAT"; payload: "off" | "one" | "all" }
+  | { type: "SET_QUALITY"; payload: AudioQuality }
+  | { type: "TOGGLE_PLAYER_VISIBILITY" }
+  | { type: "TOGGLE_PLAYER_EXPANDED" }
+  | { type: "ADD_TO_QUEUE"; payload: PlaybackTrack[] }
+  | { type: "ADD_TO_QUEUE_NEXT"; payload: PlaybackTrack[] }
+  | { type: "REMOVE_FROM_QUEUE"; payload: number }
+  | { type: "CLEAR_QUEUE" }
+  | { type: "REORDER_QUEUE"; payload: { fromIndex: number; toIndex: number } };
 
 // Initial State
 const initialState: AudioPlayerState = {
@@ -99,8 +99,8 @@ const initialState: AudioPlayerState = {
   originalQueue: [],
   queueIndex: -1,
   shuffle: false,
-  repeat: 'off',
-  quality: 'high',
+  repeat: "off",
+  quality: "high",
   showPlayer: false,
   expandedPlayer: false,
 };
@@ -108,58 +108,58 @@ const initialState: AudioPlayerState = {
 // Reducer
 function audioPlayerReducer(state: AudioPlayerState, action: AudioPlayerAction): AudioPlayerState {
   switch (action.type) {
-    case 'SET_CURRENT_TRACK':
+    case "SET_CURRENT_TRACK":
       return { ...state, currentTrack: action.payload, showPlayer: !!action.payload };
 
-    case 'SET_PLAYING':
+    case "SET_PLAYING":
       return { ...state, isPlaying: action.payload };
 
-    case 'SET_LOADING':
+    case "SET_LOADING":
       return { ...state, isLoading: action.payload };
 
-    case 'SET_VOLUME':
+    case "SET_VOLUME":
       return { ...state, volume: action.payload };
 
-    case 'SET_MUTED':
+    case "SET_MUTED":
       return { ...state, isMuted: action.payload };
 
-    case 'SET_CURRENT_TIME':
+    case "SET_CURRENT_TIME":
       return { ...state, currentTime: action.payload };
 
-    case 'SET_DURATION':
+    case "SET_DURATION":
       return { ...state, duration: action.payload };
 
-    case 'SET_QUEUE':
+    case "SET_QUEUE":
       return { ...state, queue: action.payload, originalQueue: action.payload };
 
-    case 'SET_QUEUE_INDEX':
+    case "SET_QUEUE_INDEX":
       return { ...state, queueIndex: action.payload };
 
-    case 'SET_SHUFFLE':
+    case "SET_SHUFFLE":
       return { ...state, shuffle: action.payload };
 
-    case 'SET_REPEAT':
+    case "SET_REPEAT":
       return { ...state, repeat: action.payload };
 
-    case 'SET_QUALITY':
+    case "SET_QUALITY":
       return { ...state, quality: action.payload };
 
-    case 'TOGGLE_PLAYER_VISIBILITY':
+    case "TOGGLE_PLAYER_VISIBILITY":
       return { ...state, showPlayer: !state.showPlayer };
 
-    case 'TOGGLE_PLAYER_EXPANDED':
+    case "TOGGLE_PLAYER_EXPANDED":
       return { ...state, expandedPlayer: !state.expandedPlayer };
 
-    case 'ADD_TO_QUEUE':
+    case "ADD_TO_QUEUE":
       return { ...state, queue: [...state.queue, ...action.payload] };
 
-    case 'ADD_TO_QUEUE_NEXT': {
+    case "ADD_TO_QUEUE_NEXT": {
       const newQueue = [...state.queue];
       newQueue.splice(state.queueIndex + 1, 0, ...action.payload);
       return { ...state, queue: newQueue };
     }
 
-    case 'REMOVE_FROM_QUEUE': {
+    case "REMOVE_FROM_QUEUE": {
       const filteredQueue = state.queue.filter((_, index) => index !== action.payload);
       let newIndex = state.queueIndex;
       if (action.payload < state.queueIndex) {
@@ -170,7 +170,7 @@ function audioPlayerReducer(state: AudioPlayerState, action: AudioPlayerAction):
       return { ...state, queue: filteredQueue, queueIndex: newIndex };
     }
 
-    case 'CLEAR_QUEUE':
+    case "CLEAR_QUEUE":
       return {
         ...state,
         queue: [],
@@ -180,7 +180,7 @@ function audioPlayerReducer(state: AudioPlayerState, action: AudioPlayerAction):
         isPlaying: false,
       };
 
-    case 'REORDER_QUEUE': {
+    case "REORDER_QUEUE": {
       const reorderedQueue = [...state.queue];
       const [movedItem] = reorderedQueue.splice(action.payload.fromIndex, 1);
       reorderedQueue.splice(action.payload.toIndex, 0, movedItem);
@@ -210,42 +210,42 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
     (index: number) => {
       if (index >= 0 && index < state.queue.length) {
         const track = state.queue[index];
-        dispatch({ type: 'SET_QUEUE_INDEX', payload: index });
-        dispatch({ type: 'SET_CURRENT_TRACK', payload: track as TrackWithRelations });
-        dispatch({ type: 'SET_LOADING', payload: true });
+        dispatch({ type: "SET_QUEUE_INDEX", payload: index });
+        dispatch({ type: "SET_CURRENT_TRACK", payload: track as TrackWithRelations });
+        dispatch({ type: "SET_LOADING", payload: true });
 
         if (audioRef.current) {
           audioRef.current.src = track.stream_url;
-          audioRef.current.play().catch((error) => console.error('Audio playback error', error));
+          audioRef.current.play().catch((error) => console.error("Audio playback error", error));
         }
       }
     },
-    [state.queue]
+    [state.queue],
   );
 
   // Handle audio errors
   const handleAudioError = useCallback(() => {
-    console.error('Audio playback error');
-    dispatch({ type: 'SET_LOADING', payload: false });
-    dispatch({ type: 'SET_PLAYING', payload: false });
+    console.error("Audio playback error");
+    dispatch({ type: "SET_LOADING", payload: false });
+    dispatch({ type: "SET_PLAYING", payload: false });
     // Could implement retry logic here
   }, []);
 
   // Handle track end
   const handleTrackEnd = useCallback(() => {
-    dispatch({ type: 'SET_PLAYING', payload: false });
-    dispatch({ type: 'SET_LOADING', payload: false });
+    dispatch({ type: "SET_PLAYING", payload: false });
+    dispatch({ type: "SET_LOADING", payload: false });
 
-    if (state.repeat === 'one') {
+    if (state.repeat === "one") {
       // Repeat current track
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
         audioRef.current.play().catch(console.error);
       }
-    } else if (state.queueIndex < state.queue.length - 1 || state.repeat === 'all') {
+    } else if (state.queueIndex < state.queue.length - 1 || state.repeat === "all") {
       // Play next track
       const nextIndex =
-        state.repeat === 'all' && state.queueIndex === state.queue.length - 1
+        state.repeat === "all" && state.queueIndex === state.queue.length - 1
           ? 0
           : state.queueIndex + 1;
       playTrackAtIndex(nextIndex);
@@ -256,29 +256,29 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
     if (!audioRef.current) {
       audioRef.current = new Audio();
       audioRef.current.volume = state.volume;
-      audioRef.current.preload = 'metadata';
+      audioRef.current.preload = "metadata";
 
       // Event listeners
-      audioRef.current.addEventListener('loadstart', () =>
-        dispatch({ type: 'SET_LOADING', payload: true })
+      audioRef.current.addEventListener("loadstart", () =>
+        dispatch({ type: "SET_LOADING", payload: true }),
       );
-      audioRef.current.addEventListener('canplay', () =>
-        dispatch({ type: 'SET_LOADING', payload: false })
+      audioRef.current.addEventListener("canplay", () =>
+        dispatch({ type: "SET_LOADING", payload: false }),
       );
-      audioRef.current.addEventListener('timeupdate', () => {
-        dispatch({ type: 'SET_CURRENT_TIME', payload: audioRef.current!.currentTime });
+      audioRef.current.addEventListener("timeupdate", () => {
+        dispatch({ type: "SET_CURRENT_TIME", payload: audioRef.current!.currentTime });
       });
-      audioRef.current.addEventListener('durationchange', () => {
-        dispatch({ type: 'SET_DURATION', payload: audioRef.current!.duration || 0 });
+      audioRef.current.addEventListener("durationchange", () => {
+        dispatch({ type: "SET_DURATION", payload: audioRef.current!.duration || 0 });
       });
-      audioRef.current.addEventListener('ended', handleTrackEnd);
-      audioRef.current.addEventListener('error', handleAudioError);
+      audioRef.current.addEventListener("ended", handleTrackEnd);
+      audioRef.current.addEventListener("error", handleAudioError);
     }
 
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
-        audioRef.current.src = '';
+        audioRef.current.src = "";
       }
     };
   }, [handleAudioError, handleTrackEnd, state.volume]);
@@ -289,7 +289,6 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
       audioRef.current.volume = state.isMuted ? 0 : state.volume;
     }
   }, [state.volume, state.isMuted]);
-
 
   // Actions
   const play = useCallback(
@@ -306,10 +305,10 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
           artist_name: track.artist?.name,
         };
 
-        dispatch({ type: 'SET_QUEUE', payload: [playbackTrack] });
-        dispatch({ type: 'SET_QUEUE_INDEX', payload: 0 });
-        dispatch({ type: 'SET_CURRENT_TRACK', payload: track });
-        dispatch({ type: 'SET_LOADING', payload: true });
+        dispatch({ type: "SET_QUEUE", payload: [playbackTrack] });
+        dispatch({ type: "SET_QUEUE_INDEX", payload: 0 });
+        dispatch({ type: "SET_CURRENT_TRACK", payload: track });
+        dispatch({ type: "SET_LOADING", payload: true });
 
         if (audioRef.current) {
           audioRef.current.src = playbackTrack.stream_url;
@@ -317,17 +316,17 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
         }
       } else if (audioRef.current && state.currentTrack) {
         audioRef.current.play().catch(handleAudioError);
-        dispatch({ type: 'SET_PLAYING', payload: true });
+        dispatch({ type: "SET_PLAYING", payload: true });
       }
     },
-    [state.currentTrack, handleAudioError]
+    [state.currentTrack, handleAudioError],
   );
 
   const pause = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
     }
-    dispatch({ type: 'SET_PLAYING', payload: false });
+    dispatch({ type: "SET_PLAYING", payload: false });
   }, []);
 
   const togglePlayPause = useCallback(() => {
@@ -356,63 +355,63 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
     if (audioRef.current) {
       audioRef.current.currentTime = time;
     }
-    dispatch({ type: 'SET_CURRENT_TIME', payload: time });
+    dispatch({ type: "SET_CURRENT_TIME", payload: time });
   }, []);
 
   const setVolume = useCallback((volume: number) => {
-    dispatch({ type: 'SET_VOLUME', payload: Math.max(0, Math.min(1, volume)) });
+    dispatch({ type: "SET_VOLUME", payload: Math.max(0, Math.min(1, volume)) });
   }, []);
 
   const toggleMute = useCallback(() => {
-    dispatch({ type: 'SET_MUTED', payload: !state.isMuted });
+    dispatch({ type: "SET_MUTED", payload: !state.isMuted });
   }, [state.isMuted]);
 
   const addToQueue = useCallback((tracks: PlaybackTrack[]) => {
-    dispatch({ type: 'ADD_TO_QUEUE', payload: tracks });
+    dispatch({ type: "ADD_TO_QUEUE", payload: tracks });
   }, []);
 
   const addToQueueNext = useCallback((tracks: PlaybackTrack[]) => {
-    dispatch({ type: 'ADD_TO_QUEUE_NEXT', payload: tracks });
+    dispatch({ type: "ADD_TO_QUEUE_NEXT", payload: tracks });
   }, []);
 
   const removeFromQueue = useCallback((index: number) => {
-    dispatch({ type: 'REMOVE_FROM_QUEUE', payload: index });
+    dispatch({ type: "REMOVE_FROM_QUEUE", payload: index });
   }, []);
 
   const clearQueue = useCallback(() => {
-    dispatch({ type: 'CLEAR_QUEUE' });
+    dispatch({ type: "CLEAR_QUEUE" });
   }, []);
 
   const reorderQueue = useCallback((fromIndex: number, toIndex: number) => {
-    dispatch({ type: 'REORDER_QUEUE', payload: { fromIndex, toIndex } });
+    dispatch({ type: "REORDER_QUEUE", payload: { fromIndex, toIndex } });
   }, []);
 
   const playAlbum = useCallback(
     (tracks: PlaybackTrack[], startIndex: number = 0) => {
-      dispatch({ type: 'SET_QUEUE', payload: tracks });
+      dispatch({ type: "SET_QUEUE", payload: tracks });
       playTrackAtIndex(startIndex);
     },
-    [playTrackAtIndex]
+    [playTrackAtIndex],
   );
 
   const setShuffle = useCallback((shuffle: boolean) => {
-    dispatch({ type: 'SET_SHUFFLE', payload: shuffle });
+    dispatch({ type: "SET_SHUFFLE", payload: shuffle });
   }, []);
 
-  const setRepeat = useCallback((repeat: 'off' | 'one' | 'all') => {
-    dispatch({ type: 'SET_REPEAT', payload: repeat });
+  const setRepeat = useCallback((repeat: "off" | "one" | "all") => {
+    dispatch({ type: "SET_REPEAT", payload: repeat });
   }, []);
 
   const setQuality = useCallback((quality: AudioQuality) => {
-    dispatch({ type: 'SET_QUALITY', payload: quality });
+    dispatch({ type: "SET_QUALITY", payload: quality });
   }, []);
 
   const togglePlayerVisibility = useCallback(() => {
-    dispatch({ type: 'TOGGLE_PLAYER_VISIBILITY' });
+    dispatch({ type: "TOGGLE_PLAYER_VISIBILITY" });
   }, []);
 
   const togglePlayerExpanded = useCallback(() => {
-    dispatch({ type: 'TOGGLE_PLAYER_EXPANDED' });
+    dispatch({ type: "TOGGLE_PLAYER_EXPANDED" });
   }, []);
 
   const contextValue: AudioPlayerState & AudioPlayerActions = {
@@ -446,28 +445,28 @@ export function useAudioPlayer(): AudioPlayerState & AudioPlayerActions {
   const context = useContext(AudioPlayerContext);
   if (!context) {
     // Return a safe default instead of throwing immediately
-    console.warn('useAudioPlayer called outside AudioPlayerProvider, returning default state');
+    console.warn("useAudioPlayer called outside AudioPlayerProvider, returning default state");
     return {
       ...initialState,
-      play: () => console.warn('AudioPlayer not initialized'),
-      pause: () => console.warn('AudioPlayer not initialized'),
-      togglePlayPause: () => console.warn('AudioPlayer not initialized'),
-      next: () => console.warn('AudioPlayer not initialized'),
-      previous: () => console.warn('AudioPlayer not initialized'),
-      seek: () => console.warn('AudioPlayer not initialized'),
-      setVolume: () => console.warn('AudioPlayer not initialized'),
-      toggleMute: () => console.warn('AudioPlayer not initialized'),
-      addToQueue: () => console.warn('AudioPlayer not initialized'),
-      addToQueueNext: () => console.warn('AudioPlayer not initialized'),
-      removeFromQueue: () => console.warn('AudioPlayer not initialized'),
-      clearQueue: () => console.warn('AudioPlayer not initialized'),
-      reorderQueue: () => console.warn('AudioPlayer not initialized'),
-      playAlbum: () => console.warn('AudioPlayer not initialized'),
-      setShuffle: () => console.warn('AudioPlayer not initialized'),
-      setRepeat: () => console.warn('AudioPlayer not initialized'),
-      setQuality: () => console.warn('AudioPlayer not initialized'),
-      togglePlayerVisibility: () => console.warn('AudioPlayer not initialized'),
-      togglePlayerExpanded: () => console.warn('AudioPlayer not initialized'),
+      play: () => console.warn("AudioPlayer not initialized"),
+      pause: () => console.warn("AudioPlayer not initialized"),
+      togglePlayPause: () => console.warn("AudioPlayer not initialized"),
+      next: () => console.warn("AudioPlayer not initialized"),
+      previous: () => console.warn("AudioPlayer not initialized"),
+      seek: () => console.warn("AudioPlayer not initialized"),
+      setVolume: () => console.warn("AudioPlayer not initialized"),
+      toggleMute: () => console.warn("AudioPlayer not initialized"),
+      addToQueue: () => console.warn("AudioPlayer not initialized"),
+      addToQueueNext: () => console.warn("AudioPlayer not initialized"),
+      removeFromQueue: () => console.warn("AudioPlayer not initialized"),
+      clearQueue: () => console.warn("AudioPlayer not initialized"),
+      reorderQueue: () => console.warn("AudioPlayer not initialized"),
+      playAlbum: () => console.warn("AudioPlayer not initialized"),
+      setShuffle: () => console.warn("AudioPlayer not initialized"),
+      setRepeat: () => console.warn("AudioPlayer not initialized"),
+      setQuality: () => console.warn("AudioPlayer not initialized"),
+      togglePlayerVisibility: () => console.warn("AudioPlayer not initialized"),
+      togglePlayerExpanded: () => console.warn("AudioPlayer not initialized"),
     };
   }
   return context;

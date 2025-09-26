@@ -1,5 +1,5 @@
-import { createRootRoute, Outlet } from '@tanstack/react-router';
-import { Layout } from '@/components/Layout';
+import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { Layout } from "@/components/Layout";
 
 const NotFound = () => (
   <div className="flex flex-col items-center justify-center min-h-96 p-8">

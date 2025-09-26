@@ -1,4 +1,4 @@
-import { Component, PropsWithChildren, ReactNode } from 'react';
+import { Component, PropsWithChildren, ReactNode } from "react";
 
 interface ErrorBoundaryProps {
   fallback?: ReactNode;
@@ -22,7 +22,7 @@ export class ErrorBoundary extends Component<
 
   public componentDidCatch(error: Error, info: unknown) {
     if (import.meta.env.DEV) {
-      console.error('ErrorBoundary caught an error', { error, info });
+      console.error("ErrorBoundary caught an error", { error, info });
     }
   }
 
@@ -41,9 +41,9 @@ export class ErrorBoundary extends Component<
     }
 
     return (
-      <div role="alert" style={{ padding: '2rem', textAlign: 'center' }}>
+      <div role="alert" style={{ padding: "2rem", textAlign: "center" }}>
         <h2>문제가 발생했습니다.</h2>
-        <p>{this.state.error?.message ?? '예기치 못한 오류가 발생했습니다.'}</p>
+        <p>{this.state.error?.message ?? "예기치 못한 오류가 발생했습니다."}</p>
         <button type="button" onClick={this.handleReset}>
           다시 시도
         </button>

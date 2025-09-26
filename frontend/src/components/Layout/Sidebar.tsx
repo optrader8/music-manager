@@ -1,7 +1,7 @@
-import React from 'react';
-import { Button } from '../ui2/Button';
-import styles from './Sidebar.module.scss';
-import type { SidebarProps } from '../../types';
+import React from "react";
+import { Button } from "../ui2/Button";
+import styles from "./Sidebar.module.scss";
+import type { SidebarProps } from "../../types";
 
 export const Sidebar: React.FC<SidebarProps> = ({ navigationItems, onNavigate }) => {
   return (
@@ -17,9 +17,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ navigationItems, onNavigate })
             {navigationItems.map((item) => (
               <Button
                 key={item.id}
-                variant={item.active ? 'default' : 'ghost'}
+                variant={item.active ? "default" : "ghost"}
                 size="sm"
-                className={`${styles.navigationItem} ${item.active ? styles.active : ''}`}
+                className={`${styles.navigationItem} ${item.active ? styles.active : ""}`}
                 onClick={() => onNavigate?.(item.id)}
               >
                 <span className={styles.navigationIcon}>{item.icon}</span>

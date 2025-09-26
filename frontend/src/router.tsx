@@ -1,6 +1,6 @@
-import { createRouter } from '@tanstack/react-router';
-import { routeTree } from '@/routeTree.gen';
-import type { AuthContextType } from '@/types';
+import { createRouter } from "@tanstack/react-router";
+import { routeTree } from "@/routeTree.gen";
+import type { AuthContextType } from "@/types";
 
 interface RouterContext {
   auth: AuthContextType;
@@ -11,7 +11,7 @@ export const router = createRouter({
   context: {
     auth: {
       isAuthenticated: true, // Dev mode
-      user: { id: 'dev-user', email: 'dev@test.com', name: 'Dev User' },
+      user: { id: "dev-user", email: "dev@test.com", name: "Dev User" },
       login: async () => {},
       logout: () => {},
       isLoading: false,
@@ -19,7 +19,7 @@ export const router = createRouter({
   } as RouterContext,
 });
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }

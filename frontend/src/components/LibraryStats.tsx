@@ -1,7 +1,7 @@
-import React from 'react';
-import { Card, CardContent } from './ui/card';
-import { useLibraryStats } from '../hooks/useMusicLibrary';
-import { formatFileSize } from '../lib/utils';
+import React from "react";
+import { Card, CardContent } from "./ui/card";
+import { useLibraryStats } from "../hooks/useMusicLibrary";
+import { formatFileSize } from "../lib/utils";
 
 export function LibraryStats() {
   const { data: stats, isLoading, error } = useLibraryStats();
@@ -38,28 +38,28 @@ export function LibraryStats() {
 
   const statItems = [
     {
-      label: 'Tracks',
+      label: "Tracks",
       value: stats.total_tracks.toLocaleString(),
-      color: 'from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30',
-      icon: '🎵',
+      color: "from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30",
+      icon: "🎵",
     },
     {
-      label: 'Albums',
+      label: "Albums",
       value: stats.total_albums.toLocaleString(),
-      color: 'from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30',
-      icon: '💿',
+      color: "from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30",
+      icon: "💿",
     },
     {
-      label: 'Artists',
+      label: "Artists",
       value: stats.total_artists.toLocaleString(),
-      color: 'from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30',
-      icon: '🎤',
+      color: "from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30",
+      icon: "🎤",
     },
     {
-      label: 'Total Size',
+      label: "Total Size",
       value: formatFileSize(stats.total_size),
-      color: 'from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30',
-      icon: '💾',
+      color: "from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30",
+      icon: "💾",
     },
   ];
 

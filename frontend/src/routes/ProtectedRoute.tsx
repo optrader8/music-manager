@@ -1,7 +1,7 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-import { LoadingOverlay } from '../components/LoadingOverlay';
-import { useAuth } from '../hooks';
+import { LoadingOverlay } from "../components/LoadingOverlay";
+import { useAuth } from "../hooks";
 
 interface ProtectedRouteProps {
   requiredRoles?: string[];

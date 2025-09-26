@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Input } from './ui/input';
-import { Card, CardContent } from './ui/card';
-import { debounce } from '../lib/utils';
-import { SEARCH_DEBOUNCE_MS, COMMON_GENRES, SUPPORTED_AUDIO_FORMATS } from '../constants';
-import type { SearchFilters as SearchFiltersType } from '../types/api';
+import React, { useState } from "react";
+import { Input } from "./ui/input";
+import { Card, CardContent } from "./ui/card";
+import { debounce } from "../lib/utils";
+import { SEARCH_DEBOUNCE_MS, COMMON_GENRES, SUPPORTED_AUDIO_FORMATS } from "../constants";
+import type { SearchFilters as SearchFiltersType } from "../types/api";
 
 interface SearchFiltersProps {
   filters: SearchFiltersType;
@@ -16,7 +16,7 @@ export function SearchFilters({
   onFiltersChange,
   showAdvanced = false,
 }: SearchFiltersProps) {
-  const [localQuery, setLocalQuery] = useState(filters.query || '');
+  const [localQuery, setLocalQuery] = useState(filters.query || "");
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(showAdvanced);
 
   // Debounced search query update
@@ -25,7 +25,7 @@ export function SearchFilters({
       debounce((query: string) => {
         onFiltersChange({ ...filters, query: query || undefined });
       }, SEARCH_DEBOUNCE_MS),
-    [filters, onFiltersChange]
+    [filters, onFiltersChange],
   );
 
   React.useEffect(() => {
@@ -44,11 +44,11 @@ export function SearchFilters({
     });
   };
 
-  const handleYearRangeChange = (type: 'min' | 'max', value: string) => {
+  const handleYearRangeChange = (type: "min" | "max", value: string) => {
     const year = parseInt(value) || undefined;
     const newYears = filters.years || [];
 
-    if (type === 'min') {
+    if (type === "min") {
       onFiltersChange({
         ...filters,
         years: year ? [year, newYears[1] || new Date().getFullYear()] : undefined,
@@ -76,7 +76,7 @@ export function SearchFilters({
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
             className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
           >
-            {showAdvancedFilters ? 'Hide' : 'Show'} Filters
+            {showAdvancedFilters ? "Hide" : "Show"} Filters
           </button>
         </div>
 
@@ -95,8 +95,8 @@ export function SearchFilters({
                     onClick={() => handleGenreToggle(genre)}
                     className={`px-3 py-1 text-sm rounded-full border transition-colors ${
                       filters.genres?.includes(genre)
-                        ? 'bg-blue-500 text-white border-blue-500'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600"
                     }`}
                   >
                     {genre}
@@ -116,8 +116,8 @@ export function SearchFilters({
                   placeholder="1900"
                   min="1900"
                   max={new Date().getFullYear()}
-                  value={filters.years?.[0] || ''}
-                  onChange={(e) => handleYearRangeChange('min', e.target.value)}
+                  value={filters.years?.[0] || ""}
+                  onChange={(e) => handleYearRangeChange("min", e.target.value)}
                 />
               </div>
               <div>
@@ -129,8 +129,8 @@ export function SearchFilters({
                   placeholder={new Date().getFullYear().toString()}
                   min="1900"
                   max={new Date().getFullYear()}
-                  value={filters.years?.[1] || ''}
-                  onChange={(e) => handleYearRangeChange('max', e.target.value)}
+                  value={filters.years?.[1] || ""}
+                  onChange={(e) => handleYearRangeChange("max", e.target.value)}
                 />
               </div>
             </div>
@@ -157,8 +157,8 @@ export function SearchFilters({
                     }}
                     className={`px-3 py-1 text-sm rounded-full border transition-colors ${
                       filters.formats?.includes(format)
-                        ? 'bg-green-500 text-white border-green-500'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        ? "bg-green-500 text-white border-green-500"
+                        : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600"
                     }`}
                   >
                     {format}

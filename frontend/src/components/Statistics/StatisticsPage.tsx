@@ -1,5 +1,5 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   BarChart,
   Bar,
@@ -11,8 +11,8 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-} from 'recharts';
-import { Music2, Users, Album, Disc } from 'lucide-react';
+} from "recharts";
+import { Music2, Users, Album, Disc } from "lucide-react";
 
 import {
   fetchGenreStats,
@@ -21,7 +21,7 @@ import {
   fetchQualityStats,
   fetchMostPlayedTracks,
   fetchRecentAlbums,
-} from '@/services/musicApi';
+} from "@/services/musicApi";
 import type {
   GenreStats,
   ArtistStats,
@@ -29,17 +29,17 @@ import type {
   QualityStats,
   TrackPlayStatsResponse,
   AlbumListResponse,
-} from '@/types/stats';
+} from "@/types/stats";
 
 const COLORS = [
-  '#0088FE',
-  '#00C49F',
-  '#FFBB28',
-  '#FF8042',
-  '#8884d8',
-  '#82ca9d',
-  '#ffc658',
-  '#ff7300',
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7300",
 ];
 
 interface StatsSectionProps {
@@ -60,34 +60,34 @@ const StatsSection: React.FC<StatsSectionProps> = ({ title, icon, children }) =>
 
 export const StatisticsPage: React.FC = () => {
   const { data: genreStats, isLoading: genreLoading } = useQuery<GenreStats[]>({
-    queryKey: ['stats', 'genres'],
+    queryKey: ["stats", "genres"],
     queryFn: fetchGenreStats,
   });
 
   const { data: artistStats, isLoading: artistLoading } = useQuery<ArtistStats[]>({
-    queryKey: ['stats', 'artists'],
+    queryKey: ["stats", "artists"],
     queryFn: fetchArtistStats,
   });
 
   const { data: albumStats, isLoading: albumLoading } = useQuery<AlbumStats[]>({
-    queryKey: ['stats', 'albums'],
+    queryKey: ["stats", "albums"],
     queryFn: fetchAlbumStats,
   });
 
   const { data: qualityStats, isLoading: qualityLoading } = useQuery<QualityStats>({
-    queryKey: ['stats', 'quality'],
+    queryKey: ["stats", "quality"],
     queryFn: fetchQualityStats,
   });
 
   const { data: mostPlayedTracks, isLoading: mostPlayedLoading } = useQuery<TrackPlayStatsResponse>(
     {
-      queryKey: ['stats', 'most-played'],
+      queryKey: ["stats", "most-played"],
       queryFn: () => fetchMostPlayedTracks(1, 20),
-    }
+    },
   );
 
   const { data: recentAlbums, isLoading: recentAlbumsLoading } = useQuery<AlbumListResponse>({
-    queryKey: ['stats', 'recent-albums'],
+    queryKey: ["stats", "recent-albums"],
     queryFn: () => fetchRecentAlbums(1, 9),
   });
 
@@ -177,7 +177,7 @@ export const StatisticsPage: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="bitrate" tickFormatter={(value) => `${value} kbps`} />
                 <YAxis />
-                <Tooltip formatter={(value: number) => [value, 'Tracks']} />
+                <Tooltip formatter={(value: number) => [value, "Tracks"]} />
                 <Bar dataKey="count" fill="#00C49F" />
               </BarChart>
             </ResponsiveContainer>
@@ -198,7 +198,7 @@ export const StatisticsPage: React.FC = () => {
                 >
                   <div>
                     <h4 className="font-medium text-gray-900">{album.title}</h4>
-                    <p className="text-sm text-gray-600">{album.artist_name ?? 'Unknown Artist'}</p>
+                    <p className="text-sm text-gray-600">{album.artist_name ?? "Unknown Artist"}</p>
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-medium text-gray-900">
@@ -238,7 +238,7 @@ export const StatisticsPage: React.FC = () => {
                 )}
                 <div>
                   <h4 className="font-medium text-gray-900">{album.title}</h4>
-                  <p className="text-sm text-gray-600">{album.artist?.name ?? 'Unknown Artist'}</p>
+                  <p className="text-sm text-gray-600">{album.artist?.name ?? "Unknown Artist"}</p>
                   {album.release_year && (
                     <p className="text-xs text-gray-500 mt-1">Released {album.release_year}</p>
                   )}
@@ -279,16 +279,16 @@ export const StatisticsPage: React.FC = () => {
                       {track.title}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      {track.artist?.name ?? 'Unknown Artist'}
+                      {track.artist?.name ?? "Unknown Artist"}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      {track.album?.title ?? 'Unknown Album'}
+                      {track.album?.title ?? "Unknown Album"}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-right">
                       {track.play_count}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 text-right">
-                      {track.last_played_at ? new Date(track.last_played_at).toLocaleString() : '—'}
+                      {track.last_played_at ? new Date(track.last_played_at).toLocaleString() : "—"}
                     </td>
                   </tr>
                 ))}

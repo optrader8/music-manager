@@ -1,4 +1,4 @@
-import type { AudioQuality } from './playback';
+import type { AudioQuality } from "./playback";
 
 export interface PaginationMeta {
   page: number;

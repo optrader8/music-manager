@@ -1,14 +1,14 @@
-import React, { ReactNode, useState, useEffect } from 'react';
-import { useNavigate, useLocation } from '@tanstack/react-router';
-import cn from 'classnames';
-import { Header } from '@/components/Layout/Header';
-import { Sidebar } from '@/components/Layout/Sidebar';
-import { PlayerControls } from '@/components/AudioPlayer/PlayerControls';
-import { PlayerQueue } from '@/components/AudioPlayer/PlayerQueue';
-import { AudioPlayerProvider } from '@/context/AudioPlayerContext';
-import { navigationItems } from '@/constants/navigation';
-import styles from './Layout.module.scss';
-import { FileRouteTypes } from '@/routeTree.gen';
+import React, { ReactNode, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "@tanstack/react-router";
+import cn from "classnames";
+import { Header } from "@/components/Layout/Header";
+import { Sidebar } from "@/components/Layout/Sidebar";
+import { PlayerControls } from "@/components/AudioPlayer/PlayerControls";
+import { PlayerQueue } from "@/components/AudioPlayer/PlayerQueue";
+import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
+import { navigationItems } from "@/constants/navigation";
+import styles from "./Layout.module.scss";
+import { FileRouteTypes } from "@/routeTree.gen";
 
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -19,14 +19,14 @@ const useMediaQuery = (query: string) => {
       setMatches(media.matches);
     }
     const listener = () => setMatches(media.matches);
-    window.addEventListener('resize', listener);
-    return () => window.removeEventListener('resize', listener);
+    window.addEventListener("resize", listener);
+    return () => window.removeEventListener("resize", listener);
   }, [matches, query]);
 
   return matches;
 };
 
-type ValidRoutes = FileRouteTypes['to'];
+type ValidRoutes = FileRouteTypes["to"];
 
 interface LayoutProps {
   children: ReactNode;
@@ -34,37 +34,37 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   // 개발환경에서는 항상 인증된 상태로 처리
-  const user = { id: 'dev-user', email: 'dev@test.com', name: 'Dev User' };
+  const user = { id: "dev-user", email: "dev@test.com", name: "Dev User" };
   const isAuthenticated = true;
 
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
-  const isMobile = useMediaQuery('(max-width: 992px)');
+  const isMobile = useMediaQuery("(max-width: 992px)");
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
   const handleSignIn = () => {
-    navigate({ to: '/' });
+    navigate({ to: "/" });
   };
 
   const handleSignOut = () => {
     // 개발환경에서는 로그아웃 기능 비활성화
-    console.log('Dev mode: logout disabled');
-    navigate({ to: '/' });
+    console.log("Dev mode: logout disabled");
+    navigate({ to: "/" });
   };
 
   const handleNavigate = (itemId: string) => {
     const routes: Record<string, ValidRoutes> = {
-      home: '/',
-      dashboard: '/',
-      statistics: '/statistics',
-      music: '/music',
-      playlists: '/playlists',
-      settings: '/settings',
+      home: "/",
+      dashboard: "/",
+      statistics: "/statistics",
+      music: "/music",
+      playlists: "/playlists",
+      settings: "/settings",
     };
 
     const route = routes[itemId];
@@ -76,7 +76,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Update navigation items with active state
   const updatedNavigationItems = navigationItems.map((item) => ({
     ...item,
-    active: location.pathname === (item.href || '/dashboard'),
+    active: location.pathname === (item.href || "/dashboard"),
   }));
 
   const sidebarContent = (

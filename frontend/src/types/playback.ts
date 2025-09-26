@@ -1,4 +1,4 @@
-export type AudioQuality = 'original' | 'high' | 'medium' | 'low';
+export type AudioQuality = "original" | "high" | "medium" | "low";
 
 export interface PlaybackTrack {
   track_id: number;

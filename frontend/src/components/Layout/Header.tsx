@@ -1,9 +1,9 @@
-import React from 'react';
-import * as NavigationMenu from '@radix-ui/react-navigation-menu';
-import { Menu } from 'lucide-react';
-import { Button } from '../ui2/Button';
-import styles from './Header.module.scss';
-import type { HeaderProps } from '../../types';
+import React from "react";
+import * as NavigationMenu from "@radix-ui/react-navigation-menu";
+import { Menu } from "lucide-react";
+import { Button } from "../ui2/Button";
+import styles from "./Header.module.scss";
+import type { HeaderProps } from "../../types";
 
 interface ExtendedHeaderProps extends HeaderProps {
   onToggleSidebar?: () => void;

@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
-import { useAudioPlayer } from '../context/AudioPlayerContext';
-import type { TrackWithRelations } from '../types/api';
-import type { PlaybackTrack } from '../types/playback';
+import { useCallback } from "react";
+import { useAudioPlayer } from "../context/AudioPlayerContext";
+import type { TrackWithRelations } from "../types/api";
+import type { PlaybackTrack } from "../types/playback";
 
 /**
  * Hook for basic audio player controls
@@ -37,7 +37,7 @@ export function useAudioControls() {
         seek(time);
       }
     },
-    [canSeek, duration, seek]
+    [canSeek, duration, seek],
   );
 
   const skipForward = useCallback(
@@ -45,7 +45,7 @@ export function useAudioControls() {
       const newTime = Math.min(currentTime + seconds, duration);
       seek(newTime);
     },
-    [currentTime, duration, seek]
+    [currentTime, duration, seek],
   );
 
   const skipBackward = useCallback(
@@ -53,7 +53,7 @@ export function useAudioControls() {
       const newTime = Math.max(currentTime - seconds, 0);
       seek(newTime);
     },
-    [currentTime, seek]
+    [currentTime, seek],
   );
 
   return {
@@ -122,7 +122,7 @@ export function usePlaybackQueue() {
       };
       addToQueue([playbackTrack]);
     },
-    [addToQueue]
+    [addToQueue],
   );
 
   const addTrackNext = useCallback(
@@ -138,7 +138,7 @@ export function usePlaybackQueue() {
       };
       addToQueueNext([playbackTrack]);
     },
-    [addToQueueNext]
+    [addToQueueNext],
   );
 
   const playTracks = useCallback(
@@ -154,21 +154,21 @@ export function usePlaybackQueue() {
       }));
       playAlbum(playbackTracks, startIndex);
     },
-    [playAlbum]
+    [playAlbum],
   );
 
   const removeTrack = useCallback(
     (index: number) => {
       removeFromQueue(index);
     },
-    [removeFromQueue]
+    [removeFromQueue],
   );
 
   const moveTrack = useCallback(
     (fromIndex: number, toIndex: number) => {
       reorderQueue(fromIndex, toIndex);
     },
-    [reorderQueue]
+    [reorderQueue],
   );
 
   return {
@@ -210,14 +210,14 @@ export function useAudioErrorHandling() {
   // - Error reporting
 
   const handleError = useCallback((error: Error) => {
-    console.error('Audio player error:', error);
+    console.error("Audio player error:", error);
     // Could implement error reporting here
   }, []);
 
   const retry = useCallback(() => {
     if (currentTrack) {
       // Implement retry logic
-      console.log('Retrying playback for track:', currentTrack.title);
+      console.log("Retrying playback for track:", currentTrack.title);
     }
   }, [currentTrack]);
 
@@ -248,7 +248,7 @@ export function useAudioPersistence() {
   // Load settings from localStorage on mount
   const loadSettings = useCallback(() => {
     try {
-      const saved = localStorage.getItem('audio-player-settings');
+      const saved = localStorage.getItem("audio-player-settings");
       if (saved) {
         const settings = JSON.parse(saved);
         if (settings.volume !== undefined) setVolume(settings.volume);
@@ -257,7 +257,7 @@ export function useAudioPersistence() {
         if (settings.quality !== undefined) setQuality(settings.quality);
       }
     } catch (error) {
-      console.warn('Failed to load audio player settings:', error);
+      console.warn("Failed to load audio player settings:", error);
     }
   }, [setVolume, setShuffle, setRepeat, setQuality]);
 
@@ -271,9 +271,9 @@ export function useAudioPersistence() {
         repeat,
         quality,
       };
-      localStorage.setItem('audio-player-settings', JSON.stringify(settings));
+      localStorage.setItem("audio-player-settings", JSON.stringify(settings));
     } catch (error) {
-      console.warn('Failed to save audio player settings:', error);
+      console.warn("Failed to save audio player settings:", error);
     }
   }, [volume, isMuted, shuffle, repeat, quality]);
 

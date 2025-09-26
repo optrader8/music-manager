@@ -1,15 +1,15 @@
-import React from 'react';
-import { Play, MoreHorizontal, Music, Folder } from 'lucide-react';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import { useAudioPlayer } from '@/context/AudioPlayerContext';
+import React from "react";
+import { Play, MoreHorizontal, Music, Folder } from "lucide-react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Tooltip from "@radix-ui/react-tooltip";
+import { useAudioPlayer } from "@/context/AudioPlayerContext";
 
 interface MusicCardProps {
   id: string;
   title: string;
   subtitle?: string;
   coverArt?: string;
-  type: 'album' | 'artist' | 'playlist' | 'folder';
+  type: "album" | "artist" | "playlist" | "folder";
   trackCount?: number;
   onClick?: () => void;
   onPlay?: () => void;
@@ -40,8 +40,8 @@ export const MusicCard: React.FC<MusicCardProps> = ({
     <div
       className={`group relative rounded-xl shadow-sm border transition-all duration-300 cursor-pointer overflow-hidden ${
         isCurrentlyPlaying && isPlaying
-          ? 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 shadow-lg'
-          : 'bg-white border-gray-200 hover:shadow-lg'
+          ? "bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 shadow-lg"
+          : "bg-white border-gray-200 hover:shadow-lg"
       }`}
       onClick={onClick}
     >
@@ -51,7 +51,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({
           <img src={coverArt} alt={title} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            {type === 'folder' ? (
+            {type === "folder" ? (
               <Folder size={48} className="text-gray-400" />
             ) : (
               <Music size={48} className="text-gray-400" />
@@ -151,7 +151,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({
         {subtitle && <p className="text-xs text-gray-600 truncate">{subtitle}</p>}
         <div className="flex items-center justify-between mt-2">
           <span className="text-xs text-gray-500 capitalize">{type}</span>
-          {type === 'album' && <div className="w-2 h-2 bg-green-400 rounded-full" />}
+          {type === "album" && <div className="w-2 h-2 bg-green-400 rounded-full" />}
         </div>
       </div>
     </div>
