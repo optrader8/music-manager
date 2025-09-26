@@ -1,11 +1,12 @@
 import React from 'react';
-import { RouterProvider } from '@tanstack/react-router';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Layout } from '@/components/Layout/Layout';
 
-import { router } from './router';
-import { AuthProvider } from './context/AuthContext';
-import { ErrorBoundary } from './components/ErrorBoundary';
+// Pages
+import Dashboard from '@/pages/Dashboard';
+import Statistics from '@/pages/Statistics';
+import { MusicListPage } from '@/pages/MusicListPage';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -37,13 +38,17 @@ const queryClient = new QueryClient({
 
 export function App() {
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <RouterProvider router={router} />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </AuthProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/statistics" element={<Statistics />} />
+            <Route path="/music/list" element={<MusicListPage />} />
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }

@@ -1,9 +1,9 @@
-import React from "react";
-import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { Menu } from "lucide-react";
-import { Button } from "../ui2/Button";
-import styles from "./Header.module.scss";
-import type { HeaderProps } from "../../types";
+import React from 'react';
+import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import { Menu } from 'lucide-react';
+import { Button } from '../ui2/Button';
+import styles from './Header.module.scss';
+import type { HeaderProps } from '../../types';
 
 interface ExtendedHeaderProps extends HeaderProps {
   onToggleSidebar?: () => void;
@@ -37,7 +37,7 @@ export const Header: React.FC<ExtendedHeaderProps> = ({
               <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="currentColor" />
             </svg>
           </div>
-          <h2 className={styles.logoText}>React UI Template</h2>
+          <h2 className={styles.logoText}>Music Manager</h2>
         </div>
       </div>
 

@@ -1,40 +1,40 @@
-import React from "react";
-import { Home, BarChart, Music, Library, Settings } from "lucide-react";
-import type { NavigationItem } from "../types";
+import React from 'react';
+import { Home, BarChart, Music, Library, Settings } from 'lucide-react';
+import type { NavigationItem } from '../types';
 
 export const navigationItems: NavigationItem[] = [
   {
-    id: "dashboard",
-    label: "Dashboard",
+    id: 'dashboard',
+    label: 'Dashboard',
     icon: <Home />,
-    href: "/",
+    href: '/',
   },
   {
-    id: "statistics",
-    label: "Statistics",
+    id: 'statistics',
+    label: 'Statistics',
     icon: <BarChart size={24} />,
-    href: "/statistics",
+    href: '/statistics',
     active: false,
   },
   {
-    id: "music",
-    label: "Music",
+    id: 'music',
+    label: 'MusicList',
     icon: <Music size={24} />,
-    href: "/music",
+    href: '/music/list',
     active: false,
   },
   {
-    id: "playlists",
-    label: "Playlists",
+    id: 'playlists',
+    label: 'Playlists',
     icon: <Library size={24} />,
-    href: "/playlists",
+    href: '/playlists',
     active: false,
   },
   {
-    id: "settings",
-    label: "Settings",
+    id: 'settings',
+    label: 'Settings',
     icon: <Settings size={24} />,
-    href: "/settings",
+    href: '/settings',
     active: false,
   },
 ];

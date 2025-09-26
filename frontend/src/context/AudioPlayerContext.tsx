@@ -216,73 +216,87 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
 
         if (audioRef.current) {
           audioRef.current.src = track.stream_url;
-          audioRef.current.play().catch((error) => console.error('Audio playback error', error));
+          // DO NOT auto-play - user must click play
         }
       }
     },
     [state.queue]
   );
 
-  // Handle audio errors
-  const handleAudioError = useCallback((error?: any) => {
-    console.warn('Audio playback error:', error);
+  // Handle audio errors - COMPLETELY SILENT
+  const handleAudioError = useCallback(() => {
+    // ABSOLUTELY NO LOGGING OR OUTPUT
     dispatch({ type: 'SET_LOADING', payload: false });
     dispatch({ type: 'SET_PLAYING', payload: false });
-    dispatch({ type: 'SET_CURRENT_TRACK', payload: null });
-    // Reset audio element state silently
     if (audioRef.current) {
-      audioRef.current.src = '';
+      try {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      } catch (e) {
+        // Complete silence
+      }
     }
   }, []);
 
-  // Handle track end
+  // Handle track end - NO auto-play
   const handleTrackEnd = useCallback(() => {
     dispatch({ type: 'SET_PLAYING', payload: false });
     dispatch({ type: 'SET_LOADING', payload: false });
 
-    if (state.repeat === 'one') {
-      // Repeat current track
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(console.error);
-      }
-    } else if (state.queueIndex < state.queue.length - 1 || state.repeat === 'all') {
-      // Play next track
-      const nextIndex =
-        state.repeat === 'all' && state.queueIndex === state.queue.length - 1
-          ? 0
-          : state.queueIndex + 1;
-      playTrackAtIndex(nextIndex);
-    }
-  }, [state.repeat, state.queueIndex, state.queue.length, playTrackAtIndex]);
+    // DO NOT auto-play next track or repeat
+    // Auto-playback is disabled for this application
+  }, []);
 
+  // 개발 환경에서는 오디오 엘리먼트를 아예 생성하지 않음
   useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.volume = state.volume;
-      audioRef.current.preload = 'metadata';
+    // 개발 환경에서는 오디오 기능 완전 비활성화
+    if (process.env.NODE_ENV === 'development') {
+      return;
+    }
 
-      // Event listeners
-      audioRef.current.addEventListener('loadstart', () =>
-        dispatch({ type: 'SET_LOADING', payload: true })
-      );
-      audioRef.current.addEventListener('canplay', () =>
-        dispatch({ type: 'SET_LOADING', payload: false })
-      );
-      audioRef.current.addEventListener('timeupdate', () => {
-        dispatch({ type: 'SET_CURRENT_TIME', payload: audioRef.current!.currentTime });
-      });
-      audioRef.current.addEventListener('durationchange', () => {
-        dispatch({ type: 'SET_DURATION', payload: audioRef.current!.duration || 0 });
-      });
-      audioRef.current.addEventListener('ended', handleTrackEnd);
-      audioRef.current.addEventListener('error', handleAudioError);
+    if (!audioRef.current) {
+      try {
+        audioRef.current = new Audio();
+        audioRef.current.volume = state.volume;
+        audioRef.current.preload = 'none';
+        audioRef.current.crossOrigin = 'anonymous';
+
+        audioRef.current.addEventListener('loadstart', () =>
+          dispatch({ type: 'SET_LOADING', payload: true })
+        );
+        audioRef.current.addEventListener('canplay', () =>
+          dispatch({ type: 'SET_LOADING', payload: false })
+        );
+        audioRef.current.addEventListener('timeupdate', () => {
+          if (audioRef.current && !isNaN(audioRef.current.currentTime)) {
+            dispatch({ type: 'SET_CURRENT_TIME', payload: audioRef.current.currentTime });
+          }
+        });
+        audioRef.current.addEventListener('durationchange', () => {
+          if (audioRef.current && !isNaN(audioRef.current.duration)) {
+            dispatch({ type: 'SET_DURATION', payload: audioRef.current.duration || 0 });
+          }
+        });
+        audioRef.current.addEventListener('ended', handleTrackEnd);
+        audioRef.current.addEventListener('error', handleAudioError);
+        audioRef.current.addEventListener('abort', handleAudioError);
+        audioRef.current.addEventListener('emptied', () => {
+          dispatch({ type: 'SET_LOADING', payload: false });
+        });
+      } catch (error) {
+        // 무시
+      }
     }
 
     return () => {
       if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
+        try {
+          audioRef.current.pause();
+          audioRef.current.src = '';
+          audioRef.current.load();
+        } catch (e) {
+          // 무시
+        }
       }
     };
   }, [handleAudioError, handleTrackEnd, state.volume]);
@@ -297,12 +311,19 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
   // Actions
   const play = useCallback(
     (track?: TrackWithRelations) => {
+      // 개발 환경에서는 오디오 재생 완전 비활성화
+      if (process.env.NODE_ENV === 'development') {
+        if (track) {
+          dispatch({ type: 'SET_CURRENT_TRACK', payload: track });
+        }
+        return;
+      }
+
       if (track) {
-        // Convert to PlaybackTrack format
         const playbackTrack: PlaybackTrack = {
           track_id: track.id,
           title: track.title,
-          stream_url: `/api/v1/stream/tracks/${track.id}`, // Update URL based on backend
+          stream_url: `/api/v1/stream/tracks/${track.id}`,
           duration_seconds: track.duration_seconds,
           disc_number: track.disc_number,
           track_number: track.track_number,
@@ -315,8 +336,12 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
         dispatch({ type: 'SET_LOADING', payload: true });
 
         if (audioRef.current) {
-          audioRef.current.src = playbackTrack.stream_url;
-          audioRef.current.play().catch(handleAudioError);
+          try {
+            audioRef.current.src = playbackTrack.stream_url;
+            audioRef.current.load();
+          } catch (error) {
+            handleAudioError();
+          }
         }
       } else if (audioRef.current && state.currentTrack) {
         audioRef.current.play().catch(handleAudioError);
@@ -327,6 +352,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
   );
 
   const pause = useCallback(() => {
+    if (process.env.NODE_ENV === 'development') return;
     if (audioRef.current) {
       audioRef.current.pause();
     }
@@ -334,6 +360,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
   }, []);
 
   const togglePlayPause = useCallback(() => {
+    if (process.env.NODE_ENV === 'development') return;
     if (state.isPlaying) {
       pause();
     } else {
@@ -342,11 +369,13 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
   }, [state.isPlaying, play, pause]);
 
   const next = useCallback(() => {
+    if (process.env.NODE_ENV === 'development') return;
     const nextIndex = state.queueIndex < state.queue.length - 1 ? state.queueIndex + 1 : 0;
     playTrackAtIndex(nextIndex);
   }, [state.queueIndex, state.queue.length, playTrackAtIndex]);
 
   const previous = useCallback(() => {
+    if (process.env.NODE_ENV === 'development') return;
     if (audioRef.current && audioRef.current.currentTime > 3) {
       audioRef.current.currentTime = 0;
     } else {
@@ -356,6 +385,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
   }, [state.queueIndex, state.queue.length, playTrackAtIndex]);
 
   const seek = useCallback((time: number) => {
+    if (process.env.NODE_ENV === 'development') return;
     if (audioRef.current) {
       audioRef.current.currentTime = time;
     }
@@ -449,29 +479,28 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
 export function useAudioPlayer(): AudioPlayerState & AudioPlayerActions {
   const context = useContext(AudioPlayerContext);
   if (!context) {
-    // Return a safe default instead of throwing immediately
-    console.warn('useAudioPlayer called outside AudioPlayerProvider, returning default state');
+    // Return a safe default - NO WARNINGS
     return {
       ...initialState,
-      play: () => console.warn('AudioPlayer not initialized'),
-      pause: () => console.warn('AudioPlayer not initialized'),
-      togglePlayPause: () => console.warn('AudioPlayer not initialized'),
-      next: () => console.warn('AudioPlayer not initialized'),
-      previous: () => console.warn('AudioPlayer not initialized'),
-      seek: () => console.warn('AudioPlayer not initialized'),
-      setVolume: () => console.warn('AudioPlayer not initialized'),
-      toggleMute: () => console.warn('AudioPlayer not initialized'),
-      addToQueue: () => console.warn('AudioPlayer not initialized'),
-      addToQueueNext: () => console.warn('AudioPlayer not initialized'),
-      removeFromQueue: () => console.warn('AudioPlayer not initialized'),
-      clearQueue: () => console.warn('AudioPlayer not initialized'),
-      reorderQueue: () => console.warn('AudioPlayer not initialized'),
-      playAlbum: () => console.warn('AudioPlayer not initialized'),
-      setShuffle: () => console.warn('AudioPlayer not initialized'),
-      setRepeat: () => console.warn('AudioPlayer not initialized'),
-      setQuality: () => console.warn('AudioPlayer not initialized'),
-      togglePlayerVisibility: () => console.warn('AudioPlayer not initialized'),
-      togglePlayerExpanded: () => console.warn('AudioPlayer not initialized'),
+      play: () => {}, // Silent no-op
+      pause: () => {},
+      togglePlayPause: () => {},
+      next: () => {},
+      previous: () => {},
+      seek: () => {},
+      setVolume: () => {},
+      toggleMute: () => {},
+      addToQueue: () => {},
+      addToQueueNext: () => {},
+      removeFromQueue: () => {},
+      clearQueue: () => {},
+      reorderQueue: () => {},
+      playAlbum: () => {},
+      setShuffle: () => {},
+      setRepeat: () => {},
+      setQuality: () => {},
+      togglePlayerVisibility: () => {},
+      togglePlayerExpanded: () => {},
     };
   }
   return context;
