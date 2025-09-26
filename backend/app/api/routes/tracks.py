@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
-from app.core.dependencies import get_current_user, get_session
+from app.core.dependencies import get_current_user, get_db
 from app.db.models import Track, User
 from app.schemas import TrackRead, TrackWithRelations
 
@@ -17,7 +17,7 @@ async def get_tracks(
     search: Optional[str] = Query(None),
     artist_id: Optional[int] = Query(None),
     album_id: Optional[int] = Query(None),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Get tracks with optional filtering and pagination."""
@@ -42,7 +42,7 @@ async def get_tracks(
 @router.get("/{track_id}", response_model=TrackWithRelations)
 async def get_track(
     track_id: int,
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Get a specific track by ID."""

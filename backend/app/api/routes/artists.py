@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user, get_session
+from app.core.dependencies import get_current_user, get_db
 from app.db.models import Artist, User
 from app.schemas import ArtistRead
 
@@ -15,7 +15,7 @@ async def get_artists(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     search: Optional[str] = Query(None),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Get artists with optional filtering and pagination."""
@@ -31,7 +31,7 @@ async def get_artists(
 @router.get("/{artist_id}", response_model=ArtistRead)
 async def get_artist(
     artist_id: int,
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Get a specific artist by ID."""

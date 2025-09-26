@@ -9,6 +9,7 @@ import type {
   Track,
   LibraryStats,
 } from '../types/api';
+import type { AudioQuality, PlaybackQueue } from '../types/playback';
 
 export const musicService = {
   // Library stats
@@ -65,14 +66,38 @@ export const musicService = {
     return response.data;
   },
 
+  async getAlbumPlaybackQueue(
+    albumId: number,
+    options?: { quality?: AudioQuality; crossfadeSeconds?: number; gapless?: boolean }
+  ): Promise<PlaybackQueue> {
+    const params = new URLSearchParams();
+    if (options?.quality) params.set('quality', options.quality);
+    if (typeof options?.crossfadeSeconds === 'number') {
+      params.set('crossfade_seconds', String(options.crossfadeSeconds));
+    }
+    if (typeof options?.gapless === 'boolean') {
+      params.set('gapless', String(options.gapless));
+    }
+    const response = await apiClient.get<PlaybackQueue>(`/stream/albums/${albumId}/queue`, {
+      params,
+    });
+    return response.data;
+  },
+
   // Streaming
-  getStreamUrl(trackId: number): string {
-    return `${apiClient.defaults.baseURL}/stream/tracks/${trackId}`;
+  getStreamUrl(trackId: number, quality: AudioQuality = 'original'): string {
+    const base = `${apiClient.defaults.baseURL}/stream/tracks/${trackId}`;
+    if (quality === 'original') {
+      return base;
+    }
+    const url = new URL(base, apiClient.defaults.baseURL);
+    url.searchParams.set('quality', quality);
+    return url.toString();
   },
 
   // Album artwork
-  getAlbumArtworkUrl(albumId: number, size: 'small' | 'medium' | 'large' = 'medium'): string {
-    return `${apiClient.defaults.baseURL}/albums/${albumId}/artwork?size=${size}`;
+  getAlbumArtworkUrl(albumId: number, size: 'thumbnail' | 'medium' | 'large' = 'medium'): string {
+    return `${apiClient.defaults.baseURL}/albums/${albumId}/cover?size=${size}`;
   },
 
   // Library scanning

@@ -1,32 +1,47 @@
 version: "3.9"
 
 services:
-  backend:
+  music-manager-backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "32000:8000"
     volumes:
       - ./backend:/app
-      - /mnt/nas-music:/music:ro
+      - /mnt/data/nas-music:/music:ro
     environment:
       - DATABASE_URL=sqlite:///./music_manager.db
       - MUSIC_LIBRARY_PATH=/music
+      - PYTHONPATH=/app
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - music-manager-network
 
-  frontend:
+  music-manager-frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "32001:3000"
     volumes:
-      - ./frontend:/app
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
     environment:
-      - VITE_API_URL=http://localhost:8000
-    command: npm run dev -- --host 0.0.0.0
+      - VITE_API_URL=http://localhost:32000
+    depends_on:
+      - music-manager-backend
+    networks:
+      - music-manager-network
 
-  redis:
+  music-manager-redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "32002:6379"
     command: redis-server --save 20 1 --loglevel warning
+    networks:
+      - music-manager-network
+
+networks:
+  music-manager-network:
+    driver: bridge

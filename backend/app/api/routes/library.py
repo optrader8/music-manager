@@ -7,11 +7,17 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.dependencies import get_current_user, get_db
+from app.core.pagination import (
+    PaginationParams,
+    build_pagination_metadata,
+    pagination_params,
+)
 from app.db.models import User
 from app.db.session import SessionLocal
 from app.schemas import (
     LibraryBrowseResponse,
     LibrarySearchResponse,
+    PaginationMeta,
     TrackSearchResult,
     TrackWithRelations,
 )
@@ -73,9 +79,8 @@ async def get_scan_status(
 @router.get("/search", response_model=LibrarySearchResponse)
 async def search_library_tracks(
     response: Response,
+    pagination: PaginationParams = Depends(pagination_params(default_page_size=25, max_page_size=100)),
     q: str = Query(..., min_length=1, description="Search query"),
-    page: int = Query(1, ge=1),
-    page_size: int = Query(25, ge=1, le=100),
     sort: str = Query(
         "relevance",
         pattern=r"^(relevance|title|artist|album|recent)$",
@@ -89,8 +94,8 @@ async def search_library_tracks(
     service = LibraryService(db)
     tracks, scores, total = service.search_tracks(
         query=q,
-        page=page,
-        page_size=page_size,
+        page=pagination.page,
+        page_size=pagination.page_size,
         filters=SearchFilters(artist_id=artist_id, album_id=album_id, genre=genre),
         sort=sort,
     )
@@ -101,24 +106,20 @@ async def search_library_tracks(
         track_data["score"] = scores.get(track.id, 0.0)
         items.append(TrackSearchResult.model_validate(track_data))
 
-    has_more = page * page_size < total
+    meta = build_pagination_metadata(total=total, params=pagination)
     response.headers["Cache-Control"] = "no-store"
     response.headers["X-Total-Count"] = str(total)
 
     return LibrarySearchResponse(
         items=items,
-        total=total,
-        page=page,
-        page_size=page_size,
-        has_more=has_more,
+        pagination=PaginationMeta.model_validate(meta),
     )
 
 
 @router.get("/tracks", response_model=LibraryBrowseResponse)
 async def browse_library_tracks(
     response: Response,
-    page: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1, le=200),
+    pagination: PaginationParams = Depends(pagination_params(default_page_size=50, max_page_size=200)),
     sort: str = Query(
         "recent",
         pattern=r"^(recent|recent_asc|title|title_desc|artist|artist_desc|album|album_desc)$",
@@ -131,25 +132,22 @@ async def browse_library_tracks(
 ) -> LibraryBrowseResponse:
     service = LibraryService(db)
     tracks, total = service.browse_tracks(
-        page=page,
-        page_size=page_size,
+        page=pagination.page,
+        page_size=pagination.page_size,
         filters=SearchFilters(artist_id=artist_id, album_id=album_id, genre=genre),
         sort=sort,
         search=search,
     )
 
     items = [TrackWithRelations.model_validate(track) for track in tracks]
-    has_more = page * page_size < total
+    meta = build_pagination_metadata(total=total, params=pagination)
 
     response.headers["Cache-Control"] = "public, max-age=30"
     response.headers["X-Total-Count"] = str(total)
 
     return LibraryBrowseResponse(
         items=items,
-        total=total,
-        page=page,
-        page_size=page_size,
-        has_more=has_more,
+        pagination=PaginationMeta.model_validate(meta),
     )
 
 

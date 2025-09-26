@@ -70,7 +70,7 @@ async def update_playlist(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
 
-@router.delete("/{playlist_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{playlist_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_playlist(
     playlist_id: int,
     db: Session = Depends(get_db),

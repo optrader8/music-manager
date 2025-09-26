@@ -1,6 +1,18 @@
-from .album import AlbumBase, AlbumCreate, AlbumRead, AlbumUpdate, AlbumWithArtist
+from .album import (
+    AlbumBase,
+    AlbumCreate,
+    AlbumFilters,
+    AlbumListResponse,
+    AlbumRead,
+    AlbumSortOptions,
+    AlbumSummary,
+    AlbumUpdate,
+    AlbumWithArtist,
+    AlbumWithTracks,
+)
 from .artist import ArtistBase, ArtistCreate, ArtistRead, ArtistUpdate
-from .library import LibraryBrowseResponse, LibrarySearchResponse, PaginatedResponse
+from .library import LibraryBrowseResponse, LibrarySearchResponse
+from .pagination import PaginatedResponse, PaginationMeta
 from .playlist import (
     PlaylistCreate,
     PlaylistDetail,
@@ -10,25 +22,44 @@ from .playlist import (
     PlaylistTrackRequest,
     PlaylistUpdate,
 )
+from .playback import PlaybackQueue, PlaybackTrack
 from .token import Token, TokenPayload
 from .track import (
     MetadataSuggestion,
     TrackBase,
     TrackCreate,
+    TrackInAlbum,
     TrackMetadataUpdate,
     TrackRead,
     TrackSearchResult,
     TrackUpdate,
     TrackWithRelations,
 )
+from .stats import (
+    AlbumStats,
+    ArtistStats,
+    BitrateDistribution,
+    DashboardData,
+    GenreDistribution,
+    LibraryOverview,
+    QualityStats,
+    SampleRateDistribution,
+    TrackPlayStats,
+    TrackPlayStatsResponse,
+)
 from .user import UserCreate, UserLogin, UserRead
 
 __all__ = [
     "AlbumBase",
     "AlbumCreate",
+    "AlbumFilters",
+    "AlbumListResponse",
     "AlbumRead",
+    "AlbumSortOptions",
+    "AlbumSummary",
     "AlbumUpdate",
     "AlbumWithArtist",
+    "AlbumWithTracks",
     "ArtistBase",
     "ArtistCreate",
     "ArtistRead",
@@ -36,6 +67,7 @@ __all__ = [
     "LibraryBrowseResponse",
     "LibrarySearchResponse",
     "PaginatedResponse",
+    "PaginationMeta",
     "PlaylistCreate",
     "PlaylistDetail",
     "PlaylistRead",
@@ -43,16 +75,29 @@ __all__ = [
     "PlaylistTrackReorderRequest",
     "PlaylistTrackRequest",
     "PlaylistUpdate",
+    "PlaybackQueue",
+    "PlaybackTrack",
     "Token",
     "TokenPayload",
     "MetadataSuggestion",
     "TrackBase",
     "TrackCreate",
+    "TrackInAlbum",
     "TrackMetadataUpdate",
     "TrackRead",
     "TrackSearchResult",
     "TrackUpdate",
     "TrackWithRelations",
+    "AlbumStats",
+    "ArtistStats",
+    "BitrateDistribution",
+    "DashboardData",
+    "GenreDistribution",
+    "LibraryOverview",
+    "QualityStats",
+    "SampleRateDistribution",
+    "TrackPlayStats",
+    "TrackPlayStatsResponse",
     "UserCreate",
     "UserLogin",
     "UserRead",

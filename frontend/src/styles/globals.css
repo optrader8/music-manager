@@ -1,0 +1,433 @@
+/* 전체 애플리케이션 레이아웃 */
+body {
+  margin: 0;
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  background: #f8fafc;
+  color: #1f2937;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  background: #f8fafc;
+}
+
+/* 모바일 오버레이 */
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  display: none;
+}
+
+/* 사이드바 */
+.sidebar {
+  width: 280px;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sidebar-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0.25rem;
+  border-radius: 4px;
+  display: none;
+}
+
+.sidebar-close:hover {
+  background: #f3f4f6;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  background: none;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.nav-item.active {
+  background: #eff6ff;
+  color: #2563eb;
+  border-right: 3px solid #2563eb;
+}
+
+.sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.app-info {
+  text-align: center;
+  color: #6b7280;
+}
+
+.app-info p {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.version {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+/* 메인 컨텐츠 */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 헤더 */
+.header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: none;
+}
+
+.menu-button:hover {
+  background: #f3f4f6;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.header-actions {
+  margin-left: auto;
+}
+
+/* 컨텐츠 영역 */
+.content {
+  flex: 1;
+  overflow: auto;
+  padding: 1.5rem;
+}
+
+/* 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.modal-close:hover {
+  background: #f3f4f6;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.receipt-details {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.detail-group:last-child {
+  border-bottom: none;
+}
+
+.detail-group label {
+  font-weight: 500;
+  color: #374151;
+  min-width: 100px;
+}
+
+.detail-group span {
+  color: #6b7280;
+  text-align: right;
+}
+
+.detail-group .reimbursement {
+  color: #059669;
+  font-weight: 600;
+}
+
+.receipt-image {
+  margin-top: 1rem;
+}
+
+.receipt-image label {
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.receipt-img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+/* 배지 스타일 */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.badge-점심 {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-저녁 {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-간식 {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.badge-야근식대 {
+  background: #fdf2f8;
+  color: #be185d;
+}
+
+.badge-default {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* 버튼 스타일 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #4f46e5;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: #d1d5db;
+  color: #6b7280;
+}
+
+.btn-outline:hover:not(:disabled) {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-close {
+    display: block;
+  }
+
+  .mobile-overlay {
+    display: block;
+  }
+
+  .menu-button {
+    display: block;
+  }
+
+  .main-content {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .modal-content {
+    margin: 0.5rem;
+    max-width: none;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+
+  .detail-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .detail-group span {
+    text-align: left;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+}

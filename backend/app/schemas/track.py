@@ -39,6 +39,8 @@ class TrackRead(TrackBase):
     file_hash: str
     created_at: datetime
     updated_at: datetime
+    play_count: int
+    last_played_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -47,6 +49,18 @@ class TrackRead(TrackBase):
 class TrackWithRelations(TrackRead):
     artist: Optional["ArtistRead"] = None
     album: Optional["AlbumRead"] = None
+
+    class Config:
+        from_attributes = True
+
+
+class TrackInAlbum(BaseModel):
+    id: int
+    title: str
+    track_number: Optional[int] = None
+    disc_number: Optional[int] = None
+    duration_seconds: Optional[float] = None
+    artist: Optional["ArtistRead"] = None
 
     class Config:
         from_attributes = True
@@ -74,6 +88,7 @@ from .album import AlbumRead  # noqa: E402
 from .artist import ArtistRead  # noqa: E402
 
 TrackWithRelations.model_rebuild()
+TrackInAlbum.model_rebuild()
 
 
 class TrackSearchResult(TrackWithRelations):
@@ -87,6 +102,7 @@ __all__ = [
     "MetadataSuggestion",
     "TrackBase",
     "TrackCreate",
+    "TrackInAlbum",
     "TrackMetadataUpdate",
     "TrackRead",
     "TrackSearchResult",

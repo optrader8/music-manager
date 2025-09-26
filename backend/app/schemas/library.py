@@ -1,23 +1,16 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
+from app.schemas.pagination import PaginatedResponse
 
 from .track import TrackSearchResult, TrackWithRelations
 
 
-class PaginatedResponse(BaseModel):
-    page: int
-    page_size: int
-    total: int
-    has_more: bool
+class LibrarySearchResponse(PaginatedResponse[TrackSearchResult]):
+    """Paginated response for search results."""
 
 
-class LibrarySearchResponse(PaginatedResponse):
-    items: list[TrackSearchResult]
+class LibraryBrowseResponse(PaginatedResponse[TrackWithRelations]):
+    """Paginated response for track browsing."""
 
 
-class LibraryBrowseResponse(PaginatedResponse):
-    items: list[TrackWithRelations]
-
-
-__all__ = ["LibrarySearchResponse", "LibraryBrowseResponse", "PaginatedResponse"]
+__all__ = ["LibrarySearchResponse", "LibraryBrowseResponse"]

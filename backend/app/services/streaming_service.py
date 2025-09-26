@@ -1,14 +1,25 @@
 from __future__ import annotations
 
 import asyncio
+import io
 from collections.abc import AsyncGenerator
+from datetime import datetime, timezone
+from email.utils import format_datetime
+from enum import Enum
 from pathlib import Path
 
 import aiofiles
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Response, status
+from PIL import Image
+
+if hasattr(Image, "Resampling"):
+    _RESAMPLE = Image.Resampling.LANCZOS
+else:  # pragma: no cover - Pillow < 9 fallback
+    _RESAMPLE = Image.LANCZOS
+
 from sqlalchemy.orm import Session
 
-from app.db.models import Track
+from app.db.models import Album, Track
 
 SUPPORTED_CONTENT_TYPES = {
     ".mp3": "audio/mpeg",
@@ -27,7 +38,40 @@ TRANSCODE_CONTENT_TYPES = {
     "wav": "audio/wav",
 }
 
+IMAGE_CONTENT_TYPES = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp",
+}
+
 SUPPORTED_TRANSCODE_FORMATS = set(TRANSCODE_CONTENT_TYPES.keys())
+
+
+class CoverSize(str, Enum):
+    THUMBNAIL = "thumbnail"
+    MEDIUM = "medium"
+    LARGE = "large"
+    ORIGINAL = "original"
+
+
+_COVER_DIMENSIONS = {
+    CoverSize.THUMBNAIL: 128,
+    CoverSize.MEDIUM: 256,
+    CoverSize.LARGE: 512,
+}
+
+_COVER_CANDIDATE_NAMES = (
+    "cover.jpg",
+    "cover.jpeg",
+    "cover.png",
+    "folder.jpg",
+    "folder.png",
+    "front.jpg",
+    "front.png",
+    "album.jpg",
+    "album.png",
+)
 
 
 class StreamingService:
@@ -47,6 +91,39 @@ class StreamingService:
         if not file_path.exists():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Audio file not found")
         return track, file_path
+
+    async def get_album_cover(
+        self, album_id: int, size: CoverSize = CoverSize.MEDIUM
+    ) -> Response:
+        album = self.session.get(Album, album_id)
+        if not album:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Album not found")
+
+        track = (
+            self.session.query(Track)
+            .filter(Track.album_id == album_id)
+            .order_by(
+                Track.disc_number.nullsfirst(),
+                Track.track_number.nullsfirst(),
+                Track.id.asc(),
+            )
+            .first()
+        )
+        if not track:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cover art not found")
+
+        audio_path = Path(track.file_path)
+        cover_path = self._locate_cover_art(audio_path.parent)
+        if not cover_path:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cover art not found")
+
+        image_bytes, media_type, mtime = self._prepare_cover_bytes(cover_path, size)
+        response = Response(content=image_bytes, media_type=media_type)
+        response.headers["Cache-Control"] = "public, max-age=86400"
+        response.headers["Last-Modified"] = format_datetime(
+            datetime.fromtimestamp(mtime, tz=timezone.utc)
+        )
+        return response
 
     async def stream_file(
         self,
@@ -91,6 +168,55 @@ class StreamingService:
         iterator = self._transcode_file(file_path, target_format, bitrate)
         media_type = TRANSCODE_CONTENT_TYPES[target_format]
         return iterator, media_type, track
+
+    def record_play(self, track: Track) -> None:
+        """Increment play count metadata for a track."""
+        track.play_count = (track.play_count or 0) + 1
+        track.last_played_at = datetime.now(timezone.utc)
+        self.session.add(track)
+        self.session.commit()
+
+    def _locate_cover_art(self, directory: Path) -> Path | None:
+        if not directory.exists():
+            return None
+
+        for name in _COVER_CANDIDATE_NAMES:
+            candidate = directory / name
+            if candidate.exists() and candidate.is_file():
+                return candidate
+
+        for entry in directory.iterdir():
+            if entry.is_file() and entry.suffix.lower() in IMAGE_CONTENT_TYPES:
+                return entry
+        return None
+
+    def _prepare_cover_bytes(self, cover_path: Path, size: CoverSize) -> tuple[bytes, str, float]:
+        media_type = IMAGE_CONTENT_TYPES.get(cover_path.suffix.lower(), "image/jpeg")
+        mtime = cover_path.stat().st_mtime
+
+        if size == CoverSize.ORIGINAL or size not in _COVER_DIMENSIONS:
+            return cover_path.read_bytes(), media_type, mtime
+
+        target = _COVER_DIMENSIONS[size]
+        with Image.open(cover_path) as image:
+            if media_type == "image/jpeg" and image.mode not in {"RGB", "L"}:
+                image = image.convert("RGB")
+            elif media_type in {"image/png", "image/webp"} and image.mode not in {"RGB", "RGBA", "L"}:
+                image = image.convert("RGBA")
+
+            image.thumbnail((target, target), _RESAMPLE)
+            buffer = io.BytesIO()
+            if media_type == "image/jpeg":
+                format_name = "JPEG"
+            elif media_type == "image/png":
+                format_name = "PNG"
+            elif media_type == "image/webp":
+                format_name = "WEBP"
+            else:
+                format_name = "PNG"
+                media_type = "image/png"
+            image.save(buffer, format=format_name)
+            return buffer.getvalue(), media_type, mtime
 
     def _get_content_type(self, file_path: Path) -> str:
         return SUPPORTED_CONTENT_TYPES.get(file_path.suffix.lower(), "audio/mpeg")
@@ -207,4 +333,4 @@ class StreamingService:
         return generator()
 
 
-__all__ = ["StreamingService", "SUPPORTED_TRANSCODE_FORMATS"]
+__all__ = ["StreamingService", "SUPPORTED_TRANSCODE_FORMATS", "CoverSize"]
