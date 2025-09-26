@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Filter, Grid, List, SortAsc } from 'lucide-react';
+import { Search, Grid, List, SortAsc } from 'lucide-react';
 import * as Select from '@radix-ui/react-select';
 import * as Tabs from '@radix-ui/react-tabs';
 import { MusicCard } from '@/components/MusicCard/MusicCard';

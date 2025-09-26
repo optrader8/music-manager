@@ -7,6 +7,7 @@
 이 프로젝트는 `/home/optrader/dev/receipt-manager/frontend`에서 구현된 검증된 UI 구조를 추출하여, 다른 프로젝트에서 쉽게 재사용할 수 있는 템플릿으로 만드는 것을 목표로 합니다.
 
 ### 핵심 목표
+
 1. **Phase 1**: Receipt Manager의 Layout 시스템을 이 프로젝트로 이식
    - Header, Sidebar, Content 구조
    - 반응형 디자인 및 모바일 최적화
@@ -20,11 +21,13 @@
 ## 🛠 기술 스택
 
 ### 핵심 프레임워크
+
 - **React 18.3.1** - 현대적인 React 기능 활용
 - **TypeScript 5.8.3** - 타입 안전성과 개발자 경험 향상
 - **RSBuild** - 고성능 번들러 (Rspack 기반)
 
 ### UI & 스타일링
+
 - **Tailwind CSS 4.1.11** - 유틸리티 우선 CSS 프레임워크
 - **SCSS Modules** - 컴포넌트 스코프 스타일링
 - **Radix UI** - 접근성과 사용성이 검증된 UI 프리미티브
@@ -33,11 +36,13 @@
 - **Class Variance Authority (CVA)** - 타입 안전한 변형 관리
 
 ### 상태 관리 & 라우팅
+
 - **TanStack Router** - 타입 안전한 파일 기반 라우팅
 - **TanStack Query** - 서버 상태 관리
 - **Zustand** - 클라이언트 상태 관리
 
 ### 개발 도구
+
 - **ESLint 9** - 코드 품질 관리
 - **Prettier 3.5** - 코드 포맷팅
 - **PostCSS** - CSS 후처리
@@ -46,6 +51,7 @@
 ## 📁 프로젝트 구조
 
 ### 현재 Receipt Manager 구조 분석
+
 ```
 src/
 ├── components/
@@ -78,6 +84,7 @@ src/
 ```
 
 ### 계획된 Template 구조
+
 ```
 react-ui-template/
 ├── src/
@@ -99,6 +106,7 @@ react-ui-template/
 ### Layout System
 
 #### 1. **Layout.tsx** - 메인 레이아웃 컨테이너
+
 - **반응형 디자인**: 데스크톱과 모바일에서 다른 사이드바 동작
 - **상태 관리**: 사이드바 가시성, 인증 상태
 - **라우팅 연동**: TanStack Router와 완전 통합
@@ -113,12 +121,14 @@ react-ui-template/
 ```
 
 #### 2. **Header.tsx** - 상단 헤더
+
 - **브랜드 영역**: 로고 + 애플리케이션 이름
 - **네비게이션**: 미인증 사용자용 메뉴 (Features, Pricing, Support)
 - **사용자 액션**: 로그인/로그아웃 버튼
 - **모바일 메뉴**: 햄버거 메뉴로 사이드바 토글
 
 #### 3. **Sidebar.tsx** - 사이드 네비게이션
+
 - **동적 네비게이션**: `navigationItems` 배열 기반
 - **활성 상태**: 현재 라우트에 따른 하이라이트
 - **아이콘 + 라벨**: Lucide React 아이콘 시스템
@@ -127,17 +137,20 @@ react-ui-template/
 ## 🎨 디자인 시스템
 
 ### Color Scheme
+
 - Primary: 브랜드 컬러 기반
 - Secondary: 보조 액션용
 - Ghost: 미니멀한 호버 효과
 - Destructive: 위험한 액션용
 
 ### Typography
+
 - 일관된 폰트 크기 및 두께
 - 계층적 정보 구조
 - 가독성 최적화
 
 ### Spacing & Layout
+
 - CSS Grid 및 Flexbox 활용
 - 일관된 여백 시스템
 - 반응형 그리드
@@ -145,6 +158,7 @@ react-ui-template/
 ## 🚀 설치 및 실행
 
 ### Prerequisites
+
 - Node.js 18.x 이상
 - npm 또는 yarn
 
@@ -172,14 +186,16 @@ npm run dev
 ## 🔧 개발 가이드
 
 ### 컴포넌트 개발 원칙
+
 1. **TypeScript First**: 모든 컴포넌트는 타입 안전성 보장
-2. **SCSS Modules**: 스타일 캡슐화 및 CSS 클래스 충돌 방지  
+2. **SCSS Modules**: 스타일 캡슐화 및 CSS 클래스 충돌 방지
 3. **Composition Pattern**: 재사용성과 확장성을 위한 합성 패턴
 4. **Accessibility**: WCAG 2.1 AA 준수
 
 ### 커스터마이징 가이드
 
 #### Navigation Items 수정
+
 ```typescript
 // src/constants/navigation.tsx
 export const navigationItems: NavigationItem[] = [
@@ -194,6 +210,7 @@ export const navigationItems: NavigationItem[] = [
 ```
 
 #### 테마 커스터마이징
+
 ```scss
 // src/styles/theme.scss
 :root {
@@ -204,6 +221,7 @@ export const navigationItems: NavigationItem[] = [
 ```
 
 ### 성능 최적화
+
 - **Code Splitting**: TanStack Router의 자동 코드 분할
 - **Tree Shaking**: 사용되지 않는 코드 제거
 - **CSS Optimization**: 미사용 CSS 제거
@@ -212,6 +230,7 @@ export const navigationItems: NavigationItem[] = [
 ## 🗺 로드맵
 
 ### Phase 1: UI 이식 (현재 단계)
+
 - [ ] Layout 컴포넌트 이식
 - [ ] UI 컴포넌트 라이브러리 구축
 - [ ] 기본 라우팅 구조 설정
@@ -219,6 +238,7 @@ export const navigationItems: NavigationItem[] = [
 - [ ] 타입 정의 완성
 
 ### Phase 2: 템플릿화
+
 - [ ] 설정 기반 커스터마이징 시스템
 - [ ] CLI 도구 개발
 - [ ] 템플릿 생성 스크립트
@@ -226,6 +246,7 @@ export const navigationItems: NavigationItem[] = [
 - [ ] 플러그인 아키텍처
 
 ### Phase 3: 에코시스템
+
 - [ ] 추가 레이아웃 템플릿들
 - [ ] 컴포넌트 라이브러리 확장
 - [ ] Storybook 통합

@@ -6,15 +6,6 @@ import { router } from '@/router';
 import { AuthProvider } from '@/hooks/useAuth';
 import '@/styles/globals.css';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 10, // 10 minutes
-    },
-  },
-});
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -24,6 +15,15 @@ function App() {
     </QueryClientProvider>
   );
 }
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes
+    },
+  },
+});
 
 const rootEl = document.getElementById('root');
 
@@ -37,3 +37,5 @@ if (rootEl) {
 } else {
   console.error('Root element not found!');
 }
+
+export { App };

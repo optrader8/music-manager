@@ -1,7 +1,4 @@
-import React, { useState } from 'react';
-import { Button } from '../ui/button';
-import { Slider } from '../ui/slider';
-import { Card } from '../ui/card';
+import React from 'react';
 import {
   Play,
   Pause,
@@ -12,15 +9,10 @@ import {
   Repeat,
   Repeat1,
   Shuffle,
-  ChevronUp,
-  ChevronDown,
   List,
-  Heart,
-  MoreHorizontal,
+  ChevronUp,
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { useAudioControls, usePlaybackQueue } from '../../hooks/useAudioPlayer';
-import { musicService } from '../../services/musicService';
+import { useAudioPlayer } from '@/context/AudioPlayerContext';
 
 interface PlayerControlsProps {
   className?: string;
@@ -32,7 +24,7 @@ interface PlayerControlsProps {
 }
 
 export const PlayerControls: React.FC<PlayerControlsProps> = ({
-  className,
+  className = '',
   showQueue = true,
   showVolume = true,
   compact = false,
@@ -47,266 +39,161 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
     isMuted,
     currentTime,
     duration,
-    progress,
-    canPlay,
-    canSeek,
-    togglePlayPause,
+    shuffle,
+    repeat,
+    play,
+    pause,
     next,
     previous,
-    seekTo,
+    seek,
     setVolume,
     toggleMute,
-  } = useAudioControls();
+    setShuffle,
+    setRepeat,
+  } = useAudioPlayer();
 
-  const { shuffle, repeat, setShuffle, setRepeat, queueLength } = usePlaybackQueue();
-
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragProgress, setDragProgress] = useState(0);
+  if (!currentTrack) {
+    return null;
+  }
 
   const formatTime = (seconds: number) => {
-    if (!seconds || !isFinite(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleProgressChange = (value: number[]) => {
-    const newProgress = value[0];
-    setDragProgress(newProgress);
-    if (!isDragging) {
-      seekTo(newProgress);
-    }
-  };
-
-  const handleProgressChangeStart = () => {
-    setIsDragging(true);
-  };
-
-  const handleProgressChangeEnd = (value: number[]) => {
-    setIsDragging(false);
-    seekTo(value[0]);
-  };
-
-  const getRepeatIcon = () => {
-    switch (repeat) {
-      case 'one':
-        return Repeat1;
-      case 'all':
-        return Repeat;
-      default:
-        return Repeat;
-    }
-  };
-
-  const RepeatIcon = getRepeatIcon();
-
-  if (!currentTrack && !compact) {
-    return (
-      <Card className={cn('p-4 bg-gray-900 text-white', className)}>
-        <div className="flex items-center justify-center h-16">
-          <p className="text-gray-400">No track selected</p>
-        </div>
-      </Card>
-    );
-  }
-
-  if (compact && !currentTrack) {
-    return null;
-  }
+  const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <Card
-      className={cn('bg-gray-900 text-white border-gray-700', compact ? 'p-2' : 'p-4', className)}
-    >
-      <div className={cn('flex items-center gap-4', compact ? 'flex-col' : 'flex-row')}>
+    <div className={`bg-white border-t border-gray-200 px-4 py-3 ${className}`}>
+      <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Track Info */}
-        <div className={cn('flex items-center gap-3', compact ? 'w-full' : 'flex-1 min-w-0')}>
-          {currentTrack && (
-            <>
-              {/* Album Art */}
-              <div className={cn('flex-shrink-0', compact ? 'w-12 h-12' : 'w-16 h-16')}>
-                <img
-                  src={musicService.getAlbumArtworkUrl(currentTrack.album?.id || 0, 'medium')}
-                  alt={currentTrack.album?.title || 'Album cover'}
-                  className="w-full h-full rounded object-cover"
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    target.src = '/placeholder-album.png';
-                  }}
-                />
-              </div>
-
-              {/* Track Details */}
-              <div className="flex-1 min-w-0">
-                <h4 className={cn('font-medium truncate', compact ? 'text-sm' : 'text-base')}>
-                  {currentTrack.title}
-                </h4>
-                <p className={cn('text-gray-400 truncate', compact ? 'text-xs' : 'text-sm')}>
-                  {currentTrack.artist?.name || 'Unknown Artist'}
-                  {currentTrack.album && ` • ${currentTrack.album.title}`}
-                </p>
-              </div>
-
-              {/* Favorite Button */}
-              {!compact && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-400 hover:text-white flex-shrink-0"
-                >
-                  <Heart className="w-4 h-4" />
-                </Button>
-              )}
-            </>
-          )}
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+            {currentTrack.album?.cover_art_url ? (
+              <img
+                src={currentTrack.album.cover_art_url}
+                alt={currentTrack.album.title}
+                className="w-full h-full object-cover rounded-lg"
+              />
+            ) : (
+              <Play size={16} className="text-gray-400" />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-sm font-medium text-gray-900 truncate">{currentTrack.title}</h4>
+            <p className="text-xs text-gray-600 truncate">
+              {currentTrack.artist?.name || 'Unknown Artist'}
+            </p>
+          </div>
         </div>
 
-        {/* Main Controls */}
-        <div
-          className={cn('flex flex-col items-center gap-2', compact ? 'w-full' : 'flex-1 max-w-md')}
-        >
-          {/* Control Buttons */}
+        {/* Center Controls */}
+        <div className="flex flex-col items-center gap-2 flex-1 max-w-md">
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => setShuffle(!shuffle)}
-              className={cn('text-gray-400 hover:text-white', shuffle && 'text-green-500')}
+              className={`p-2 rounded-full transition-colors ${
+                shuffle ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'
+              }`}
             >
-              <Shuffle className={cn('w-4 h-4', compact && 'w-3 h-3')} />
-            </Button>
+              <Shuffle size={16} />
+            </button>
 
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={previous}
-              disabled={!canPlay}
-              className="text-gray-400 hover:text-white disabled:opacity-50"
+              className="p-2 rounded-full text-gray-600 hover:text-gray-900 transition-colors"
             >
-              <SkipBack className={cn('w-4 h-4', compact && 'w-3 h-3')} />
-            </Button>
+              <SkipBack size={18} />
+            </button>
 
-            <Button
-              onClick={togglePlayPause}
-              disabled={!canPlay || isLoading}
-              className={cn(
-                'bg-white text-black hover:bg-gray-200 disabled:opacity-50 rounded-full',
-                compact ? 'w-8 h-8' : 'w-10 h-10'
-              )}
+            <button
+              onClick={() => (isPlaying ? pause() : play())}
+              disabled={isLoading}
+              className="p-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white transition-colors disabled:opacity-50"
             >
               {isLoading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-white" />
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <Pause className={cn('w-4 h-4', compact && 'w-3 h-3')} />
+                <Pause size={20} />
               ) : (
-                <Play className={cn('w-4 h-4 ml-0.5', compact && 'w-3 h-3 ml-0')} />
+                <Play size={20} />
               )}
-            </Button>
+            </button>
 
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={next}
-              disabled={!canPlay}
-              className="text-gray-400 hover:text-white disabled:opacity-50"
+              className="p-2 rounded-full text-gray-600 hover:text-gray-900 transition-colors"
             >
-              <SkipForward className={cn('w-4 h-4', compact && 'w-3 h-3')} />
-            </Button>
+              <SkipForward size={18} />
+            </button>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                const nextRepeat = repeat === 'off' ? 'all' : repeat === 'all' ? 'one' : 'off';
-                setRepeat(nextRepeat);
-              }}
-              className={cn('text-gray-400 hover:text-white', repeat !== 'off' && 'text-green-500')}
+            <button
+              onClick={() => setRepeat(repeat === 'off' ? 'all' : repeat === 'all' ? 'one' : 'off')}
+              className={`p-2 rounded-full transition-colors ${
+                repeat !== 'off' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'
+              }`}
             >
-              <RepeatIcon className={cn('w-4 h-4', compact && 'w-3 h-3')} />
-            </Button>
+              {repeat === 'one' ? <Repeat1 size={16} /> : <Repeat size={16} />}
+            </button>
           </div>
 
           {/* Progress Bar */}
-          {!compact && canSeek && (
-            <div className="flex items-center gap-3 w-full">
-              <span className="text-xs text-gray-400 w-10 text-right">
-                {formatTime(currentTime)}
-              </span>
-              <Slider
-                value={[isDragging ? dragProgress : progress]}
-                onValueChange={handleProgressChange}
-                onValueCommit={handleProgressChangeEnd}
-                onPointerDown={handleProgressChangeStart}
-                max={100}
-                step={0.1}
-                className="flex-1"
+          <div className="flex items-center gap-2 w-full text-xs text-gray-500">
+            <span>{formatTime(currentTime)}</span>
+            <div
+              className="flex-1 h-1 bg-gray-200 rounded-full cursor-pointer"
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const percentage = clickX / rect.width;
+                seek(percentage * duration);
+              }}
+            >
+              <div
+                className="h-full bg-blue-500 rounded-full transition-all"
+                style={{ width: `${progressPercentage}%` }}
               />
-              <span className="text-xs text-gray-400 w-10">{formatTime(duration)}</span>
             </div>
-          )}
+            <span>{formatTime(duration)}</span>
+          </div>
         </div>
 
         {/* Right Controls */}
-        <div
-          className={cn(
-            'flex items-center gap-2',
-            compact ? 'w-full justify-center' : 'flex-shrink-0'
-          )}
-        >
-          {/* Volume Control */}
-          {showVolume && !compact && (
+        <div className="flex items-center gap-2 flex-1 justify-end">
+          {showVolume && (
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleMute}
-                className="text-gray-400 hover:text-white"
-              >
-                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </Button>
-              <Slider
-                value={[isMuted ? 0 : volume * 100]}
-                onValueChange={(value) => setVolume(value[0] / 100)}
-                max={100}
-                step={1}
-                className="w-20"
+              <button onClick={toggleMute} className="p-2 text-gray-600 hover:text-gray-900">
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={isMuted ? 0 : volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                className="w-20 h-1 bg-gray-200 rounded-full appearance-none cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(isMuted ? 0 : volume) * 100}%, #e5e7eb ${(isMuted ? 0 : volume) * 100}%, #e5e7eb 100%)`,
+                }}
               />
             </div>
           )}
 
-          {/* Queue Toggle */}
           {showQueue && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleQueue}
-              className="text-gray-400 hover:text-white"
-            >
-              <List className="w-4 h-4" />
-              {!compact && queueLength > 0 && <span className="ml-1 text-xs">{queueLength}</span>}
-            </Button>
+            <button onClick={onToggleQueue} className="p-2 text-gray-600 hover:text-gray-900">
+              <List size={16} />
+            </button>
           )}
 
-          {/* Expand/Collapse */}
           {onToggleExpanded && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggleExpanded}
-              className="text-gray-400 hover:text-white"
-            >
-              <ChevronUp className="w-4 h-4" />
-            </Button>
-          )}
-
-          {/* More Options */}
-          {!compact && (
-            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
+            <button onClick={onToggleExpanded} className="p-2 text-gray-600 hover:text-gray-900">
+              <ChevronUp size={16} />
+            </button>
           )}
         </div>
       </div>
-    </Card>
+    </div>
   );
 };

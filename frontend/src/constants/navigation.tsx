@@ -17,10 +17,10 @@ export const navigationItems: NavigationItem[] = [
     active: false,
   },
   {
-    id: 'tracks',
+    id: 'music',
     label: 'Music',
     icon: <Music size={24} />,
-    href: '/tracks',
+    href: '/music',
     active: false,
   },
   {

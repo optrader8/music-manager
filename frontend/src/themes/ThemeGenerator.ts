@@ -211,7 +211,7 @@ export class ThemeGenerator {
   /**
    * Generate color system from theme colors configuration
    */
-  private async generateColorSystem(colors: any): Promise<{
+  private async generateColorSystem(colors: unknown): Promise<{
     primary: ColorScale;
     secondary: ColorScale;
     neutral: ColorScale;

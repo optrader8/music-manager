@@ -5,6 +5,7 @@ import { Header } from '@/components/Layout/Header';
 import { Sidebar } from '@/components/Layout/Sidebar';
 import { PlayerControls } from '@/components/AudioPlayer/PlayerControls';
 import { PlayerQueue } from '@/components/AudioPlayer/PlayerQueue';
+import { AudioPlayerProvider } from '@/context/AudioPlayerContext';
 import { navigationItems } from '@/constants/navigation';
 import styles from './Layout.module.scss';
 import { FileRouteTypes } from '@/routeTree.gen';
@@ -61,7 +62,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       home: '/',
       dashboard: '/',
       statistics: '/statistics',
-      tracks: '/tracks',
+      music: '/music',
       playlists: '/playlists',
       settings: '/settings',
     };
@@ -91,60 +92,62 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 
   return (
-    <div className={styles.root}>
-      <div className={styles.container}>
-        <Header
-          user={user}
-          onSignIn={handleSignIn}
-          onSignOut={handleSignOut}
-          onToggleSidebar={toggleSidebar}
-          isAuthenticated={isAuthenticated}
-        />
-        <div className={styles.mainContent}>
-          {isAuthenticated && (
-            <>
-              {isMobile ? (
-                <>
+    <AudioPlayerProvider>
+      <div className={styles.root}>
+        <div className={styles.container}>
+          <Header
+            user={user}
+            onSignIn={handleSignIn}
+            onSignOut={handleSignOut}
+            onToggleSidebar={toggleSidebar}
+            isAuthenticated={isAuthenticated}
+          />
+          <div className={styles.mainContent}>
+            {isAuthenticated && (
+              <>
+                {isMobile ? (
+                  <>
+                    <div
+                      className={cn(styles.mobileSidebarContainer, {
+                        [styles.visible]: isSidebarVisible,
+                      })}
+                    >
+                      {sidebarContent}
+                    </div>
+                    <div
+                      className={cn(styles.overlay, {
+                        [styles.visible]: isSidebarVisible,
+                      })}
+                      onClick={toggleSidebar}
+                    />
+                  </>
+                ) : (
                   <div
-                    className={cn(styles.mobileSidebarContainer, {
-                      [styles.visible]: isSidebarVisible,
+                    className={cn(styles.sidebarContainer, {
+                      [styles.hidden]: !isSidebarVisible,
                     })}
                   >
                     {sidebarContent}
                   </div>
-                  <div
-                    className={cn(styles.overlay, {
-                      [styles.visible]: isSidebarVisible,
-                    })}
-                    onClick={toggleSidebar}
-                  />
-                </>
-              ) : (
-                <div
-                  className={cn(styles.sidebarContainer, {
-                    [styles.hidden]: !isSidebarVisible,
-                  })}
-                >
-                  {sidebarContent}
-                </div>
-              )}
-            </>
-          )}
-          <div className={styles.content}>{children}</div>
-        </div>
+                )}
+              </>
+            )}
+            <div className={styles.content}>{children}</div>
+          </div>
 
-        {/* Persistent Audio Player */}
-        <div className="fixed bottom-0 left-0 right-0 z-50">
-          <PlayerControls
-            onToggleQueue={() => setIsQueueOpen(true)}
-            showQueue={true}
-            showVolume={true}
-          />
-        </div>
+          {/* Persistent Audio Player */}
+          <div className="fixed bottom-0 left-0 right-0 z-50">
+            <PlayerControls
+              onToggleQueue={() => setIsQueueOpen(true)}
+              showQueue={true}
+              showVolume={true}
+            />
+          </div>
 
-        {/* Player Queue Modal */}
-        <PlayerQueue isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
+          {/* Player Queue Modal */}
+          <PlayerQueue isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
+        </div>
       </div>
-    </div>
+    </AudioPlayerProvider>
   );
 };

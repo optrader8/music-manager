@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Card, CardContent } from './ui/card';
 import { ScrollArea } from './ui/scroll-area';
-import { Play, Pause, SkipBack, SkipForward, Clock, Calendar, Disc, Music, X } from 'lucide-react';
-import { useAlbumTracks, useAlbumPlaybackQueue } from '../hooks/useMusicLibrary';
+import { Play, Pause, Clock, Calendar, Disc, Music, X } from 'lucide-react';
+import { useAlbumTracks } from '../hooks/useMusicLibrary';
 import { useAudioPlayer } from '../context/AudioPlayerContext';
 import { musicService } from '../services/musicService';
 import type { AlbumWithTracks } from '../types/api';
@@ -19,7 +18,7 @@ interface AlbumDetailModalProps {
 }
 
 interface TrackRowProps {
-  track: any; // Using any for now, should be TrackWithRelations
+  track: TrackWithRelations;
   index: number;
   isPlaying: boolean;
   isCurrentTrack: boolean;
@@ -97,8 +96,7 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
   onPlayAlbum,
   onPlayTrack,
 }) => {
-  const { currentTrack, isPlaying, play, pause } = useAudioPlayer();
-  const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
+  const { currentTrack, isPlaying, pause } = useAudioPlayer();
 
   // Fetch album tracks if album has tracks, otherwise use the provided tracks
   const { data: albumData, isLoading } = useAlbumTracks(album?.id || 0, {
@@ -107,11 +105,6 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
 
   const displayAlbum = album || albumData;
   const tracks = displayAlbum?.tracks || [];
-
-  // Get playback queue for the album
-  const { data: playbackQueue } = useAlbumPlaybackQueue(displayAlbum?.id || 0, {
-    enabled: !!displayAlbum?.id,
-  });
 
   const handlePlayAlbum = () => {
     if (displayAlbum && onPlayAlbum) {
@@ -133,7 +126,6 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
   };
 
   const handlePlayTrack = (trackId: number) => {
-    setSelectedTrackId(trackId);
     if (onPlayTrack) {
       onPlayTrack(trackId);
     }

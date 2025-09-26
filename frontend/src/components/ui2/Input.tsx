@@ -2,9 +2,7 @@ import React from 'react';
 import { cn } from '@/utils/cn';
 import styles from '@/components/ui2/Input.module.scss';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  // 추가 프롭스가 필요한 경우 여기에 정의
-}
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {

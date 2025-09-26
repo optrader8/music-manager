@@ -1,13 +1,6 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { musicService } from '../services/musicService';
-import type {
-  PaginationParams,
-  SearchFilters,
-  Album,
-  Artist,
-  Track,
-  LibraryStats,
-} from '../types/api';
+import type { PaginationParams, SearchFilters } from '../types/api';
 import type { AudioQuality, PlaybackQueue } from '../types/playback';
 
 // Query keys for cache management

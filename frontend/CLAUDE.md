@@ -14,6 +14,7 @@ React UI Template is a reusable UI template system extracted from a production a
 ## Project-Specific Architecture
 
 ### Technology Stack
+
 - **React 18.3.1** with TypeScript 5.8.3
 - **RSBuild** (Rspack-based bundler) with Hot Module Replacement
 - **TanStack Router** for file-based routing
@@ -23,6 +24,7 @@ React UI Template is a reusable UI template system extracted from a production a
 - **TanStack Query** for server state
 
 ### Source Structure
+
 ```
 src/
 ├── components/
@@ -43,6 +45,7 @@ src/
 ## Development Commands
 
 ### Setup and Development
+
 ```bash
 # Install dependencies
 npm install
@@ -62,6 +65,7 @@ npm run format
 ```
 
 ### Git Workflow
+
 Use the global `gac` command as specified in [/home/optrader/CLAUDE.md](/home/optrader/CLAUDE.md):
 
 ```bash
@@ -72,6 +76,7 @@ gac auto -y -d -t "feat: add responsive sidebar" -c "Implement mobile-responsive
 ## Component Development Guidelines
 
 ### Layout Components
+
 When working with Layout components, follow these principles:
 
 1. **Responsive First**: Always consider mobile and desktop experiences
@@ -80,6 +85,7 @@ When working with Layout components, follow these principles:
 4. **Theming**: Use CSS custom properties for easy customization
 
 ### SCSS Module Conventions
+
 ```scss
 // Layout.module.scss
 .root {
@@ -109,6 +115,7 @@ When working with Layout components, follow these principles:
 ```
 
 ### TypeScript Patterns
+
 ```typescript
 // Interface definitions
 export interface LayoutProps {
@@ -132,26 +139,34 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 ## Styling Strategy
 
 ### CSS Architecture
+
 - **Global styles**: `src/styles/globals.css` for Tailwind base and utilities
 - **Component styles**: SCSS modules for component-specific styles
 - **Theme system**: CSS custom properties for easy customization
 - **Responsive design**: Mobile-first approach with breakpoints
 
 ### Class Naming (BEM-inspired)
+
 ```scss
 // Block
-.sidebar { }
+.sidebar {
+}
 
 // Element
-.sidebarHeader { }
-.sidebarContent { }
+.sidebarHeader {
+}
+.sidebarContent {
+}
 
 // Modifier
-.sidebar--collapsed { }
-.sidebar--mobile { }
+.sidebar--collapsed {
+}
+.sidebar--mobile {
+}
 ```
 
 ### Utility Usage
+
 ```typescript
 import { cn } from '@/utils/cn';
 
@@ -165,17 +180,19 @@ className={cn(
 ## State Management
 
 ### Component State
+
 - Use `useState` for local component state
 - Use `useReducer` for complex state logic
 - Custom hooks for reusable stateful logic
 
 ### Application State (Zustand)
+
 ```typescript
 // Store structure
 interface AppStore {
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   sidebarCollapsed: boolean;
-  setTheme: (theme: 'light' | 'dark') => void;
+  setTheme: (theme: "light" | "dark") => void;
   toggleSidebar: () => void;
 }
 ```
@@ -183,6 +200,7 @@ interface AppStore {
 ## Routing Conventions
 
 ### File-Based Routing
+
 ```
 src/app/
 ├── __root.tsx              # Root layout
@@ -194,6 +212,7 @@ src/app/
 ```
 
 ### Route Components
+
 ```typescript
 // Route component structure
 export default function DashboardPage() {
@@ -208,12 +227,14 @@ export default function DashboardPage() {
 ## Testing Strategy
 
 ### Component Testing
+
 - Focus on Layout component behavior
 - Test responsive breakpoints
 - Verify accessibility features
 - Mock navigation interactions
 
 ### Integration Testing
+
 - Test route transitions
 - Verify layout state persistence
 - Check theme switching
@@ -221,11 +242,13 @@ export default function DashboardPage() {
 ## Performance Considerations
 
 ### Bundle Optimization
+
 - Use React.lazy for route components
 - Implement dynamic imports for heavy dependencies
 - Minimize CSS-in-JS runtime if used
 
 ### Runtime Performance
+
 - Memoize expensive Layout calculations
 - Optimize sidebar toggle animations
 - Use CSS transforms for smooth transitions
@@ -233,6 +256,7 @@ export default function DashboardPage() {
 ## Customization Points
 
 ### Theme Customization
+
 ```css
 :root {
   --sidebar-width: 240px;
@@ -242,6 +266,7 @@ export default function DashboardPage() {
 ```
 
 ### Navigation Customization
+
 ```typescript
 // constants/navigation.tsx
 export const navigationItems: NavigationItem[] = [
@@ -268,13 +293,15 @@ When porting components from Receipt Manager:
 ## Future Phase 2 Considerations
 
 ### Template System Requirements
+
 - Configuration-based customization
-- CLI tool for project generation  
+- CLI tool for project generation
 - Multiple layout variants
 - Theme system with design tokens
 - Component library export
 
 ### Plugin Architecture
+
 - Extensible navigation system
 - Custom layout compositions
 - Third-party integrations
@@ -282,4 +309,4 @@ When porting components from Receipt Manager:
 
 ---
 
-*For common coding standards, git workflow, and general best practices, refer to [/home/optrader/CLAUDE.md](/home/optrader/CLAUDE.md).*
+_For common coding standards, git workflow, and general best practices, refer to [/home/optrader/CLAUDE.md](/home/optrader/CLAUDE.md)._

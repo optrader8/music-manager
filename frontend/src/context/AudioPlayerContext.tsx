@@ -6,7 +6,7 @@ import React, {
   useCallback,
   useEffect,
 } from 'react';
-import type { TrackWithRelations, PlaybackQueue, AudioQuality } from '../types/api';
+import type { TrackWithRelations, AudioQuality } from '../types/api';
 import type { PlaybackTrack } from '../types/playback';
 
 // Audio Player State Types
@@ -153,12 +153,13 @@ function audioPlayerReducer(state: AudioPlayerState, action: AudioPlayerAction):
     case 'ADD_TO_QUEUE':
       return { ...state, queue: [...state.queue, ...action.payload] };
 
-    case 'ADD_TO_QUEUE_NEXT':
+    case 'ADD_TO_QUEUE_NEXT': {
       const newQueue = [...state.queue];
       newQueue.splice(state.queueIndex + 1, 0, ...action.payload);
       return { ...state, queue: newQueue };
+    }
 
-    case 'REMOVE_FROM_QUEUE':
+    case 'REMOVE_FROM_QUEUE': {
       const filteredQueue = state.queue.filter((_, index) => index !== action.payload);
       let newIndex = state.queueIndex;
       if (action.payload < state.queueIndex) {
@@ -167,6 +168,7 @@ function audioPlayerReducer(state: AudioPlayerState, action: AudioPlayerAction):
         newIndex = Math.min(state.queueIndex, filteredQueue.length - 1);
       }
       return { ...state, queue: filteredQueue, queueIndex: newIndex };
+    }
 
     case 'CLEAR_QUEUE':
       return {
@@ -178,11 +180,12 @@ function audioPlayerReducer(state: AudioPlayerState, action: AudioPlayerAction):
         isPlaying: false,
       };
 
-    case 'REORDER_QUEUE':
+    case 'REORDER_QUEUE': {
       const reorderedQueue = [...state.queue];
       const [movedItem] = reorderedQueue.splice(action.payload.fromIndex, 1);
       reorderedQueue.splice(action.payload.toIndex, 0, movedItem);
       return { ...state, queue: reorderedQueue };
+    }
 
     default:
       return state;
@@ -202,6 +205,53 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Audio element setup
+  // Play track at specific index
+  const playTrackAtIndex = useCallback(
+    (index: number) => {
+      if (index >= 0 && index < state.queue.length) {
+        const track = state.queue[index];
+        dispatch({ type: 'SET_QUEUE_INDEX', payload: index });
+        dispatch({ type: 'SET_CURRENT_TRACK', payload: track as TrackWithRelations });
+        dispatch({ type: 'SET_LOADING', payload: true });
+
+        if (audioRef.current) {
+          audioRef.current.src = track.stream_url;
+          audioRef.current.play().catch((error) => console.error('Audio playback error', error));
+        }
+      }
+    },
+    [state.queue]
+  );
+
+  // Handle audio errors
+  const handleAudioError = useCallback(() => {
+    console.error('Audio playback error');
+    dispatch({ type: 'SET_LOADING', payload: false });
+    dispatch({ type: 'SET_PLAYING', payload: false });
+    // Could implement retry logic here
+  }, []);
+
+  // Handle track end
+  const handleTrackEnd = useCallback(() => {
+    dispatch({ type: 'SET_PLAYING', payload: false });
+    dispatch({ type: 'SET_LOADING', payload: false });
+
+    if (state.repeat === 'one') {
+      // Repeat current track
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(console.error);
+      }
+    } else if (state.queueIndex < state.queue.length - 1 || state.repeat === 'all') {
+      // Play next track
+      const nextIndex =
+        state.repeat === 'all' && state.queueIndex === state.queue.length - 1
+          ? 0
+          : state.queueIndex + 1;
+      playTrackAtIndex(nextIndex);
+    }
+  }, [state.repeat, state.queueIndex, state.queue.length, playTrackAtIndex]);
+
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
@@ -231,7 +281,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
         audioRef.current.src = '';
       }
     };
-  }, []);
+  }, [handleAudioError, handleTrackEnd, state.volume]);
 
   // Volume sync
   useEffect(() => {
@@ -240,52 +290,6 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
     }
   }, [state.volume, state.isMuted]);
 
-  // Handle track end
-  const handleTrackEnd = useCallback(() => {
-    dispatch({ type: 'SET_PLAYING', payload: false });
-    dispatch({ type: 'SET_LOADING', payload: false });
-
-    if (state.repeat === 'one') {
-      // Repeat current track
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(console.error);
-      }
-    } else if (state.queueIndex < state.queue.length - 1 || state.repeat === 'all') {
-      // Play next track
-      const nextIndex =
-        state.repeat === 'all' && state.queueIndex === state.queue.length - 1
-          ? 0
-          : state.queueIndex + 1;
-      playTrackAtIndex(nextIndex);
-    }
-  }, [state.repeat, state.queueIndex, state.queue.length]);
-
-  // Handle audio errors
-  const handleAudioError = useCallback(() => {
-    console.error('Audio playback error');
-    dispatch({ type: 'SET_LOADING', payload: false });
-    dispatch({ type: 'SET_PLAYING', payload: false });
-    // Could implement retry logic here
-  }, []);
-
-  // Play track at specific index
-  const playTrackAtIndex = useCallback(
-    (index: number) => {
-      if (index >= 0 && index < state.queue.length) {
-        const track = state.queue[index];
-        dispatch({ type: 'SET_QUEUE_INDEX', payload: index });
-        dispatch({ type: 'SET_CURRENT_TRACK', payload: track as TrackWithRelations });
-        dispatch({ type: 'SET_LOADING', payload: true });
-
-        if (audioRef.current) {
-          audioRef.current.src = track.stream_url;
-          audioRef.current.play().catch(handleAudioError);
-        }
-      }
-    },
-    [state.queue]
-  );
 
   // Actions
   const play = useCallback(

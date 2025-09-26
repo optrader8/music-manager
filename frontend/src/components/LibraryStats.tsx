@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from './ui/card';
 import { useLibraryStats } from '../hooks/useMusicLibrary';
-import { formatFileSize, formatDuration } from '../lib/utils';
+import { formatFileSize } from '../lib/utils';
 
 export function LibraryStats() {
   const { data: stats, isLoading, error } = useLibraryStats();

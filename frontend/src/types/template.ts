@@ -222,7 +222,7 @@ export interface BorderRadiusConfig {
   full: string;
 }
 
-export interface NavigationConfig extends NavigationItem[] {}
+export type NavigationConfig = NavigationItem[];
 
 export interface FeatureFlags {
   authentication: boolean;
@@ -238,7 +238,7 @@ export interface PluginConfig {
   name: string;
   version?: string;
   enabled: boolean;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
 export interface BuildConfig {
@@ -340,15 +340,15 @@ export interface PluginManifest {
   author: string;
   license: string;
   keywords: string[];
-  
+
   dependencies: Record<string, string>;
   peerDependencies?: Record<string, string>;
-  
+
   files: FileManifest[];
   components: ComponentManifest[];
   hooks: HookManifest[];
-  
-  configuration?: any; // JSON Schema
+
+  configuration?: unknown; // JSON Schema
 }
 
 export interface FileManifest {
@@ -361,7 +361,7 @@ export interface ComponentManifest {
   name: string;
   path: string;
   dependencies: string[];
-  props?: Record<string, any>;
+  props?: Record<string, unknown>;
 }
 
 export interface HookManifest {
@@ -389,14 +389,14 @@ export interface PromptStep {
   type: 'input' | 'select' | 'multiselect' | 'confirm' | 'color';
   message: string;
   choices?: Choice[];
-  default?: any;
-  validate?: (value: any) => boolean | string;
-  when?: (answers: any) => boolean;
+  default?: unknown;
+  validate?: (value: unknown) => boolean | string;
+  when?: (answers: unknown) => boolean;
 }
 
 export interface Choice {
   name: string;
-  value: any;
+  value: unknown;
   description?: string;
   disabled?: boolean | string;
 }

@@ -8,7 +8,7 @@ import type { Album } from '../types/api';
 export function LibraryPage() {
   const [selectedAlbumId, setSelectedAlbumId] = useState<number | null>(null);
 
-  const { data: selectedAlbum, isLoading: isLoadingAlbum } = useAlbum(selectedAlbumId || 0, {
+  const { data: selectedAlbum } = useAlbum(selectedAlbumId || 0, {
     enabled: !!selectedAlbumId,
   });
   const { playAlbum } = useAudioPlayer();

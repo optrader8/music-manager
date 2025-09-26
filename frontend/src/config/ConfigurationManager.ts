@@ -11,7 +11,7 @@ import type {
  */
 export class ConfigurationManager {
   private static instance: ConfigurationManager;
-  private schemas: Map<string, any> = new Map();
+  private schemas: Map<string, unknown> = new Map();
   private migrations: Migration[] = [];
 
   private constructor() {
@@ -316,7 +316,7 @@ export class ConfigurationManager {
     return migratedConfig;
   }
 
-  private validateThemeConfig(theme: any): ValidationResult {
+  private validateThemeConfig(theme: unknown): ValidationResult {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
 
@@ -344,7 +344,7 @@ export class ConfigurationManager {
     return hexRegex.test(color) || rgbRegex.test(color) || hslRegex.test(color);
   }
 
-  private deepMerge(target: any, source: any): any {
+  private deepMerge(target: unknown, source: unknown): unknown {
     if (source === null || typeof source !== 'object') {
       return source;
     }
@@ -356,7 +356,7 @@ export class ConfigurationManager {
     const result = { ...target };
 
     for (const key in source) {
-      if (source.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
         if (target[key] && typeof target[key] === 'object' && !Array.isArray(target[key])) {
           result[key] = this.deepMerge(target[key], source[key]);
         } else {
@@ -385,7 +385,7 @@ export class ConfigurationManager {
     );
   }
 
-  private getDefaultSpacing(): any {
+  private getDefaultSpacing(): Record<string, string> {
     return {
       0: '0px',
       px: '1px',
@@ -425,7 +425,7 @@ export class ConfigurationManager {
     };
   }
 
-  private getDefaultShadows(): any {
+  private getDefaultShadows(): Record<string, string> {
     return {
       sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
       default: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
@@ -438,7 +438,7 @@ export class ConfigurationManager {
     };
   }
 
-  private getDefaultBorderRadius(): any {
+  private getDefaultBorderRadius(): Record<string, string> {
     return {
       none: '0px',
       sm: '0.125rem',

@@ -1,18 +1,34 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Music, Users, Album, Clock, HardDrive, Headphones,
-  Play, Pause, SkipForward, SkipBack, Volume2,
-  Search, RefreshCw, Plus, TrendingUp, Star,
-  Disc3, Activity, Zap, Heart, AlertCircle
+  Music,
+  Users,
+  Album,
+  Clock,
+  HardDrive,
+  Headphones,
+  Play,
+  Pause,
+  SkipForward,
+  SkipBack,
+  Volume2,
+  Search,
+  RefreshCw,
+  Plus,
+  TrendingUp,
+  Star,
+  Disc3,
+  Activity,
+  Zap,
+  Heart,
+  AlertCircle,
 } from 'lucide-react';
-import * as Card from '@radix-ui/react-card';
 import * as Progress from '@radix-ui/react-progress';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import * as Separator from '@radix-ui/react-separator';
-import * as Badge from '@radix-ui/react-badge';
 
 import { fetchDashboardData } from '@/services/musicApi';
+import { useAudioPlayer } from '@/context/AudioPlayerContext';
 import type { DashboardData } from '@/types/stats';
 
 interface StatCardProps {
@@ -86,7 +102,12 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, color
   </Tooltip.Provider>
 );
 
-const QuickAction: React.FC<QuickActionProps> = ({ label, icon, onClick, variant = 'secondary' }) => (
+const QuickAction: React.FC<QuickActionProps> = ({
+  label,
+  icon,
+  onClick,
+  variant = 'secondary',
+}) => (
   <Tooltip.Provider>
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
@@ -98,9 +119,11 @@ const QuickAction: React.FC<QuickActionProps> = ({ label, icon, onClick, variant
               : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
           }`}
         >
-          <div className={`transition-transform group-hover:scale-110 ${
-            variant === 'primary' ? 'text-white' : 'text-current'
-          }`}>
+          <div
+            className={`transition-transform group-hover:scale-110 ${
+              variant === 'primary' ? 'text-white' : 'text-current'
+            }`}
+          >
             {icon}
           </div>
           <span className="font-medium">{label}</span>
@@ -157,7 +180,11 @@ const MusicPlayerWidget: React.FC<MusicPlayerWidgetProps> = ({
               />
             ) : (
               <div className="w-16 h-16 bg-gradient-to-br from-white/20 to-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <Disc3 size={24} className="text-white animate-spin" style={{ animationDuration: '3s' }} />
+                <Disc3
+                  size={24}
+                  className="text-white animate-spin"
+                  style={{ animationDuration: '3s' }}
+                />
               </div>
             )}
             {isPlaying && (
@@ -187,7 +214,10 @@ const MusicPlayerWidget: React.FC<MusicPlayerWidgetProps> = ({
                   </button>
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
-                  <Tooltip.Content className="bg-gray-900 text-white px-2 py-1 rounded text-xs" sideOffset={5}>
+                  <Tooltip.Content
+                    className="bg-gray-900 text-white px-2 py-1 rounded text-xs"
+                    sideOffset={5}
+                  >
                     Previous
                   </Tooltip.Content>
                 </Tooltip.Portal>
@@ -198,7 +228,11 @@ const MusicPlayerWidget: React.FC<MusicPlayerWidgetProps> = ({
               onClick={isPlaying ? onPause : onPlay}
               className="p-3 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm transition-all duration-200 hover:scale-110 shadow-lg"
             >
-              {isPlaying ? <Pause size={20} className="text-white" /> : <Play size={20} className="text-white fill-white" />}
+              {isPlaying ? (
+                <Pause size={20} className="text-white" />
+              ) : (
+                <Play size={20} className="text-white fill-white" />
+              )}
             </button>
 
             <Tooltip.Provider>
@@ -212,7 +246,10 @@ const MusicPlayerWidget: React.FC<MusicPlayerWidgetProps> = ({
                   </button>
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
-                  <Tooltip.Content className="bg-gray-900 text-white px-2 py-1 rounded text-xs" sideOffset={5}>
+                  <Tooltip.Content
+                    className="bg-gray-900 text-white px-2 py-1 rounded text-xs"
+                    sideOffset={5}
+                  >
                     Next
                   </Tooltip.Content>
                 </Tooltip.Portal>
@@ -229,6 +266,7 @@ const MusicPlayerWidget: React.FC<MusicPlayerWidgetProps> = ({
           </button>
         </div>
       )}
+    </div>
   </div>
 );
 
@@ -239,16 +277,19 @@ export const DashboardPage: React.FC = () => {
     staleTime: 30_000,
   });
 
-  // Mock current playing track (would come from player state)
-  const mockCurrentTrack = {
-    title: "Bohemian Rhapsody",
-    artist: "Queen",
-    album: "A Night at the Opera",
-    duration: 355,
-    coverArt: undefined,
-  };
+  // Use real audio player state
+  const { currentTrack, isPlaying, play, pause, next, previous } = useAudioPlayer();
 
-  const [isPlaying, setIsPlaying] = React.useState(false);
+  // Convert current track for display
+  const displayTrack = currentTrack
+    ? {
+        title: currentTrack.title,
+        artist: currentTrack.artist?.name || 'Unknown Artist',
+        album: currentTrack.album?.title,
+        duration: currentTrack.duration_seconds || 0,
+        coverArt: currentTrack.album?.cover_art_url,
+      }
+    : undefined;
 
   const handleQuickAction = (action: string) => {
     console.log(`Quick action: ${action}`);
@@ -281,7 +322,12 @@ export const DashboardPage: React.FC = () => {
     );
   }
 
-  const { overview, recent_albums: recentAlbums, top_tracks: topTracks, scan_status: scanStatus } = data;
+  const {
+    overview,
+    recent_albums: recentAlbums,
+    top_tracks: topTracks,
+    scan_status: scanStatus,
+  } = data;
 
   return (
     <div className="space-y-6 p-6">
@@ -329,12 +375,12 @@ export const DashboardPage: React.FC = () => {
 
       {/* Music Player Widget */}
       <MusicPlayerWidget
-        currentTrack={mockCurrentTrack}
+        currentTrack={displayTrack}
         isPlaying={isPlaying}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onNext={() => console.log('Next track')}
-        onPrev={() => console.log('Previous track')}
+        onPlay={() => play()}
+        onPause={() => pause()}
+        onNext={() => next()}
+        onPrev={() => previous()}
       />
 
       {/* Library Overview */}
@@ -345,14 +391,18 @@ export const DashboardPage: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900">Library Overview</h2>
           </div>
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${
-              scanStatus === 'completed' ? 'bg-green-500' : 'bg-yellow-500'
-            }`} />
-            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${
-              scanStatus === 'completed'
-                ? 'bg-green-50 text-green-700 border-green-200'
-                : 'bg-yellow-50 text-yellow-700 border-yellow-200'
-            }`}>
+            <div
+              className={`w-2 h-2 rounded-full ${
+                scanStatus === 'completed' ? 'bg-green-500' : 'bg-yellow-500'
+              }`}
+            />
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                scanStatus === 'completed'
+                  ? 'bg-green-50 text-green-700 border-green-200'
+                  : 'bg-yellow-50 text-yellow-700 border-yellow-200'
+              }`}
+            >
               {scanStatus}
             </span>
           </div>
@@ -396,7 +446,11 @@ export const DashboardPage: React.FC = () => {
           />
           <StatCard
             title="Avg Length"
-            value={overview.average_track_duration ? `${(overview.average_track_duration / 60).toFixed(1)}m` : '—'}
+            value={
+              overview.average_track_duration
+                ? `${(overview.average_track_duration / 60).toFixed(1)}m`
+                : '—'
+            }
             icon={<Headphones size={20} />}
             color="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200"
           />
@@ -422,7 +476,11 @@ export const DashboardPage: React.FC = () => {
                   >
                     <div className="relative">
                       {album.cover_art_url ? (
-                        <img src={album.cover_art_url} alt={album.title} className="h-12 w-12 rounded-lg object-cover" />
+                        <img
+                          src={album.cover_art_url}
+                          alt={album.title}
+                          className="h-12 w-12 rounded-lg object-cover"
+                        />
                       ) : (
                         <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
                           <Album size={16} className="text-blue-600" />
@@ -434,7 +492,9 @@ export const DashboardPage: React.FC = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-gray-900 text-sm truncate">{album.title}</h3>
-                      <p className="text-xs text-gray-600 truncate">{album.artist?.name ?? 'Unknown Artist'}</p>
+                      <p className="text-xs text-gray-600 truncate">
+                        {album.artist?.name ?? 'Unknown Artist'}
+                      </p>
                       {album.release_year && (
                         <p className="text-xs text-gray-400">{album.release_year}</p>
                       )}
@@ -477,14 +537,18 @@ export const DashboardPage: React.FC = () => {
                   <div className="w-3 h-3 bg-yellow-400 rounded-full" />
                   <span className="text-sm font-medium text-gray-700">Missing artwork</span>
                 </div>
-                <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">23 files</span>
+                <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                  23 files
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 bg-red-400 rounded-full" />
                   <span className="text-sm font-medium text-gray-700">Duplicate files</span>
                 </div>
-                <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">5 files</span>
+                <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+                  5 files
+                </span>
               </div>
             </div>
           </div>
@@ -499,14 +563,22 @@ export const DashboardPage: React.FC = () => {
                 const percentage = Math.floor(Math.random() * 60) + 20;
                 const trackCount = Math.floor(Math.random() * 500) + 100;
                 return (
-                  <div key={genre} className="group hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors">
+                  <div
+                    key={genre}
+                    className="group hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+                  >
                     <div className="flex items-center gap-4">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                        index === 0 ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
-                        index === 1 ? 'bg-gradient-to-r from-gray-400 to-gray-500' :
-                        index === 2 ? 'bg-gradient-to-r from-amber-600 to-amber-700' :
-                        'bg-gradient-to-r from-blue-500 to-purple-500'
-                      }`}>
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                          index === 0
+                            ? 'bg-gradient-to-r from-yellow-400 to-orange-500'
+                            : index === 1
+                              ? 'bg-gradient-to-r from-gray-400 to-gray-500'
+                              : index === 2
+                                ? 'bg-gradient-to-r from-amber-600 to-amber-700'
+                                : 'bg-gradient-to-r from-blue-500 to-purple-500'
+                        }`}
+                      >
                         #{index + 1}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -514,7 +586,10 @@ export const DashboardPage: React.FC = () => {
                           <span className="text-sm font-semibold text-gray-900">{genre}</span>
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-medium text-gray-600">{trackCount}</span>
-                            <Heart size={12} className="text-gray-400 group-hover:text-red-400 transition-colors" />
+                            <Heart
+                              size={12}
+                              className="text-gray-400 group-hover:text-red-400 transition-colors"
+                            />
                           </div>
                         </div>
                         <Progress.Root className="relative overflow-hidden bg-gray-200 rounded-full w-full h-2">
@@ -535,36 +610,67 @@ export const DashboardPage: React.FC = () => {
 
       {/* Top Tracks - More Compact Display */}
       {topTracks.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Most Played</h2>
-            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Star size={20} className="text-amber-500" />
+              <h2 className="text-xl font-semibold text-gray-900">Most Played</h2>
+            </div>
+            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium px-3 py-1 rounded-lg hover:bg-blue-50 transition-colors">
               View All
             </button>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {topTracks.slice(0, 5).map((track, index) => (
               <div
                 key={track.id}
-                className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group"
+                className="flex items-center gap-4 p-4 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 transition-all duration-200 cursor-pointer group border border-transparent hover:border-blue-200"
               >
-                <div className="w-8 text-center">
-                  <span className="text-sm font-medium text-gray-500">#{index + 1}</span>
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                    index === 0
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500'
+                      : index === 1
+                        ? 'bg-gradient-to-r from-gray-400 to-gray-500'
+                        : index === 2
+                          ? 'bg-gradient-to-r from-amber-600 to-amber-700'
+                          : 'bg-gradient-to-r from-blue-500 to-purple-500'
+                  }`}
+                >
+                  {index + 1}
                 </div>
-                <div className="h-10 w-10 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Music size={16} className="text-green-600" />
+                <div className="h-12 w-12 bg-gradient-to-br from-green-100 to-blue-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <Music size={18} className="text-green-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 text-sm truncate">{track.title}</h3>
+                  <h3 className="font-semibold text-gray-900 text-sm truncate">{track.title}</h3>
                   <p className="text-xs text-gray-600 truncate">
-                    {track.artist?.name ?? 'Unknown Artist'} · {track.album?.title ?? 'Unknown Album'}
+                    {track.artist?.name ?? 'Unknown Artist'} ·{' '}
+                    {track.album?.title ?? 'Unknown Album'}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-500">{track.play_count} plays</span>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Play size={14} className="text-gray-400" />
+                  <div className="text-right">
+                    <div className="text-xs font-medium text-gray-900">{track.play_count}</div>
+                    <div className="text-xs text-gray-500">plays</div>
                   </div>
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        <button className="opacity-0 group-hover:opacity-100 transition-all duration-200 p-2 rounded-full hover:bg-blue-100">
+                          <Play size={14} className="text-blue-600" />
+                        </button>
+                      </Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        <Tooltip.Content
+                          className="bg-gray-900 text-white px-2 py-1 rounded text-xs"
+                          sideOffset={5}
+                        >
+                          Play track
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
                 </div>
               </div>
             ))}

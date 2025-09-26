@@ -2,6 +2,7 @@ import React from 'react';
 import { Play, MoreHorizontal, Music, Folder } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import { useAudioPlayer } from '@/context/AudioPlayerContext';
 
 interface MusicCardProps {
   id: string;
@@ -27,9 +28,21 @@ export const MusicCard: React.FC<MusicCardProps> = ({
   onAddToPlaylist,
   onShowDetails,
 }) => {
+  const { currentTrack, isPlaying } = useAudioPlayer();
+
+  // Check if this card represents the currently playing track/album
+  const isCurrentlyPlaying =
+    currentTrack &&
+    (currentTrack.title === title ||
+      currentTrack.album?.title === title ||
+      currentTrack.artist?.name === title);
   return (
     <div
-      className="group relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden"
+      className={`group relative rounded-xl shadow-sm border transition-all duration-300 cursor-pointer overflow-hidden ${
+        isCurrentlyPlaying && isPlaying
+          ? 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 shadow-lg'
+          : 'bg-white border-gray-200 hover:shadow-lg'
+      }`}
       onClick={onClick}
     >
       {/* Cover Art */}
@@ -120,6 +133,14 @@ export const MusicCard: React.FC<MusicCardProps> = ({
         {trackCount && (
           <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
             {trackCount} tracks
+          </div>
+        )}
+
+        {/* Now Playing Indicator */}
+        {isCurrentlyPlaying && isPlaying && (
+          <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+            Playing
           </div>
         )}
       </div>
