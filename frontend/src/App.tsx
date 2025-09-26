@@ -8,7 +8,7 @@ import Dashboard from '@/pages/Dashboard';
 import Statistics from '@/pages/Statistics';
 import { MusicListPage } from '@/pages/MusicListPage';
 
-// Create a client
+// Create a client - HMR Test
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

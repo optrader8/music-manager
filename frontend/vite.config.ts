@@ -10,9 +10,25 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
-    host: 'localhost',
-    open: true,
+    port: 32001,
+    host: '0.0.0.0',
+    open: false,
+    allowedHosts: ['g2', 'localhost', '127.0.0.1'],
+    hmr: {
+      port: 32001,
+      host: '0.0.0.0',
+    },
+    watch: {
+      usePolling: true,
+      interval: 100,
+    },
+    proxy: {
+      '/api': {
+        target: 'http://music-manager-backend:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   preview: {
     port: 4173,
