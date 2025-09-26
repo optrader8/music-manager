@@ -221,8 +221,15 @@ class StatisticsService:
     def _build_meta(self, *, total: int, params: PaginationParams) -> PaginationMeta:
         from app.core.pagination import build_pagination_metadata
 
-        meta = build_pagination_metadata(total=total, params=params)
-        return PaginationMeta.model_validate(meta)
+        meta_data = build_pagination_metadata(total=total, params=params)
+        return PaginationMeta(
+            page=meta_data.page,
+            page_size=meta_data.page_size,
+            total=meta_data.total,
+            total_pages=meta_data.total_pages,
+            has_next=meta_data.has_next,
+            has_previous=meta_data.has_previous,
+        )
 
 
 __all__ = ["StatisticsService"]

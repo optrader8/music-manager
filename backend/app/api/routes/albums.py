@@ -35,7 +35,6 @@ async def list_albums(
     year_to: int | None = Query(None, ge=0),
     sort: AlbumSortOptions = Query(AlbumSortOptions.RECENTLY_ADDED),
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ) -> AlbumListResponse:
     service = AlbumService(session)
     filters = AlbumFilters(
@@ -54,14 +53,23 @@ async def list_albums(
     meta = build_pagination_metadata(total=total, params=pagination)
     response.headers["X-Total-Count"] = str(total)
     response.headers["Cache-Control"] = "public, max-age=30"
-    return AlbumListResponse(items=items, pagination=PaginationMeta.model_validate(meta))
+    return AlbumListResponse(
+        items=items,
+        pagination=PaginationMeta(
+            page=meta.page,
+            page_size=meta.page_size,
+            total=meta.total,
+            total_pages=meta.total_pages,
+            has_next=meta.has_next,
+            has_previous=meta.has_previous,
+        )
+    )
 
 
 @router.get("/{album_id}", response_model=AlbumSummary)
 async def get_album(
     album_id: int,
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ) -> AlbumSummary:
     service = AlbumService(session)
     return service.get_album_summary(album_id)
@@ -71,7 +79,6 @@ async def get_album(
 async def get_album_tracks(
     album_id: int,
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ) -> AlbumWithTracks:
     service = AlbumService(session)
     return service.get_album_with_tracks(album_id)
@@ -82,7 +89,6 @@ async def get_album_cover(
     album_id: int,
     size: CoverSize = Query(CoverSize.MEDIUM),
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ) -> Response:
     streaming_service = StreamingService(session)
     return await streaming_service.get_album_cover(album_id, size)

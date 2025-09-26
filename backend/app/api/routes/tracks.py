@@ -18,7 +18,6 @@ async def get_tracks(
     artist_id: Optional[int] = Query(None),
     album_id: Optional[int] = Query(None),
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Get tracks with optional filtering and pagination."""
     query = session.query(Track).options(
@@ -43,7 +42,6 @@ async def get_tracks(
 async def get_track(
     track_id: int,
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Get a specific track by ID."""
     track = (

@@ -3,7 +3,9 @@ import { AlbumGrid } from '../components/AlbumGrid';
 import { LibraryStats } from '../components/LibraryStats';
 import { LibrarySection } from '../components/LibrarySection';
 import { SearchFilters } from '../components/SearchFilters';
-import { useLibraryScan } from '../hooks/useMusicLibrary';
+import { AlbumDetailModal } from '../components/AlbumDetailModal';
+import { useLibraryScan, useAlbum } from '../hooks/useMusicLibrary';
+import { useAudioPlayer } from '../context/AudioPlayerContext';
 import type { Album, SearchFilters as SearchFiltersType } from '../types/api';
 
 type ViewMode = 'albums' | 'artists' | 'tracks';
@@ -11,14 +13,41 @@ type ViewMode = 'albums' | 'artists' | 'tracks';
 export function LibraryPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('albums');
   const [searchFilters, setSearchFilters] = useState<SearchFiltersType>({});
-  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+  const [selectedAlbumId, setSelectedAlbumId] = useState<number | null>(null);
 
   const { mutate: scanLibrary, isPending: isScanning } = useLibraryScan();
+  const { data: selectedAlbum, isLoading: isLoadingAlbum } = useAlbum(selectedAlbumId || 0, {
+    enabled: !!selectedAlbumId,
+  });
+  const { playAlbum } = useAudioPlayer();
 
   const handleAlbumClick = (album: Album) => {
-    setSelectedAlbum(album);
-    // TODO: Navigate to album detail page or open album modal
-    console.log('Selected album:', album);
+    setSelectedAlbumId(album.id);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedAlbumId(null);
+  };
+
+  const handlePlayAlbum = (album: Album) => {
+    // Convert album tracks to playback format and play
+    if (album.tracks) {
+      const playbackTracks = album.tracks.map((track) => ({
+        track_id: track.id,
+        title: track.title,
+        stream_url: `/api/v1/stream/tracks/${track.id}`,
+        duration_seconds: track.duration_seconds,
+        disc_number: track.disc_number,
+        track_number: track.track_number,
+        artist_name: track.artist?.name,
+      }));
+      playAlbum(playbackTracks, 0);
+    }
+  };
+
+  const handlePlayTrack = (trackId: number) => {
+    // Individual track play would be implemented here
+    console.log('Play track:', trackId);
   };
 
   const handleScanLibrary = () => {

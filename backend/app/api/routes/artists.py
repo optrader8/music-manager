@@ -16,7 +16,6 @@ async def get_artists(
     limit: int = Query(100, ge=1, le=1000),
     search: Optional[str] = Query(None),
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Get artists with optional filtering and pagination."""
     query = session.query(Artist)
@@ -32,7 +31,6 @@ async def get_artists(
 async def get_artist(
     artist_id: int,
     session: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Get a specific artist by ID."""
     artist = session.query(Artist).filter(Artist.id == artist_id).first()

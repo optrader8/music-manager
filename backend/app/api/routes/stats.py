@@ -23,7 +23,7 @@ from app.schemas import (
 )
 from app.services import StatisticsService
 
-router = APIRouter(prefix="/api/v1/stats", tags=["statistics"])
+router = APIRouter(prefix="/stats", tags=["statistics"])
 
 _CACHE_TTL_SECONDS = 30
 _dashboard_cache: TTLCache[str, DashboardData] | None = None

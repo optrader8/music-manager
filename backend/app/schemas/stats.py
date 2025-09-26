@@ -22,6 +22,17 @@ class LibraryOverview(BaseModel):
     recently_added_at: Optional[datetime] = None
 
 
+class LibraryStats(BaseModel):
+    """Compact library metrics for legacy API consumers."""
+
+    total_tracks: int
+    total_albums: int
+    total_artists: int
+    total_size: int
+    total_duration: int
+    last_scan: str
+
+
 class GenreDistribution(BaseModel):
     genre: str
     track_count: int

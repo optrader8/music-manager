@@ -17,11 +17,12 @@ from app.db.session import SessionLocal
 from app.schemas import (
     LibraryBrowseResponse,
     LibrarySearchResponse,
+    LibraryStats,
     PaginationMeta,
     TrackSearchResult,
     TrackWithRelations,
 )
-from app.services import FileScannerService, LibraryService, SearchFilters
+from app.services import FileScannerService, LibraryService, SearchFilters, StatisticsService
 
 router = APIRouter(prefix="/library", tags=["library"])
 logger = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ async def scan_library(
     current_user: User = Depends(get_current_user),
 ) -> dict[str, str]:
     """Start a library scan operation."""
+
     if current_user.role.value not in {"admin", "editor"}:
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
@@ -148,6 +150,23 @@ async def browse_library_tracks(
     return LibraryBrowseResponse(
         items=items,
         pagination=PaginationMeta.model_validate(meta),
+    )
+
+
+@router.get("/stats", response_model=LibraryStats)
+async def get_library_stats(db: Session = Depends(get_db)) -> LibraryStats:
+    """Get library statistics compatible with musicService API."""
+    stats_service = StatisticsService(db)
+    overview = stats_service.get_library_overview()
+
+    # Convert to LibraryStats format
+    return LibraryStats(
+        total_tracks=overview.total_tracks,
+        total_albums=overview.total_albums,
+        total_artists=overview.total_artists,
+        total_size=int(overview.estimated_size_mb),
+        total_duration=overview.total_duration_seconds,
+        last_scan=overview.recently_added_at.isoformat() if overview.recently_added_at else "1970-01-01T00:00:00",
     )
 
 

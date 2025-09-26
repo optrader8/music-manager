@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from '@tanstack/react-router';
 import cn from 'classnames';
 import { Header } from '@/components/Layout/Header';
 import { Sidebar } from '@/components/Layout/Sidebar';
+import { PlayerControls } from '@/components/AudioPlayer/PlayerControls';
+import { PlayerQueue } from '@/components/AudioPlayer/PlayerQueue';
 import { navigationItems } from '@/constants/navigation';
 import styles from './Layout.module.scss';
 import { FileRouteTypes } from '@/routeTree.gen';
@@ -37,6 +39,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [isQueueOpen, setIsQueueOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width: 992px)');
 
   const toggleSidebar = () => {
@@ -129,6 +132,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           )}
           <div className={styles.content}>{children}</div>
         </div>
+
+        {/* Persistent Audio Player */}
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <PlayerControls
+            onToggleQueue={() => setIsQueueOpen(true)}
+            showQueue={true}
+            showVolume={true}
+          />
+        </div>
+
+        {/* Player Queue Modal */}
+        <PlayerQueue isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
       </div>
     </div>
   );
