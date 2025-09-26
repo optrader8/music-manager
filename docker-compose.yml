@@ -9,7 +9,7 @@ services:
       - "32000:8000"
     volumes:
       - ./backend:/app
-      - /mnt/data/nas-music:/music:ro
+      - /mnt/nas-music:/mnt/nas-music:ro
     environment:
       - DATABASE_URL=sqlite:///./music_manager.db
       - MUSIC_LIBRARY_PATH=/music

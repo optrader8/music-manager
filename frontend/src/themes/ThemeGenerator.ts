@@ -1,4 +1,5 @@
-import type { ThemeConfig, DesignTokens, ColorScale, SemanticColors } from "@/types/template";
+import type { ThemeConfig, DesignTokens, ColorScale, SemanticColors } from '@/types/template';
+import type { Config as TailwindConfig } from 'tailwindcss';
 
 /**
  * Theme Generator for creating design tokens and CSS from theme configuration
@@ -28,14 +29,14 @@ export class ThemeGenerator {
       shadows: themeConfig.shadows,
       borderRadius: themeConfig.borderRadius,
       breakpoints: {
-        sm: "640px",
-        md: "768px",
-        lg: "1024px",
-        xl: "1280px",
-        "2xl": "1536px",
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+        '2xl': '1536px',
       },
       zIndex: {
-        auto: "auto",
+        auto: 'auto',
         0: 0,
         10: 10,
         20: 20,
@@ -54,134 +55,134 @@ export class ThemeGenerator {
    * Generate CSS custom properties from design tokens
    */
   generateCSS(tokens: DesignTokens): string {
-    const cssVars: string[] = [":root {"];
+    const cssVars: string[] = [':root {'];
 
     // Colors
-    cssVars.push("  /* Primary Colors */");
+    cssVars.push('  /* Primary Colors */');
     Object.entries(tokens.colors.primary).forEach(([shade, color]) => {
       cssVars.push(`  --color-primary-${shade}: ${color};`);
     });
 
-    cssVars.push("  /* Secondary Colors */");
+    cssVars.push('  /* Secondary Colors */');
     Object.entries(tokens.colors.secondary).forEach(([shade, color]) => {
       cssVars.push(`  --color-secondary-${shade}: ${color};`);
     });
 
-    cssVars.push("  /* Neutral Colors */");
+    cssVars.push('  /* Neutral Colors */');
     Object.entries(tokens.colors.neutral).forEach(([shade, color]) => {
       cssVars.push(`  --color-neutral-${shade}: ${color};`);
     });
 
-    cssVars.push("  /* Semantic Colors */");
+    cssVars.push('  /* Semantic Colors */');
     Object.entries(tokens.colors.semantic).forEach(([name, color]) => {
       cssVars.push(`  --color-${name}: ${color};`);
     });
 
     // Typography
-    cssVars.push("  /* Font Families */");
+    cssVars.push('  /* Font Families */');
     Object.entries(tokens.typography.fontFamily).forEach(([name, value]) => {
       cssVars.push(`  --font-${name}: ${value};`);
     });
 
-    cssVars.push("  /* Font Sizes */");
+    cssVars.push('  /* Font Sizes */');
     Object.entries(tokens.typography.fontSize).forEach(([size, value]) => {
       cssVars.push(`  --text-${size}: ${value};`);
     });
 
-    cssVars.push("  /* Font Weights */");
+    cssVars.push('  /* Font Weights */');
     Object.entries(tokens.typography.fontWeight).forEach(([weight, value]) => {
       cssVars.push(`  --font-${weight}: ${value};`);
     });
 
-    cssVars.push("  /* Line Heights */");
+    cssVars.push('  /* Line Heights */');
     Object.entries(tokens.typography.lineHeight).forEach(([name, value]) => {
       cssVars.push(`  --leading-${name}: ${value};`);
     });
 
     // Spacing
-    cssVars.push("  /* Spacing */");
+    cssVars.push('  /* Spacing */');
     Object.entries(tokens.spacing).forEach(([key, value]) => {
-      cssVars.push(`  --space-${key.replace(".", "-")}: ${value};`);
+      cssVars.push(`  --space-${key.replace('.', '-')}: ${value};`);
     });
 
     // Shadows
-    cssVars.push("  /* Shadows */");
+    cssVars.push('  /* Shadows */');
     Object.entries(tokens.shadows).forEach(([name, value]) => {
       cssVars.push(`  --shadow-${name}: ${value};`);
     });
 
     // Border Radius
-    cssVars.push("  /* Border Radius */");
+    cssVars.push('  /* Border Radius */');
     Object.entries(tokens.borderRadius).forEach(([name, value]) => {
       cssVars.push(`  --rounded-${name}: ${value};`);
     });
 
     // Breakpoints
-    cssVars.push("  /* Breakpoints */");
+    cssVars.push('  /* Breakpoints */');
     Object.entries(tokens.breakpoints).forEach(([name, value]) => {
       cssVars.push(`  --screen-${name}: ${value};`);
     });
 
     // Z-Index
-    cssVars.push("  /* Z-Index */");
+    cssVars.push('  /* Z-Index */');
     Object.entries(tokens.zIndex).forEach(([name, value]) => {
       cssVars.push(`  --z-${name}: ${value};`);
     });
 
-    cssVars.push("}");
+    cssVars.push('}');
 
-    return cssVars.join("\n");
+    return cssVars.join('\n');
   }
 
   /**
    * Generate SCSS variables from design tokens
    */
   generateSCSS(tokens: DesignTokens): string {
-    const scssVars: string[] = ["// Design Tokens"];
+    const scssVars: string[] = ['// Design Tokens'];
 
     // Colors
-    scssVars.push("// Primary Colors");
+    scssVars.push('// Primary Colors');
     Object.entries(tokens.colors.primary).forEach(([shade, color]) => {
       scssVars.push(`$color-primary-${shade}: ${color};`);
     });
 
-    scssVars.push("// Secondary Colors");
+    scssVars.push('// Secondary Colors');
     Object.entries(tokens.colors.secondary).forEach(([shade, color]) => {
       scssVars.push(`$color-secondary-${shade}: ${color};`);
     });
 
-    scssVars.push("// Neutral Colors");
+    scssVars.push('// Neutral Colors');
     Object.entries(tokens.colors.neutral).forEach(([shade, color]) => {
       scssVars.push(`$color-neutral-${shade}: ${color};`);
     });
 
     // Typography
-    scssVars.push("// Typography");
+    scssVars.push('// Typography');
     Object.entries(tokens.typography.fontSize).forEach(([size, value]) => {
       scssVars.push(`$text-${size}: ${value};`);
     });
 
     // Spacing
-    scssVars.push("// Spacing");
+    scssVars.push('// Spacing');
     Object.entries(tokens.spacing).forEach(([key, value]) => {
-      scssVars.push(`$space-${key.replace(".", "-")}: ${value};`);
+      scssVars.push(`$space-${key.replace('.', '-')}: ${value};`);
     });
 
     // Create SCSS maps for easier usage
-    scssVars.push("\n// Color Maps");
-    scssVars.push("$primary-colors: (");
+    scssVars.push('\n// Color Maps');
+    scssVars.push('$primary-colors: (');
     Object.entries(tokens.colors.primary).forEach(([shade, color]) => {
       scssVars.push(`  ${shade}: ${color},`);
     });
-    scssVars.push(");");
+    scssVars.push(');');
 
-    return scssVars.join("\n");
+    return scssVars.join('\n');
   }
 
   /**
    * Generate Tailwind CSS configuration
    */
-  generateTailwindConfig(tokens: DesignTokens): any {
+  generateTailwindConfig(tokens: DesignTokens): TailwindConfig {
     return {
       theme: {
         extend: {
@@ -222,7 +223,7 @@ export class ThemeGenerator {
     let neutral: ColorScale;
 
     // Generate primary color scale
-    if (typeof colors.primary === "string") {
+    if (typeof colors.primary === 'string') {
       primary = this.generateColorScale(colors.primary);
     } else {
       primary = colors.primary as ColorScale;
@@ -230,7 +231,7 @@ export class ThemeGenerator {
 
     // Generate secondary color scale
     if (colors.secondary) {
-      if (typeof colors.secondary === "string") {
+      if (typeof colors.secondary === 'string') {
         secondary = this.generateColorScale(colors.secondary);
       } else {
         secondary = colors.secondary as ColorScale;
@@ -238,7 +239,7 @@ export class ThemeGenerator {
     } else {
       // Generate complementary color
       const complementaryColor = this.generateComplementaryColor(
-        typeof colors.primary === "string" ? colors.primary : colors.primary[500],
+        typeof colors.primary === 'string' ? colors.primary : colors.primary[500]
       );
       secondary = this.generateColorScale(complementaryColor);
     }
@@ -248,16 +249,16 @@ export class ThemeGenerator {
       neutral = colors.neutral as ColorScale;
     } else {
       neutral = this.generateNeutralScale(
-        typeof colors.primary === "string" ? colors.primary : colors.primary[500],
+        typeof colors.primary === 'string' ? colors.primary : colors.primary[500]
       );
     }
 
     // Generate semantic colors
     const semantic: SemanticColors = colors.semantic || {
-      success: "#10B981", // Green-500
-      warning: "#F59E0B", // Amber-500
-      error: "#EF4444", // Red-500
-      info: "#3B82F6", // Blue-500
+      success: '#10B981', // Green-500
+      warning: '#F59E0B', // Amber-500
+      error: '#EF4444', // Red-500
+      info: '#3B82F6', // Blue-500
     };
 
     return { primary, secondary, neutral, semantic };
@@ -324,7 +325,7 @@ export class ThemeGenerator {
    */
   private hexToHsl(hex: string): { h: number; s: number; l: number } {
     // Remove # if present
-    hex = hex.replace("#", "");
+    hex = hex.replace('#', '');
 
     // Parse hex values
     const r = parseInt(hex.substr(0, 2), 16) / 255;
@@ -393,7 +394,7 @@ export class ThemeGenerator {
 
     const toHex = (c: number): string => {
       const hex = Math.round(c * 255).toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
+      return hex.length === 1 ? '0' + hex : hex;
     };
 
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
@@ -404,7 +405,7 @@ export class ThemeGenerator {
    */
   validateContrast(
     foreground: string,
-    background: string,
+    background: string
   ): {
     ratio: number;
     aaPass: boolean;
@@ -431,7 +432,7 @@ export class ThemeGenerator {
   }
 
   private hexToRgb(hex: string): { r: number; g: number; b: number } {
-    hex = hex.replace("#", "");
+    hex = hex.replace('#', '');
     return {
       r: parseInt(hex.substr(0, 2), 16),
       g: parseInt(hex.substr(2, 2), 16),

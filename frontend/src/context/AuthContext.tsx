@@ -6,13 +6,13 @@ import {
   useEffect,
   useMemo,
   useState,
-} from "react";
+} from 'react';
 
-import { authService } from "../services/authService";
-import { getAuthToken, setAuthToken } from "../services/apiClient";
-import type { ApiError, AuthContextValue, AuthCredentials, AuthSession, AuthUser } from "../types";
+import { authService } from '../services/authService';
+import { getAuthToken, setAuthToken } from '../services/apiClient';
+import type { ApiError, AuthContextValue, AuthCredentials, AuthSession, AuthUser } from '../types';
 
-const STORAGE_KEY = "music-manager::auth-session";
+const STORAGE_KEY = 'music-manager::auth-session';
 
 interface StoredSession {
   token: string;
@@ -20,7 +20,7 @@ interface StoredSession {
 }
 
 function readStoredSession(): StoredSession | null {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     return null;
   }
 
@@ -31,13 +31,13 @@ function readStoredSession(): StoredSession | null {
     }
     return JSON.parse(rawValue) as StoredSession;
   } catch (storageError) {
-    console.warn("Failed to parse stored auth session", storageError);
+    console.warn('Failed to parse stored auth session', storageError);
     return null;
   }
 }
 
 function writeStoredSession(session: StoredSession | null): void {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     return;
   }
 
@@ -56,13 +56,13 @@ const defaultValue: AuthContextValue = {
   isLoading: true,
   error: null,
   signIn: async () => {
-    throw new Error("AuthProvider not initialized");
+    throw new Error('AuthProvider not initialized');
   },
   signOut: async () => {
-    throw new Error("AuthProvider not initialized");
+    throw new Error('AuthProvider not initialized');
   },
   refreshSession: async () => {
-    throw new Error("AuthProvider not initialized");
+    throw new Error('AuthProvider not initialized');
   },
 };
 
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: PropsWithChildren): JSX.Element {
         setIsLoading(false);
       }
     },
-    [clearSession],
+    [clearSession]
   );
 
   const handleSignOut = useCallback(async () => {
@@ -199,10 +199,11 @@ export function AuthProvider({ children }: PropsWithChildren): JSX.Element {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuthContext(): AuthContextValue {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuthContext must be used within an AuthProvider");
+    throw new Error('useAuthContext must be used within an AuthProvider');
   }
   return context;
 }

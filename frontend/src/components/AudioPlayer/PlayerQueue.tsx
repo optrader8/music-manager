@@ -1,6 +1,6 @@
-import React from "react";
-import { X, Play, MoreVertical, GripVertical } from "lucide-react";
-import { useAudioPlayer } from "@/context/AudioPlayerContext";
+import React from 'react';
+import { X, Play, GripVertical } from 'lucide-react';
+import { useAudioPlayer } from '@/context/AudioPlayerContext';
 
 interface PlayerQueueProps {
   isOpen: boolean;
@@ -8,7 +8,7 @@ interface PlayerQueueProps {
 }
 
 export const PlayerQueue: React.FC<PlayerQueueProps> = ({ isOpen, onClose }) => {
-  const { queue, queueIndex, currentTrack, removeFromQueue, play } = useAudioPlayer();
+  const { queue, queueIndex, removeFromQueue } = useAudioPlayer();
 
   if (!isOpen) return null;
 
@@ -40,7 +40,7 @@ export const PlayerQueue: React.FC<PlayerQueueProps> = ({ isOpen, onClose }) => 
                 <div
                   key={`${track.track_id}-${index}`}
                   className={`flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors ${
-                    index === queueIndex ? "bg-blue-50 border border-blue-200" : ""
+                    index === queueIndex ? 'bg-blue-50 border border-blue-200' : ''
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -53,7 +53,7 @@ export const PlayerQueue: React.FC<PlayerQueueProps> = ({ isOpen, onClose }) => 
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium text-gray-900 truncate">{track.title}</h4>
                     <p className="text-xs text-gray-600 truncate">
-                      {track.artist_name || "Unknown Artist"}
+                      {track.artist_name || 'Unknown Artist'}
                     </p>
                   </div>
 
@@ -63,7 +63,7 @@ export const PlayerQueue: React.FC<PlayerQueueProps> = ({ isOpen, onClose }) => 
                         onClick={() => {
                           // Play this track
                           // Implementation would depend on your queue management
-                          console.log("Play track at index:", index);
+                          console.log('Play track at index:', index);
                         }}
                         className="p-1 rounded-full hover:bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
@@ -86,7 +86,7 @@ export const PlayerQueue: React.FC<PlayerQueueProps> = ({ isOpen, onClose }) => 
 
         {/* Footer */}
         <div className="p-3 border-t border-gray-200 text-xs text-gray-500 text-center">
-          {queue.length} {queue.length === 1 ? "track" : "tracks"} in queue
+          {queue.length} {queue.length === 1 ? 'track' : 'tracks'} in queue
         </div>
       </div>
     </>

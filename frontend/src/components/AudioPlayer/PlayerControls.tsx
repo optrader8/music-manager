@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Play,
   Pause,
@@ -11,8 +11,8 @@ import {
   Shuffle,
   List,
   ChevronUp,
-} from "lucide-react";
-import { useAudioPlayer } from "@/context/AudioPlayerContext";
+} from 'lucide-react';
+import { useAudioPlayer } from '@/context/AudioPlayerContext';
 
 interface PlayerControlsProps {
   className?: string;
@@ -24,10 +24,10 @@ interface PlayerControlsProps {
 }
 
 export const PlayerControls: React.FC<PlayerControlsProps> = ({
-  className = "",
+  className = '',
   showQueue = true,
   showVolume = true,
-  compact = false,
+  compact: _compact = false,
   onToggleQueue,
   onToggleExpanded,
 }) => {
@@ -59,7 +59,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -83,7 +83,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
           <div className="min-w-0 flex-1">
             <h4 className="text-sm font-medium text-gray-900 truncate">{currentTrack.title}</h4>
             <p className="text-xs text-gray-600 truncate">
-              {currentTrack.artist?.name || "Unknown Artist"}
+              {currentTrack.artist?.name || 'Unknown Artist'}
             </p>
           </div>
         </div>
@@ -94,7 +94,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             <button
               onClick={() => setShuffle(!shuffle)}
               className={`p-2 rounded-full transition-colors ${
-                shuffle ? "bg-blue-100 text-blue-600" : "text-gray-400 hover:text-gray-600"
+                shuffle ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'
               }`}
             >
               <Shuffle size={16} />
@@ -129,12 +129,12 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             </button>
 
             <button
-              onClick={() => setRepeat(repeat === "off" ? "all" : repeat === "all" ? "one" : "off")}
+              onClick={() => setRepeat(repeat === 'off' ? 'all' : repeat === 'all' ? 'one' : 'off')}
               className={`p-2 rounded-full transition-colors ${
-                repeat !== "off" ? "bg-blue-100 text-blue-600" : "text-gray-400 hover:text-gray-600"
+                repeat !== 'off' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'
               }`}
             >
-              {repeat === "one" ? <Repeat1 size={16} /> : <Repeat size={16} />}
+              {repeat === 'one' ? <Repeat1 size={16} /> : <Repeat size={16} />}
             </button>
           </div>
 
