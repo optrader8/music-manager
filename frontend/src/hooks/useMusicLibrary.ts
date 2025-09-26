@@ -8,6 +8,7 @@ import type {
   Track,
   LibraryStats,
 } from '../types/api';
+import type { AudioQuality, PlaybackQueue } from '../types/playback';
 
 // Query keys for cache management
 export const musicQueryKeys = {
@@ -19,6 +20,10 @@ export const musicQueryKeys = {
   album: (id: number) => [...musicQueryKeys.albums(), 'detail', id] as const,
   albumTracks: (id: number, params?: PaginationParams) =>
     [...musicQueryKeys.album(id), 'tracks', params] as const,
+  albumQueue: (
+    id: number,
+    options?: { quality?: string; crossfadeSeconds?: number; gapless?: boolean }
+  ) => [...musicQueryKeys.album(id), 'queue', options] as const,
   artists: () => [...musicQueryKeys.all, 'artists'] as const,
   artistList: (params: PaginationParams & SearchFilters) =>
     [...musicQueryKeys.artists(), 'list', params] as const,
@@ -72,6 +77,18 @@ export function useAlbumTracks(albumId: number, params?: PaginationParams) {
     queryKey: musicQueryKeys.albumTracks(albumId, params),
     queryFn: () => musicService.getAlbumTracks(albumId, params),
     enabled: !!albumId,
+  });
+}
+
+export function useAlbumPlaybackQueue(
+  albumId: number,
+  options?: { quality?: AudioQuality; crossfadeSeconds?: number; gapless?: boolean }
+) {
+  return useQuery<PlaybackQueue>({
+    queryKey: musicQueryKeys.albumQueue(albumId, options),
+    queryFn: () => musicService.getAlbumPlaybackQueue(albumId, options),
+    enabled: !!albumId,
+    staleTime: 1000 * 30,
   });
 }
 
