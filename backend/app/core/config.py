@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     musicbrainz_user_agent: str = "MusicManager/0.1.0 (music-manager@local)"
     log_level: str = "INFO"
 
+    # File browser settings
+    file_browser_root_path: Path = Path("/mnt/nas-music")
+    file_browser_max_file_size: str = "100MB"
+    file_browser_cache_ttl: int = 300
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

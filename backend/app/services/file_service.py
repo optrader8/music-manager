@@ -8,11 +8,12 @@ from mutagen import File as MutagenFile
 from mutagen.easyid3 import EasyID3
 from mutagen.id3 import ID3, TIT2, TPE1, TALB, TCON, TYER, TRCK
 
+from app.core.config import settings
 from app.schemas.file import FileItem, DirectoryListing, MP3TagData
 
 
 class FileService:
-    ROOT_PATH = "/mnt/nas-music"
+    ROOT_PATH = str(settings.file_browser_root_path)
 
     def __init__(self):
         self._ensure_root_exists()

@@ -13,6 +13,9 @@ services:
     environment:
       - DATABASE_URL=sqlite:///./music_manager.db
       - MUSIC_LIBRARY_PATH=/music
+      - FILE_BROWSER_ROOT_PATH=/mnt/nas-music
+      - FILE_BROWSER_MAX_FILE_SIZE=100MB
+      - FILE_BROWSER_CACHE_TTL=300
       - PYTHONPATH=/app
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     networks:
