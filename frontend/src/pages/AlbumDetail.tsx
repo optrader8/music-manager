@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { musicService } from '@/services/musicService';
 import type { AlbumSummary, TrackWithRelations } from '@/types/stats';
@@ -13,7 +13,6 @@ interface AlbumWithTracks extends AlbumSummary {
 export default function AlbumDetail() {
   const { albumId } = useParams<{ albumId: string }>();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [isEditMode, setIsEditMode] = useState(false);
   const [editData, setEditData] = useState<Partial<AlbumSummary>>({});
 
@@ -200,7 +199,7 @@ export default function AlbumDetail() {
                   onChange={(e) =>
                     setEditData({
                       ...editData,
-                      artist: { ...editData.artist, name: e.target.value } as any,
+                      artist: { ...editData.artist, name: e.target.value },
                     })
                   }
                   className="text-xl text-gray-600 w-full border border-gray-300 rounded-lg px-3 py-2"

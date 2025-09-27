@@ -20,7 +20,7 @@ export const musicService = {
   },
 
   // Stats overview (새로운 엔드포인트 테스트용)
-  async getStatsOverview(): Promise<any> {
+  async getStatsOverview(): Promise<Record<string, unknown>> {
     const response = await apiClient.get('/stats/overview');
     return response.data;
   },
@@ -60,7 +60,7 @@ export const musicService = {
   },
 
   // Update album
-  async updateAlbum(albumId: number, data: any) {
+  async updateAlbum<T>(albumId: number, data: T) {
     const response = await apiClient.put(`/albums/${albumId}`, data);
     return response.data;
   },

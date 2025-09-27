@@ -8,7 +8,6 @@ import type {
   LibraryStats,
   PaginationResponse,
   SearchFilters,
-  ApiError,
 } from '../types/api';
 
 // API 베이스 URL 설정
@@ -107,7 +106,7 @@ export const musicAPI = {
   },
 
   // Search
-  search: async (query: string, filters?: SearchFilters): Promise<any> => {
+  search: async (query: string, filters?: SearchFilters): Promise<Record<string, unknown>> => {
     const params = { query, ...filters };
     const response = await api.get('/search', { params });
     return response.data;

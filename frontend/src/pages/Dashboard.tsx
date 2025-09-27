@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Grid } from 'react-window';
 import { apiClient } from '@/services/apiClient';
 import { musicService } from '@/services/musicService';
-import type { StatsOverview, AlbumSummary, PaginationMeta } from '@/types/stats';
+import type { StatsOverview } from '@/types/stats';
 
 async function fetchOverview(): Promise<StatsOverview> {
   const response = await apiClient.get('/stats/overview');
@@ -96,12 +96,18 @@ export default function Dashboard() {
     1,
     Math.floor((containerSize.width - GAP) / (ITEM_WIDTH + GAP)) || 1
   );
-  const rowCount = Math.max(1, Math.ceil(allAlbums.length / columnCount) || 1);
-
-  const gridRef = useRef<any>(null);
+  const gridRef = useRef<Grid>(null);
 
   const handleScroll = useCallback(
-    ({ scrollTop, scrollHeight, clientHeight }: any) => {
+    ({
+      scrollTop,
+      scrollHeight,
+      clientHeight,
+    }: {
+      scrollTop: number;
+      scrollHeight: number;
+      clientHeight: number;
+    }) => {
       const threshold = 0.8;
       const scrollRatio = (scrollTop + clientHeight) / scrollHeight;
 
@@ -113,7 +119,21 @@ export default function Dashboard() {
   );
 
   const AlbumItem = useCallback(
-    ({ columnIndex, rowIndex, style, data }: any) => {
+    ({
+      columnIndex,
+      rowIndex,
+      style,
+      data,
+    }: {
+      columnIndex: number;
+      rowIndex: number;
+      style: React.CSSProperties;
+      data?: {
+        allAlbums: (typeof allAlbums)[number][];
+        columnCount: number;
+        navigate: (path: string) => void;
+      };
+    }) => {
       const { allAlbums: albums, columnCount: cols, navigate: nav } = data || {};
       const index = rowIndex * (cols || columnCount) + columnIndex;
       const album = albums ? albums[index] : allAlbums[index];

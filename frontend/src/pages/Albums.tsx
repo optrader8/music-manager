@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { musicService } from '@/services/musicService';
 import AlbumEditModal from '@/components/AlbumEditModal';
 import type { AlbumSummary, PaginationMeta } from '@/types/stats';
@@ -33,7 +33,7 @@ export default function Albums() {
   });
 
   const updateAlbumMutation = useMutation({
-    mutationFn: ({ albumId, data }: { albumId: number; data: any }) =>
+    mutationFn: ({ albumId, data }: { albumId: number; data: Partial<AlbumSummary> }) =>
       musicService.updateAlbum(albumId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['albums'] });

@@ -28,10 +28,10 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
+          proxy.on('error', (err, _req, _res) => {
             console.log('proxy error', err);
           });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
             console.log('Proxying:', req.method, req.url, '->', options.target + req.url);
           });
         },

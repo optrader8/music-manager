@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Input } from './ui/input';
 import { Card, CardContent } from './ui/card';
 import { debounce } from '../lib/utils';

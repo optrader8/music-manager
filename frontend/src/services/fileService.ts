@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import type { DirectoryListing, RenameRequest, MP3TagData, MP3TagUpdate } from '@/types/file';
+import type { DirectoryListing, MP3TagData, MP3TagUpdate } from '@/types/file';
 
 export const fileService = {
   async browseDirectory(path: string = '', search?: string): Promise<DirectoryListing> {

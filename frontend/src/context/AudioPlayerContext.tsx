@@ -232,7 +232,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
       try {
         audioRef.current.pause();
         audioRef.current.src = '';
-      } catch (e) {
+      } catch {
         // Complete silence
       }
     }
@@ -339,7 +339,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
           try {
             audioRef.current.src = playbackTrack.stream_url;
             audioRef.current.load();
-          } catch (error) {
+          } catch {
             handleAudioError();
           }
         }

@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FixedSizeGrid as Grid } from 'react-window';
+import { VariableSizeGrid as Grid } from 'react-window';
 import toast from 'react-hot-toast';
 import { Search } from 'lucide-react';
 import { fileService } from '@/services/fileService';
@@ -9,11 +9,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import FileItem from '@/components/FileItem';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import RenameDialog from '@/components/RenameDialog';
-import type { DirectoryListing, FileItem as FileItemType, MP3TagData } from '@/types/file';
-
-const ITEM_WIDTH = 200;
-const ITEM_HEIGHT = 160;
-const GAP = 16;
+import type { FileItem as FileItemType, MP3TagData } from '@/types/file';
 
 export default function FileBrowserPage() {
   const [currentPath, setCurrentPath] = useState('/');
@@ -58,8 +54,9 @@ export default function FileBrowserPage() {
       setConfirmDelete({ isOpen: false, item: null });
       toast.success('File deleted successfully');
     },
-    onError: (error: any) => {
-      toast.error(`Failed to delete file: ${error?.message || 'Unknown error'}`);
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to delete file: ${errorMessage}`);
     },
   });
 
@@ -71,8 +68,9 @@ export default function FileBrowserPage() {
       setRenameItem({ isOpen: false, item: null });
       toast.success('File renamed successfully');
     },
-    onError: (error: any) => {
-      toast.error(`Failed to rename file: ${error?.message || 'Unknown error'}`);
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to rename file: ${errorMessage}`);
     },
   });
 
@@ -84,35 +82,42 @@ export default function FileBrowserPage() {
       setEditTags({ isOpen: false, item: null });
       toast.success('MP3 tags updated successfully');
     },
-    onError: (error: any) => {
-      toast.error(`Failed to update MP3 tags: ${error?.message || 'Unknown error'}`);
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to update MP3 tags: ${errorMessage}`);
     },
   });
 
-  const handleItemClick = (item: FileItemType) => {
-    if (item.isDirectory) {
-      const newPath = currentPath === '/' ? `/${item.name}` : `${currentPath}/${item.name}`;
-      setCurrentPath(newPath);
-    }
-  };
+  const handleItemClick = useCallback(
+    (item: FileItemType) => {
+      if (item.isDirectory) {
+        const newPath = currentPath === '/' ? `/${item.name}` : `${currentPath}/${item.name}`;
+        setCurrentPath(newPath);
+      }
+    },
+    [currentPath, setCurrentPath]
+  );
 
   const handleNavigate = (newPath: string) => {
     setCurrentPath(newPath);
   };
 
-  const handleAction = (item: FileItemType, action: string) => {
-    switch (action) {
-      case 'delete':
-        setConfirmDelete({ isOpen: true, item });
-        break;
-      case 'rename':
-        setRenameItem({ isOpen: true, item });
-        break;
-      case 'editTags':
-        setEditTags({ isOpen: true, item });
-        break;
-    }
-  };
+  const handleAction = useCallback(
+    (item: FileItemType, action: string) => {
+      switch (action) {
+        case 'delete':
+          setConfirmDelete({ isOpen: true, item });
+          break;
+        case 'rename':
+          setRenameItem({ isOpen: true, item });
+          break;
+        case 'editTags':
+          setEditTags({ isOpen: true, item });
+          break;
+      }
+    },
+    [setConfirmDelete, setRenameItem, setEditTags]
+  );
 
   const handleDeleteConfirm = () => {
     if (confirmDelete.item) {
@@ -149,32 +154,45 @@ export default function FileBrowserPage() {
     };
   }, [directoryData?.items.length]);
 
+  const ITEM_WIDTH = 200;
+  const ITEM_HEIGHT = 160;
+  const GAP = 16;
+
   const columnCount = Math.floor((containerSize.width - GAP) / (ITEM_WIDTH + GAP)) || 4;
   const rowCount = Math.ceil((directoryData?.items.length || 0) / columnCount);
 
   const items = useMemo(() => directoryData?.items || [], [directoryData?.items]);
 
-  const FileGridItem = useMemo(
-    () =>
-      ({ columnIndex, rowIndex, style }: any) => {
-        const index = rowIndex * columnCount + columnIndex;
-        const item = items[index];
+  const FileGridItem = useCallback(
+    ({
+      columnIndex,
+      rowIndex,
+      style,
+      data,
+    }: {
+      columnIndex: number;
+      rowIndex: number;
+      style: React.CSSProperties;
+      data: { allAlbums: typeof items; columnCount: number; navigate: typeof handleNavigate };
+    }) => {
+      const index = rowIndex * (data.columnCount || columnCount) + columnIndex;
+      const item = data.allAlbums[index];
 
-        if (!item) {
-          return <div style={style} className="p-2" />;
-        }
+      if (!item) {
+        return <div style={style} className="p-2" />;
+      }
 
-        return (
-          <div style={style} className="p-2">
-            <FileItem
-              item={item}
-              onClick={() => handleItemClick(item)}
-              onAction={(action) => handleAction(item, action)}
-            />
-          </div>
-        );
-      },
-    [items, columnCount, handleItemClick, handleAction]
+      return (
+        <div style={style} className="p-2">
+          <FileItem
+            item={item}
+            onClick={() => handleItemClick(item)}
+            onAction={(action) => handleAction(item, action)}
+          />
+        </div>
+      );
+    },
+    [columnCount, handleItemClick, handleAction]
   );
 
   if (isLoading) {
@@ -235,15 +253,25 @@ export default function FileBrowserPage() {
       <Breadcrumb path={currentPath} onNavigate={handleNavigate} />
 
       {/* File Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {directoryData?.items.map((item) => (
-          <FileItem
-            key={item.path}
-            item={item}
-            onClick={() => handleItemClick(item)}
-            onAction={(action) => handleAction(item, action)}
-          />
-        ))}
+      <div className="flex-1 min-h-0" id="files-container">
+        {containerSize.width > 0 && containerSize.height > 0 && items.length > 0 ? (
+          <Grid
+            columnCount={Math.max(columnCount, 1)}
+            columnWidth={ITEM_WIDTH + GAP}
+            height={Math.max(containerSize.height, 400)}
+            rowCount={Math.max(rowCount, 1)}
+            rowHeight={ITEM_HEIGHT + GAP}
+            width={containerSize.width}
+          >
+            {FileGridItem}
+          </Grid>
+        ) : (
+          <div className="h-full flex items-center justify-center">
+            <div className="text-gray-500">
+              {items.length === 0 ? 'No files found' : 'Loading grid...'}
+            </div>
+          </div>
+        )}
       </div>
 
       {directoryData?.items.length === 0 && (
