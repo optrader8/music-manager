@@ -25,16 +25,19 @@ export class ThemeGenerator {
     return {
       colors,
       typography: themeConfig.typography,
-      spacing: themeConfig.spacing,
-      shadows: themeConfig.shadows,
-      borderRadius: themeConfig.borderRadius,
+      spacing: themeConfig.spacing as Record<string, unknown> as DesignTokens['spacing'],
+      shadows: themeConfig.shadows as Record<string, unknown> as DesignTokens['shadows'],
+      borderRadius: themeConfig.borderRadius as Record<
+        string,
+        unknown
+      > as DesignTokens['borderRadius'],
       breakpoints: {
         sm: '640px',
         md: '768px',
         lg: '1024px',
         xl: '1280px',
         '2xl': '1536px',
-      },
+      } as Record<string, unknown> as DesignTokens['breakpoints'],
       zIndex: {
         auto: 'auto',
         0: 0,
@@ -47,7 +50,7 @@ export class ThemeGenerator {
         dropdown: 1010,
         tooltip: 1020,
         overlay: 1030,
-      },
+      } as Record<string, unknown> as DesignTokens['zIndex'],
     };
   }
 
@@ -212,7 +215,7 @@ export class ThemeGenerator {
   /**
    * Generate color system from theme colors configuration
    */
-  private async generateColorSystem(colors: unknown): Promise<{
+  private async generateColorSystem(colors: any): Promise<{
     primary: ColorScale;
     secondary: ColorScale;
     neutral: ColorScale;
@@ -226,7 +229,7 @@ export class ThemeGenerator {
     if (typeof colors.primary === 'string') {
       primary = this.generateColorScale(colors.primary);
     } else {
-      primary = colors.primary as ColorScale;
+      primary = colors.primary;
     }
 
     // Generate secondary color scale
@@ -234,7 +237,7 @@ export class ThemeGenerator {
       if (typeof colors.secondary === 'string') {
         secondary = this.generateColorScale(colors.secondary);
       } else {
-        secondary = colors.secondary as ColorScale;
+        secondary = colors.secondary;
       }
     } else {
       // Generate complementary color
@@ -246,7 +249,7 @@ export class ThemeGenerator {
 
     // Generate neutral color scale
     if (colors.neutral) {
-      neutral = colors.neutral as ColorScale;
+      neutral = colors.neutral;
     } else {
       neutral = this.generateNeutralScale(
         typeof colors.primary === 'string' ? colors.primary : colors.primary[500]

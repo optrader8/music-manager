@@ -65,6 +65,7 @@ const LayoutContent: React.FC<LayoutProps> = ({ children }) => {
     const routes: Record<string, ValidRoutes> = {
       home: '/',
       dashboard: '/dashboard',
+      server: '/server',
       statistics: '/statistics',
       music: '/music/list',
       playlists: '/playlists',

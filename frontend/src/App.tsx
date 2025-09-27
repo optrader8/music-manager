@@ -7,6 +7,17 @@ import { Layout } from '@/components/Layout/Layout';
 import Dashboard from '@/pages/Dashboard';
 import Statistics from '@/pages/Statistics';
 import { MusicListPage } from '@/pages/MusicListPage';
+import Albums from '@/pages/Albums';
+import AlbumDetail from '@/pages/AlbumDetail';
+import FileBrowserPage from '@/pages/FileBrowserPage';
+
+// Temporary Server Page (will implement later)
+const ServerPage = () => (
+  <div className="p-6">
+    <h1 className="text-3xl font-bold text-gray-900 mb-6">Server</h1>
+    <p>Server management page - Coming soon</p>
+  </div>
+);
 
 // Create a client - HMR Test
 const queryClient = new QueryClient({
@@ -44,7 +55,11 @@ export function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/server" element={<ServerPage />} />
             <Route path="/statistics" element={<Statistics />} />
+            <Route path="/files" element={<FileBrowserPage />} />
+            <Route path="/albums" element={<Albums />} />
+            <Route path="/albums/:albumId" element={<AlbumDetail />} />
             <Route path="/music/list" element={<MusicListPage />} />
           </Routes>
         </Layout>

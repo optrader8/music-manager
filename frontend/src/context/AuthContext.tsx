@@ -55,6 +55,15 @@ const defaultValue: AuthContextValue = {
   isAuthenticated: false,
   isLoading: true,
   error: null,
+  login: async () => {
+    throw new Error('AuthProvider not initialized');
+  },
+  logout: async () => {
+    throw new Error('AuthProvider not initialized');
+  },
+  register: async () => {
+    throw new Error('AuthProvider not initialized');
+  },
   signIn: async () => {
     throw new Error('AuthProvider not initialized');
   },

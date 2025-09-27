@@ -100,7 +100,7 @@ const initialState: AudioPlayerState = {
   queueIndex: -1,
   shuffle: false,
   repeat: 'off',
-  quality: 'high',
+  quality: 'high' as AudioQuality,
   showPlayer: false,
   expandedPlayer: false,
 };
@@ -211,7 +211,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
       if (index >= 0 && index < state.queue.length) {
         const track = state.queue[index];
         dispatch({ type: 'SET_QUEUE_INDEX', payload: index });
-        dispatch({ type: 'SET_CURRENT_TRACK', payload: track as TrackWithRelations });
+        dispatch({ type: 'SET_CURRENT_TRACK', payload: track as unknown as TrackWithRelations });
         dispatch({ type: 'SET_LOADING', payload: true });
 
         if (audioRef.current) {
@@ -324,7 +324,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
           track_id: track.id,
           title: track.title,
           stream_url: `/api/v1/stream/tracks/${track.id}`,
-          duration_seconds: track.duration_seconds,
+          duration_seconds: track.duration, // Use 'duration' instead of 'duration_seconds'
           disc_number: track.disc_number,
           track_number: track.track_number,
           artist_name: track.artist?.name,

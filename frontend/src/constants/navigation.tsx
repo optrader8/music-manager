@@ -1,6 +1,6 @@
 import React from 'react';
-import { Home, BarChart, Music, Library, Settings } from 'lucide-react';
-import type { NavigationItem } from '../types';
+import { Home, BarChart, Music, Library, Settings, Server, Disc, Folder } from 'lucide-react';
+import type { NavigationItem } from '../types/index';
 
 export const navigationItems: NavigationItem[] = [
   {
@@ -10,10 +10,31 @@ export const navigationItems: NavigationItem[] = [
     href: '/',
   },
   {
+    id: 'server',
+    label: 'Server',
+    icon: <Server size={24} />,
+    href: '/server',
+    active: false,
+  },
+  {
     id: 'statistics',
     label: 'Statistics',
     icon: <BarChart size={24} />,
     href: '/statistics',
+    active: false,
+  },
+  {
+    id: 'files',
+    label: 'Files',
+    icon: <Folder size={24} />,
+    href: '/files',
+    active: false,
+  },
+  {
+    id: 'albums',
+    label: 'Albums',
+    icon: <Disc size={24} />,
+    href: '/albums',
     active: false,
   },
   {

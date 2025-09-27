@@ -1,13 +1,13 @@
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { ScrollArea } from "./ui/scroll-area";
-import { Play, Pause, Clock, Calendar, Disc, Music, X } from "lucide-react";
-import { useAlbumTracks } from "../hooks/useMusicLibrary";
-import { useAudioPlayer } from "../context/AudioPlayerContext";
-import { musicService } from "../services/musicService";
-import type { AlbumWithTracks } from "../types/api";
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { ScrollArea } from './ui/scroll-area';
+import { Play, Pause, Clock, Calendar, Disc, Music, X } from 'lucide-react';
+import { useAlbumTracks } from '../hooks/useMusicLibrary';
+import { useAudioPlayer } from '../context/AudioPlayerContext';
+import { musicService } from '../services/musicService';
+import type { AlbumWithTracks, TrackWithRelations } from '../types/api';
 
 interface AlbumDetailModalProps {
   album: AlbumWithTracks | null;
@@ -18,7 +18,7 @@ interface AlbumDetailModalProps {
 }
 
 interface TrackRowProps {
-  track: TrackWithRelations;
+  track: TrackWithRelations; // TrackWithRelations from api.ts
   index: number;
   isPlaying: boolean;
   isCurrentTrack: boolean;
@@ -34,19 +34,19 @@ const TrackRow: React.FC<TrackRowProps> = ({
   onPlay,
   onPause,
 }) => {
-  const formatDuration = (seconds: number | null) => {
-    if (!seconds) return "--:--";
+  const formatDuration = (seconds: number | null | undefined) => {
+    if (!seconds) return '--:--';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
     <div
       className={`flex items-center gap-4 p-3 rounded-lg transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
         isCurrentTrack
-          ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
-          : ""
+          ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
+          : ''
       }`}
     >
       {/* Track Number */}
@@ -68,7 +68,7 @@ const TrackRow: React.FC<TrackRowProps> = ({
       <div className="flex-1 min-w-0">
         <h4 className="font-medium text-gray-900 dark:text-gray-100 truncate">{track.title}</h4>
         <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-          {track.artist?.name || "Unknown Artist"}
+          {track.artist?.name || 'Unknown Artist'}
         </p>
       </div>
 
@@ -82,7 +82,7 @@ const TrackRow: React.FC<TrackRowProps> = ({
         )}
         <span className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
-          {formatDuration(track.duration_seconds)}
+          {formatDuration(track.duration)}
         </span>
       </div>
     </div>
@@ -99,12 +99,14 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
   const { currentTrack, isPlaying, pause } = useAudioPlayer();
 
   // Fetch album tracks if album has tracks, otherwise use the provided tracks
-  const { data: albumData, isLoading } = useAlbumTracks(album?.id || 0, {
-    enabled: !!album?.id && !album.tracks,
+  const shouldFetch = !!album?.id && !album?.tracks;
+  const { data: albumData, isLoading } = useAlbumTracks(shouldFetch ? album.id : 0, {
+    page: 1,
+    limit: 100,
   });
 
-  const displayAlbum = album || albumData;
-  const tracks = displayAlbum?.tracks || [];
+  const displayAlbum = album;
+  const tracks = album?.tracks || albumData?.items || [];
 
   const handlePlayAlbum = () => {
     if (displayAlbum && onPlayAlbum) {
@@ -115,13 +117,13 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
         track_id: track.id,
         title: track.title,
         stream_url: `/api/v1/stream/tracks/${track.id}`,
-        duration_seconds: track.duration_seconds,
+        duration_seconds: track.duration,
         disc_number: track.disc_number,
         track_number: track.track_number,
         artist_name: track.artist?.name,
       }));
       // This would need to be implemented in the audio player context
-      console.log("Playing album tracks:", playbackTracks);
+      console.log('Playing album tracks:', playbackTracks);
     }
   };
 
@@ -137,12 +139,12 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
     const seconds = Math.floor(totalSeconds % 60);
 
     if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const totalDuration = tracks.reduce((sum, track) => sum + (track.duration_seconds || 0), 0);
+  const totalDuration = tracks.reduce((sum, track) => sum + (track.duration || 0), 0);
 
   if (!displayAlbum) return null;
 
@@ -163,33 +165,29 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
               {/* Album Cover */}
               <div className="flex-shrink-0">
                 <img
-                  src={musicService.getAlbumArtworkUrl(displayAlbum.id, "large")}
+                  src={musicService.getAlbumArtworkUrl(displayAlbum.id, 'large')}
                   alt={`${displayAlbum.title} cover`}
                   className="w-48 h-48 rounded-lg shadow-lg object-cover"
                   onError={(e) => {
                     const target = e.currentTarget;
-                    target.src = "/placeholder-album.png"; // Fallback image
+                    target.src = '/placeholder-album.png'; // Fallback image
                   }}
                 />
               </div>
 
               {/* Album Info */}
               <div className="flex-1 min-w-0">
-                <DialogHeader className="text-left mb-4">
-                  <DialogTitle className="text-2xl font-bold mb-2">
-                    {displayAlbum.title}
-                  </DialogTitle>
-                  <p className="text-xl text-gray-200 mb-2">
-                    {displayAlbum.artist?.name || "Unknown Artist"}
-                  </p>
-                </DialogHeader>
+                <DialogTitle className="text-2xl font-bold mb-2">{album?.title}</DialogTitle>
+                <p className="text-xl text-gray-200 mb-2">
+                  {album?.artist?.name || 'Unknown Artist'}
+                </p>
 
                 {/* Album Metadata */}
                 <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-300">
-                  {displayAlbum.release_year && (
+                  {album?.release_year && (
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      {displayAlbum.release_year}
+                      {album.release_year}
                     </div>
                   )}
                   <div className="flex items-center gap-1">
@@ -200,9 +198,9 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
                     <Clock className="w-4 h-4" />
                     {formatDuration(totalDuration)}
                   </div>
-                  {displayAlbum.genre && (
+                  {album?.genre && (
                     <Badge variant="secondary" className="text-xs">
-                      {displayAlbum.genre}
+                      {album.genre}
                     </Badge>
                   )}
                 </div>
@@ -245,7 +243,7 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
                 </div>
               ) : tracks.length > 0 ? (
                 <div className="space-y-1">
-                  {tracks.map((track, index) => (
+                  {tracks.map((track: any, index) => (
                     <TrackRow
                       key={track.id}
                       track={track}

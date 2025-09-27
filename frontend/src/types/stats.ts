@@ -1,4 +1,4 @@
-import type { AudioQuality } from "./playback";
+import type { AudioQuality } from './playback';
 
 export interface PaginationMeta {
   page: number;
@@ -114,4 +114,36 @@ export interface MostPlayedQueryParams {
   page?: number;
   pageSize?: number;
   quality?: AudioQuality;
+}
+
+export interface TrackWithRelations {
+  id: number;
+  title: string;
+  album_id: number;
+  album?: AlbumSummary;
+  artist_id: number;
+  artist?: ArtistSummary;
+  track_number?: number;
+  disc_number?: number;
+  duration?: number;
+  file_path: string;
+  file_size?: number;
+  bitrate?: number;
+  sample_rate?: number;
+  format?: string;
+  performer?: string;
+  composer?: string;
+  comment?: string;
+  id3v1_comment?: string;
+  file_hash?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TracksQueryParams {
+  skip?: number;
+  limit?: number;
+  search?: string;
+  artist_id?: number;
+  album_id?: number;
 }

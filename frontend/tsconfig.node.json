@@ -8,5 +8,5 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": ["rsbuild.config.ts"]
+  "include": ["vite.config.ts"]
 }

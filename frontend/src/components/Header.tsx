@@ -1,16 +1,16 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink } from 'react-router-dom';
 
-import { useAuth } from "../hooks";
+import { useAuthContext } from '../context/AuthContext';
 
 const navItems = [
-  { to: "/", label: "대시보드" },
-  { to: "/library", label: "라이브러리" },
-  { to: "/playlists", label: "플레이리스트" },
-  { to: "/metadata", label: "메타데이터" },
+  { to: '/', label: '대시보드' },
+  { to: '/library', label: '라이브러리' },
+  { to: '/playlists', label: '플레이리스트' },
+  { to: '/metadata', label: '메타데이터' },
 ];
 
 export function Header(): JSX.Element {
-  const { user, ability, signOut } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuthContext();
 
   const handleSignOut = async () => {
     await signOut();
@@ -27,7 +27,7 @@ export function Header(): JSX.Element {
             <NavLink
               key={item.to}
               to={item.to}
-              className={({ isActive }) => (isActive ? "nav-link nav-link--active" : "nav-link")}
+              className={({ isActive }) => (isActive ? 'nav-link nav-link--active' : 'nav-link')}
             >
               {item.label}
             </NavLink>
@@ -39,7 +39,7 @@ export function Header(): JSX.Element {
           <div className="user-menu">
             <div className="user-meta">
               <span className="user-name">{user.displayName}</span>
-              <span className="user-role">{ability.isAdmin ? "관리자" : "사용자"}</span>
+              <span className="user-role">{ability.isAdmin ? '관리자' : '사용자'}</span>
             </div>
             <button type="button" className="ghost-button" onClick={handleSignOut}>
               로그아웃

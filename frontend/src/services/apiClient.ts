@@ -1,14 +1,14 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance } from 'axios';
 
-import { ApiError } from "../types/api";
+import { ApiError } from '../types/api';
 
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:32000";
+const apiBaseUrl = '/api/v1';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: apiBaseUrl,
   timeout: 15_000,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
@@ -35,7 +35,7 @@ function normalizeError(error: unknown): ApiError {
       (axiosError.response?.data as { detail?: string })?.detail ?? axiosError.message;
 
     return {
-      name: "ApiError",
+      name: 'ApiError',
       message,
       status,
       cause: axiosError,
@@ -45,8 +45,8 @@ function normalizeError(error: unknown): ApiError {
   }
 
   return {
-    name: "ApiError",
-    message: error instanceof Error ? error.message : "Unknown error",
+    name: 'ApiError',
+    message: error instanceof Error ? error.message : 'Unknown error',
     status: undefined,
     cause: error instanceof Error ? error : undefined,
     data: undefined,
@@ -63,7 +63,7 @@ apiClient.interceptors.request.use((config) => {
 
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(normalizeError(error)),
+  (error) => Promise.reject(normalizeError(error))
 );
 
 export { apiClient };

@@ -24,7 +24,7 @@
 
 - **React 18.3.1** - 현대적인 React 기능 활용
 - **TypeScript 5.8.3** - 타입 안전성과 개발자 경험 향상
-- **RSBuild** - 고성능 번들러 (Rspack 기반)
+- **Vite** - 고성능 번들러 (ESBuild 기반)
 
 ### UI & 스타일링
 

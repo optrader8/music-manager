@@ -1,19 +1,20 @@
-import React, { useState, useMemo } from "react";
-import { AlbumCard } from "./AlbumCard";
-import { Input } from "./ui/input";
-import { Skeleton } from "./ui/skeleton";
+import React, { useState, useMemo } from 'react';
+import { AlbumCard } from './AlbumCard';
+import { Input } from './ui/input';
+import { Skeleton } from './ui/skeleton';
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "./ui/pagination";
-import { useAlbums } from "../hooks/useMusicLibrary";
-import { debounce } from "../lib/utils";
-import { DEFAULT_PAGE_SIZE } from "../constants";
-import type { Album, SearchFilters } from "../types/api";
+} from './ui/pagination';
+import { useAlbums } from '../hooks/useMusicLibrary';
+import { debounce } from '../lib/utils';
+import { DEFAULT_PAGE_SIZE } from '../constants';
+import type { Album, SearchFilters } from '../types/api';
 
 interface AlbumGridProps {
   onAlbumClick?: (album: Album) => void;
@@ -21,18 +22,20 @@ interface AlbumGridProps {
 }
 
 export function AlbumGrid({ onAlbumClick, initialFilters }: AlbumGridProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<SearchFilters>(initialFilters || {});
   const [currentPage, setCurrentPage] = useState(1);
 
   // Debounced search
   const debouncedSearch = useMemo(
     () =>
-      debounce((query: string) => {
-        setFilters((prev) => ({ ...prev, query: query || undefined }));
-        setCurrentPage(1); // Reset to first page on search
+      debounce((query: unknown) => {
+        if (typeof query === 'string') {
+          setFilters((prev) => ({ ...prev, query: query || undefined }));
+          setCurrentPage(1); // Reset to first page on search
+        }
       }, 300),
-    [],
+    [debounce]
   );
 
   React.useEffect(() => {
@@ -46,18 +49,16 @@ export function AlbumGrid({ onAlbumClick, initialFilters }: AlbumGridProps) {
   } = useAlbums({
     page: currentPage,
     limit: DEFAULT_PAGE_SIZE,
-    sort_by: "title",
-    sort_order: "asc",
+    sort_by: 'title',
+    sort_order: 'asc',
     ...filters,
   });
 
   const albums = albumResponse?.items || [];
-  const totalPages =
-    albumResponse?.pagination?.total_pages ||
-    Math.ceil((albumResponse?.pagination?.total || 0) / DEFAULT_PAGE_SIZE);
-  const totalAlbums = albumResponse?.pagination?.total || 0;
+  const totalPages = Math.ceil((albumResponse?.total || 0) / DEFAULT_PAGE_SIZE);
+  const totalAlbums = albumResponse?.total || 0;
 
-  console.log("AlbumGrid data:", albumResponse, "totalPages:", totalPages);
+  console.log('AlbumGrid data:', albumResponse, 'totalPages:', totalPages);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -83,7 +84,7 @@ export function AlbumGrid({ onAlbumClick, initialFilters }: AlbumGridProps) {
         />
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {totalAlbums} albums
-          {isLoading && " (loading...)"}
+          {isLoading && ' (loading...)'}
         </div>
       </div>
 
@@ -118,7 +119,7 @@ export function AlbumGrid({ onAlbumClick, initialFilters }: AlbumGridProps) {
                       <PaginationPrevious
                         onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                         className={
-                          currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"
+                          currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
                         }
                       />
                     </PaginationItem>
@@ -186,8 +187,8 @@ export function AlbumGrid({ onAlbumClick, initialFilters }: AlbumGridProps) {
                         onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                         className={
                           currentPage === totalPages
-                            ? "pointer-events-none opacity-50"
-                            : "cursor-pointer"
+                            ? 'pointer-events-none opacity-50'
+                            : 'cursor-pointer'
                         }
                       />
                     </PaginationItem>

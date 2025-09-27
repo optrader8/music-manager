@@ -11,5 +11,5 @@ COPY . .
 
 EXPOSE 32001
 
-# Use rsbuild dev with proper host binding
+# Use vite dev with proper host binding
 CMD ["npm", "run", "dev"]

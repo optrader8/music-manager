@@ -1,11 +1,11 @@
 export interface ApiHealth {
-  status: "ok" | "degraded" | "down";
+  status: 'ok' | 'degraded' | 'down';
   message?: string;
   timestamp?: string;
 }
 
 export interface ApiError {
-  name: "ApiError";
+  name: 'ApiError';
   message: string;
   status?: number;
   cause?: unknown;
@@ -18,7 +18,7 @@ export interface PaginationParams {
   page: number;
   limit: number;
   sort_by?: string;
-  sort_order?: "asc" | "desc";
+  sort_order?: 'asc' | 'desc';
 }
 
 export interface PaginationResponse<T> {
@@ -50,6 +50,7 @@ export interface Album {
   year?: number;
   genre?: string;
   cover_art_path?: string;
+  cover_art_url?: string;
   back_cover_path?: string;
   booklet_path?: string;
   description?: string;
@@ -70,6 +71,7 @@ export interface Track {
   track_number?: number;
   disc_number?: number;
   duration?: number;
+  duration_seconds?: number;
   file_path: string;
   file_size?: number;
   bitrate?: number;
@@ -109,4 +111,21 @@ export interface LibraryStats {
   total_size: number;
   total_duration: number;
   last_scan: string;
+}
+
+// Extended types for relations
+export interface AlbumWithTracks extends Album {
+  tracks: Track[];
+  release_year?: number;
+}
+
+export interface TrackWithRelations extends Track {
+  album: Album;
+  artist: Artist;
+}
+
+export interface AudioQuality {
+  bitrate: number;
+  sample_rate: number;
+  format: string;
 }

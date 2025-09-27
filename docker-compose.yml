@@ -28,7 +28,7 @@ services:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
     environment:
-      - VITE_API_URL=http://localhost:32000
+      - VITE_API_URL=/api/v1
     depends_on:
       - music-manager-backend
     networks:

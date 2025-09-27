@@ -12,6 +12,8 @@ ALLOWED_ORIGINS = [
   "http://localhost:32001",
   "http://g2:32001",
   "http://localhost:5173",
+  "http://g2.parrot-mine.ts.net:32001",
+  "https://g2.parrot-mine.ts.net:32001",
 ]
 
 
