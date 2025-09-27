@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
 import { Layout } from '@/components/Layout/Layout';
 
 // Pages
@@ -63,6 +64,7 @@ export function App() {
             <Route path="/music/list" element={<MusicListPage />} />
           </Routes>
         </Layout>
+        <Toaster position="top-right" />
       </BrowserRouter>
     </QueryClientProvider>
   );

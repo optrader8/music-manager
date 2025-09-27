@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Input } from './ui/input';
 import { Card, CardContent } from './ui/card';
 import { debounce } from '../lib/utils';
-import { SEARCH_DEBOUNCE_MS, COMMON_GENRES, SUPPORTED_AUDIO_FORMATS } from '../constants';
+import { COMMON_GENRES, SUPPORTED_AUDIO_FORMATS } from '../constants';
 import type { SearchFilters as SearchFiltersType } from '../types/api';
 
 interface SearchFiltersProps {
@@ -20,19 +20,19 @@ export function SearchFilters({
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(showAdvanced);
 
   // Debounced search query update
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((query: unknown) => {
-        if (typeof query === 'string') {
-          onSearch?.(query);
-        }
-      }, 500),
-    [debounce, onSearch]
-  );
-
   React.useEffect(() => {
-    debouncedQueryUpdate(localQuery);
-  }, [localQuery, debouncedQueryUpdate]);
+    const debouncedSearch = debounce((query: unknown) => {
+      if (typeof query === 'string') {
+        onFiltersChange({ ...filters, query: query || undefined });
+      }
+    }, 500);
+
+    debouncedSearch(localQuery);
+
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [localQuery, onFiltersChange, filters]);
 
   const handleGenreToggle = (genre: string) => {
     const currentGenres = filters.genres || [];

@@ -143,7 +143,7 @@ export default function AlbumEditModal({ album, isOpen, onClose, onSave }: Album
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        artist: { ...formData.artist, name: e.target.value } as any,
+                        artist: { ...formData.artist, name: e.target.value },
                       })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -211,7 +211,7 @@ export default function AlbumEditModal({ album, isOpen, onClose, onSave }: Album
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            artist: { ...formData.artist, sort_name: e.target.value } as any,
+                            artist: { ...formData.artist, sort_name: e.target.value },
                           })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

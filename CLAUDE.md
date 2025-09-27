@@ -71,6 +71,7 @@
 
 ## API 엔드포인트 설계
 
+### 통계 및 라이브러리 API
 ```
 GET /api/v1/stats/overview     # 전체 통계
 GET /api/v1/stats/genres       # 장르별 통계
@@ -81,6 +82,15 @@ GET /api/v1/artists            # 아티스트 목록
 GET /api/v1/albums             # 앨범 목록
 ```
 
+### 파일 브라우저 API (✅ 구현 완료)
+```
+GET /api/v1/files/browse              # 디렉토리 탐색
+DELETE /api/v1/files/{file_path}      # 파일/폴더 삭제
+PUT /api/v1/files/{file_path}/rename  # 파일/폴더 이름 변경
+GET /api/v1/files/{file_path}/mp3-tags # MP3 태그 조회
+PUT /api/v1/files/{file_path}/mp3-tags # MP3 태그 수정
+```
+
 ---
 
 ## Frontend 페이지 구조
@@ -88,9 +98,19 @@ GET /api/v1/albums             # 앨범 목록
 ```
 /dashboard     # 대시보드 (전체 개요)
 /statistics    # 통계 페이지 (상세 분석)
+/files         # 파일 브라우저 (✅ 구현 완료)
+/albums        # 앨범 목록 및 상세
 /tracks        # 음악 목록 (향후)
 /playlists     # 플레이리스트 (향후)
 ```
+
+### 파일 브라우저 페이지 기능 (✅ 구현 완료)
+- 디렉토리 탐색 및 Breadcrumb 네비게이션
+- 실시간 파일 검색 및 필터링
+- 파일/폴더 삭제 및 이름 변경
+- MP3 태그 편집 (제목, 아티스트, 앨범, 장르, 연도, 트랙번호)
+- 반응형 그리드 레이아웃 및 가상 스크롤링
+- 안전한 경로 접근 제어 (/mnt/nas-music 하위만)
 
 ---
 
@@ -140,9 +160,13 @@ GET /api/v1/albums             # 앨범 목록
 ## 현재 프로젝트 상태
 
 - **Database**: 음악 스캔 완료, SQLite에 저장됨
-- **Backend**: FastAPI 구조 존재, 기본 모델 정의 완료
-- **Frontend**: 빈 React 프로젝트
-- **목표**: Dashboard + Statistics 페이지 구현
+- **Backend**: FastAPI 구조 완성, 파일 브라우저 API 구현 완료
+- **Frontend**: React 프로젝트 완성, 파일 브라우저 기능 구현 완료
+- **완료된 기능**:
+  - ✅ Dashboard + Statistics 페이지
+  - ✅ File Browser (디렉토리 탐색, 파일 관리, MP3 태그 편집)
+  - ✅ Albums 페이지 및 상세 정보
+- **진행 중**: 성능 최적화 및 테스트 작성
 
 ---
 

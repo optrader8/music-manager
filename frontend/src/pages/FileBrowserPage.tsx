@@ -1,266 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Folder, File, Music, Image, FileText, MoreVertical } from 'lucide-react';
+import { FixedSizeGrid as Grid } from 'react-window';
+import toast from 'react-hot-toast';
+import { Search } from 'lucide-react';
 import { fileService } from '@/services/fileService';
 import MP3TagEditModal from '@/components/MP3TagEditModal';
-import type { DirectoryListing, FileItem, MP3TagData } from '@/types/file';
+import Breadcrumb from '@/components/Breadcrumb';
+import FileItem from '@/components/FileItem';
+import ConfirmDialog from '@/components/ConfirmDialog';
+import RenameDialog from '@/components/RenameDialog';
+import type { DirectoryListing, FileItem as FileItemType, MP3TagData } from '@/types/file';
 
-function getFileIcon(fileType?: string, isDirectory?: boolean) {
-  if (isDirectory) return <Folder className="w-8 h-8 text-blue-500" />;
-  switch (fileType) {
-    case 'audio':
-      return <Music className="w-8 h-8 text-green-500" />;
-    case 'image':
-      return <Image className="w-8 h-8 text-purple-500" />;
-    case 'text':
-      return <FileText className="w-8 h-8 text-gray-500" />;
-    default:
-      return <File className="w-8 h-8 text-gray-500" />;
-  }
-}
-
-function formatFileSize(bytes?: number): string {
-  if (!bytes) return '';
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let size = bytes;
-  let unitIndex = 0;
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex++;
-  }
-  return `${size.toFixed(1)} ${units[unitIndex]}`;
-}
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString();
-}
-
-function FileCard({
-  item,
-  onClick,
-  onAction,
-}: {
-  item: FileItem;
-  onClick: () => void;
-  onAction: (action: string) => void;
-}) {
-  const [showActions, setShowActions] = useState(false);
-
-  return (
-    <div
-      className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer group"
-      onClick={onClick}
-    >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center space-x-3">
-          {getFileIcon(item.fileType, item.isDirectory)}
-          <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-medium text-gray-900 truncate" title={item.name}>
-              {item.name}
-            </h3>
-            <p className="text-xs text-gray-500">
-              {item.isDirectory ? 'Folder' : item.fileType || 'File'}
-            </p>
-          </div>
-        </div>
-        <div className="relative">
-          <button
-            className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-gray-100 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowActions(!showActions);
-            }}
-          >
-            <MoreVertical className="w-4 h-4 text-gray-400" />
-          </button>
-          {showActions && (
-            <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
-              <button
-                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAction('rename');
-                  setShowActions(false);
-                }}
-              >
-                Rename
-              </button>
-              <button
-                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAction('delete');
-                  setShowActions(false);
-                }}
-              >
-                Delete
-              </button>
-              {!item.isDirectory && item.fileType === 'audio' && (
-                <button
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAction('editTags');
-                    setShowActions(false);
-                  }}
-                >
-                  Edit Tags
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="text-xs text-gray-500 space-y-1">
-        {!item.isDirectory && item.size && <div>Size: {formatFileSize(item.size)}</div>}
-        <div>Modified: {formatDate(item.modifiedTime)}</div>
-        <div>Permissions: {item.permissions}</div>
-      </div>
-    </div>
-  );
-}
-
-function Breadcrumb({ path, onNavigate }: { path: string; onNavigate: (newPath: string) => void }) {
-  const parts = path.split('/').filter(Boolean);
-  const crumbs = [
-    { label: 'Root', path: '/' },
-    ...parts.map((part, index) => ({
-      label: part,
-      path: '/' + parts.slice(0, index + 1).join('/'),
-    })),
-  ];
-
-  return (
-    <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
-      {crumbs.map((crumb, index) => (
-        <React.Fragment key={crumb.path}>
-          {index > 0 && <span>/</span>}
-          <button
-            className="hover:text-blue-600 hover:underline"
-            onClick={() => onNavigate(crumb.path)}
-          >
-            {crumb.label}
-          </button>
-        </React.Fragment>
-      ))}
-    </div>
-  );
-}
-
-function ConfirmDialog({
-  isOpen,
-  title,
-  message,
-  onConfirm,
-  onCancel,
-}: {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-md w-full mx-4">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-          <p className="text-gray-600 mb-6">{message}</p>
-          <div className="flex items-center justify-end space-x-3">
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RenameDialog({
-  isOpen,
-  currentName,
-  onConfirm,
-  onCancel,
-}: {
-  isOpen: boolean;
-  currentName: string;
-  onConfirm: (newName: string) => void;
-  onCancel: () => void;
-}) {
-  const [newName, setNewName] = useState(currentName);
-
-  useEffect(() => {
-    if (isOpen) setNewName(currentName);
-  }, [isOpen, currentName]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newName.trim() && newName !== currentName) {
-      onConfirm(newName.trim());
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-md w-full mx-4">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Rename Item</h3>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
-              autoFocus
-            />
-            <div className="flex items-center justify-end space-x-3">
-              <button
-                type="button"
-                onClick={onCancel}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-              >
-                Rename
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-}
+const ITEM_WIDTH = 200;
+const ITEM_HEIGHT = 160;
+const GAP = 16;
 
 export default function FileBrowserPage() {
   const [currentPath, setCurrentPath] = useState('/');
   const [searchQuery, setSearchQuery] = useState('');
-  const [confirmDelete, setConfirmDelete] = useState<{ isOpen: boolean; item: FileItem | null }>({
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [confirmDelete, setConfirmDelete] = useState<{
+    isOpen: boolean;
+    item: FileItemType | null;
+  }>({ isOpen: false, item: null });
+  const [renameItem, setRenameItem] = useState<{ isOpen: boolean; item: FileItemType | null }>({
     isOpen: false,
     item: null,
   });
-  const [renameItem, setRenameItem] = useState<{ isOpen: boolean; item: FileItem | null }>({
-    isOpen: false,
-    item: null,
-  });
-  const [editTags, setEditTags] = useState<{ isOpen: boolean; item: FileItem | null }>({
+  const [editTags, setEditTags] = useState<{ isOpen: boolean; item: FileItemType | null }>({
     isOpen: false,
     item: null,
   });
@@ -271,7 +38,6 @@ export default function FileBrowserPage() {
     data: directoryData,
     isLoading,
     error,
-    refetch,
   } = useQuery({
     queryKey: ['files', currentPath, searchQuery],
     queryFn: () =>
@@ -290,6 +56,10 @@ export default function FileBrowserPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files'] });
       setConfirmDelete({ isOpen: false, item: null });
+      toast.success('File deleted successfully');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to delete file: ${error?.message || 'Unknown error'}`);
     },
   });
 
@@ -299,6 +69,10 @@ export default function FileBrowserPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files'] });
       setRenameItem({ isOpen: false, item: null });
+      toast.success('File renamed successfully');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to rename file: ${error?.message || 'Unknown error'}`);
     },
   });
 
@@ -308,10 +82,14 @@ export default function FileBrowserPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files'] });
       setEditTags({ isOpen: false, item: null });
+      toast.success('MP3 tags updated successfully');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to update MP3 tags: ${error?.message || 'Unknown error'}`);
     },
   });
 
-  const handleItemClick = (item: FileItem) => {
+  const handleItemClick = (item: FileItemType) => {
     if (item.isDirectory) {
       const newPath = currentPath === '/' ? `/${item.name}` : `${currentPath}/${item.name}`;
       setCurrentPath(newPath);
@@ -322,7 +100,7 @@ export default function FileBrowserPage() {
     setCurrentPath(newPath);
   };
 
-  const handleAction = (item: FileItem, action: string) => {
+  const handleAction = (item: FileItemType, action: string) => {
     switch (action) {
       case 'delete':
         setConfirmDelete({ isOpen: true, item });
@@ -353,6 +131,51 @@ export default function FileBrowserPage() {
       updateTagsMutation.mutate({ filePath: editTags.item.path, tags });
     }
   };
+
+  useEffect(() => {
+    const updateSize = () => {
+      const container = document.getElementById('files-container');
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        setContainerSize({ width: rect.width, height: rect.height });
+      }
+    };
+
+    const timeoutId = setTimeout(updateSize, 100);
+    window.addEventListener('resize', updateSize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', updateSize);
+    };
+  }, [directoryData?.items.length]);
+
+  const columnCount = Math.floor((containerSize.width - GAP) / (ITEM_WIDTH + GAP)) || 4;
+  const rowCount = Math.ceil((directoryData?.items.length || 0) / columnCount);
+
+  const items = useMemo(() => directoryData?.items || [], [directoryData?.items]);
+
+  const FileGridItem = useMemo(
+    () =>
+      ({ columnIndex, rowIndex, style }: any) => {
+        const index = rowIndex * columnCount + columnIndex;
+        const item = items[index];
+
+        if (!item) {
+          return <div style={style} className="p-2" />;
+        }
+
+        return (
+          <div style={style} className="p-2">
+            <FileItem
+              item={item}
+              onClick={() => handleItemClick(item)}
+              onAction={(action) => handleAction(item, action)}
+            />
+          </div>
+        );
+      },
+    [items, columnCount, handleItemClick, handleAction]
+  );
 
   if (isLoading) {
     return (
@@ -414,7 +237,7 @@ export default function FileBrowserPage() {
       {/* File Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {directoryData?.items.map((item) => (
-          <FileCard
+          <FileItem
             key={item.path}
             item={item}
             onClick={() => handleItemClick(item)}

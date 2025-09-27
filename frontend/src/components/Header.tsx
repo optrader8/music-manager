@@ -10,7 +10,7 @@ const navItems = [
 ];
 
 export function Header(): JSX.Element {
-  const { user, isAuthenticated, isLoading } = useAuthContext();
+  const { user } = useAuthContext();
 
   const handleSignOut = async () => {
     await signOut();

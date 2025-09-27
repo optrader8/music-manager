@@ -6,12 +6,7 @@ import type {
   SpacingConfig,
   ShadowConfig,
   BorderRadiusConfig,
-  Breakpoints,
-  ZIndexScale,
-  FontFamilies,
-  FontSizes,
-  FontWeights,
-  LineHeights,
+  ThemeConfig,
 } from '@/types/template';
 
 /**
@@ -328,7 +323,7 @@ export class ConfigurationManager {
     return migratedConfig;
   }
 
-  private validateThemeConfig(theme: any): ValidationResult {
+  private validateThemeConfig(theme: ThemeConfig): ValidationResult {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
 

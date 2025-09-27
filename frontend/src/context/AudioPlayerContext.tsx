@@ -283,7 +283,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
         audioRef.current.addEventListener('emptied', () => {
           dispatch({ type: 'SET_LOADING', payload: false });
         });
-      } catch (error) {
+      } catch {
         // 무시
       }
     }
@@ -294,7 +294,7 @@ export function AudioPlayerProvider({ children }: AudioPlayerProviderProps) {
           audioRef.current.pause();
           audioRef.current.src = '';
           audioRef.current.load();
-        } catch (e) {
+        } catch {
           // 무시
         }
       }

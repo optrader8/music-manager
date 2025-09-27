@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
@@ -243,7 +243,7 @@ export const AlbumDetailModal: React.FC<AlbumDetailModalProps> = ({
                 </div>
               ) : tracks.length > 0 ? (
                 <div className="space-y-1">
-                  {tracks.map((track: any, index) => (
+                  {tracks.map((track, index) => (
                     <TrackRow
                       key={track.id}
                       track={track}

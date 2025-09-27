@@ -35,7 +35,7 @@ export function AlbumGrid({ onAlbumClick, initialFilters }: AlbumGridProps) {
           setCurrentPage(1); // Reset to first page on search
         }
       }, 300),
-    [debounce]
+    []
   );
 
   React.useEffect(() => {
