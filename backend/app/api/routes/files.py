@@ -2,7 +2,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.api.dependencies import get_current_admin_user
+from app.api.dependencies import get_current_user_optional
 from app.schemas.file import DirectoryListing, RenameRequest, MP3TagData, MP3TagUpdate
 from app.services.file_service import file_service
 
@@ -13,7 +13,7 @@ router = APIRouter()
 async def browse_directory(
     path: str = Query("", description="Directory path relative to music root"),
     search: Optional[str] = Query(None, description="Search term for filtering files"),
-    current_user: dict = Depends(get_current_admin_user)
+    current_user: dict = Depends(get_current_user_optional)
 ):
     """Browse directory contents with optional search."""
     try:
@@ -29,7 +29,7 @@ async def browse_directory(
 @router.delete("/{file_path:path}")
 async def delete_file(
     file_path: str,
-    current_user: dict = Depends(get_current_admin_user)
+    current_user: dict = Depends(get_current_user_optional)
 ):
     """Delete a file or directory."""
     try:
@@ -49,7 +49,7 @@ async def delete_file(
 async def rename_file(
     file_path: str,
     request: RenameRequest,
-    current_user: dict = Depends(get_current_admin_user)
+    current_user: dict = Depends(get_current_user_optional)
 ):
     """Rename a file or directory."""
     try:
@@ -68,7 +68,7 @@ async def rename_file(
 @router.get("/{file_path:path}/mp3-tags", response_model=MP3TagData)
 async def get_mp3_tags(
     file_path: str,
-    current_user: dict = Depends(get_current_admin_user)
+    current_user: dict = Depends(get_current_user_optional)
 ):
     """Get MP3 tag data."""
     try:
@@ -83,7 +83,7 @@ async def get_mp3_tags(
 async def update_mp3_tags(
     file_path: str,
     tag_data: MP3TagUpdate,
-    current_user: dict = Depends(get_current_admin_user)
+    current_user: dict = Depends(get_current_user_optional)
 ):
     """Update MP3 tag data."""
     try:

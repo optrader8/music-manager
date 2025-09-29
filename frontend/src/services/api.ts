@@ -11,7 +11,7 @@ import type {
 } from '../types/api';
 
 // API 베이스 URL 설정
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://g2.parrot-mine.ts.net:32000/api/v1';
 
 // Axios 인스턴스 생성
 const api = axios.create({

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Grid } from 'react-window';
+import { Grid, GridImperativeAPI } from 'react-window';
 import { apiClient } from '@/services/apiClient';
 import { musicService } from '@/services/musicService';
 import type { StatsOverview } from '@/types/stats';
@@ -96,7 +96,7 @@ export default function Dashboard() {
     1,
     Math.floor((containerSize.width - GAP) / (ITEM_WIDTH + GAP)) || 1
   );
-  const gridRef = useRef<Grid>(null);
+  const gridRef = useRef<GridImperativeAPI>(null);
 
   const handleScroll = useCallback(
     ({
@@ -317,10 +317,10 @@ export default function Dashboard() {
       <div className="flex-1 px-6 min-h-0" id="albums-container">
         {containerSize.width > 0 && containerSize.height > 0 && allAlbums.length > 0 ? (
           <Grid
-            ref={gridRef}
+            gridRef={gridRef}
             columnCount={Math.max(columnCount, 1)}
             columnWidth={ITEM_WIDTH + GAP}
-            height={Math.max(containerSize.height - FOOTER_HEIGHT, 200)}
+            defaultHeight={Math.max(containerSize.height - FOOTER_HEIGHT, 200)}
             rowCount={Math.max(
               Math.ceil(
                 Math.max(allAlbums.length + (hasNextPage ? columnCount : 0), totalAlbums) /
@@ -329,12 +329,11 @@ export default function Dashboard() {
               1
             )}
             rowHeight={ITEM_HEIGHT + GAP}
-            width={containerSize.width}
-            onScroll={handleScroll}
-            itemData={{ allAlbums, columnCount, navigate }}
-          >
-            {AlbumItem}
-          </Grid>
+            defaultWidth={containerSize.width}
+            onResize={handleScroll}
+            cellProps={{ allAlbums, columnCount, navigate }}
+            cellComponent={AlbumItem}
+          />
         ) : (
           <div className="h-full flex items-center justify-center">
             <div className="text-gray-500">

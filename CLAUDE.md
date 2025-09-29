@@ -1,12 +1,21 @@
 # Music Manager - Claude 개발 지침
 
+## ⚠️ 절대 금지 사항 - 필수 확인
+
+### 포트 사용 규칙
+- **Backend**: 반드시 32000번 포트만 사용
+- **Frontend**: 반드시 32001번 포트만 사용
+- **절대 금지**: 32002, 32003 등 다른 포트 사용 금지
+- **Docker 환경**: docker-compose로 32000, 32001 포트 할당됨
+- **개발 시**: 반드시 Docker 컨테이너 내에서 실행
+
 ## 프로젝트 개요
 
 **Product**: Music Manager - 로컬 음악 라이브러리 관리 시스템
-**Backend**: FastAPI (Python)
-**Frontend**: React + TypeScript
+**Backend**: FastAPI (Python) - Port 32000 고정
+**Frontend**: React + TypeScript - Port 32001 고정
 **Database**: SQLite (개발), PostgreSQL (배포)
-**Port Configuration**: Backend(32000), Frontend(32001)
+**Port Configuration**: Backend(32000), Frontend(32001) - 절대 변경 금지
 
 ---
 

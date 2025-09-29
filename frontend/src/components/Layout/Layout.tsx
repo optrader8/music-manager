@@ -67,6 +67,8 @@ const LayoutContent: React.FC<LayoutProps> = ({ children }) => {
       dashboard: '/dashboard',
       server: '/server',
       statistics: '/statistics',
+      files: '/files',
+      albums: '/albums',
       music: '/music/list',
       playlists: '/playlists',
       settings: '/settings',

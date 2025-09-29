@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { VariableSizeGrid as Grid } from 'react-window';
 import toast from 'react-hot-toast';
 import { Search } from 'lucide-react';
 import { fileService } from '@/services/fileService';
@@ -14,7 +13,6 @@ import type { FileItem as FileItemType, MP3TagData } from '@/types/file';
 export default function FileBrowserPage() {
   const [currentPath, setCurrentPath] = useState('/');
   const [searchQuery, setSearchQuery] = useState('');
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [confirmDelete, setConfirmDelete] = useState<{
     isOpen: boolean;
     item: FileItemType | null;
@@ -88,36 +86,30 @@ export default function FileBrowserPage() {
     },
   });
 
-  const handleItemClick = useCallback(
-    (item: FileItemType) => {
-      if (item.isDirectory) {
-        const newPath = currentPath === '/' ? `/${item.name}` : `${currentPath}/${item.name}`;
-        setCurrentPath(newPath);
-      }
-    },
-    [currentPath, setCurrentPath]
-  );
+  const handleItemClick = (item: FileItemType) => {
+    if (item.isDirectory) {
+      const newPath = currentPath === '/' ? `/${item.name}` : `${currentPath}/${item.name}`;
+      setCurrentPath(newPath);
+    }
+  };
 
   const handleNavigate = (newPath: string) => {
     setCurrentPath(newPath);
   };
 
-  const handleAction = useCallback(
-    (item: FileItemType, action: string) => {
-      switch (action) {
-        case 'delete':
-          setConfirmDelete({ isOpen: true, item });
-          break;
-        case 'rename':
-          setRenameItem({ isOpen: true, item });
-          break;
-        case 'editTags':
-          setEditTags({ isOpen: true, item });
-          break;
-      }
-    },
-    [setConfirmDelete, setRenameItem, setEditTags]
-  );
+  const handleAction = (item: FileItemType, action: string) => {
+    switch (action) {
+      case 'delete':
+        setConfirmDelete({ isOpen: true, item });
+        break;
+      case 'rename':
+        setRenameItem({ isOpen: true, item });
+        break;
+      case 'editTags':
+        setEditTags({ isOpen: true, item });
+        break;
+    }
+  };
 
   const handleDeleteConfirm = () => {
     if (confirmDelete.item) {
@@ -137,63 +129,7 @@ export default function FileBrowserPage() {
     }
   };
 
-  useEffect(() => {
-    const updateSize = () => {
-      const container = document.getElementById('files-container');
-      if (container) {
-        const rect = container.getBoundingClientRect();
-        setContainerSize({ width: rect.width, height: rect.height });
-      }
-    };
-
-    const timeoutId = setTimeout(updateSize, 100);
-    window.addEventListener('resize', updateSize);
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('resize', updateSize);
-    };
-  }, [directoryData?.items.length]);
-
-  const ITEM_WIDTH = 200;
-  const ITEM_HEIGHT = 160;
-  const GAP = 16;
-
-  const columnCount = Math.floor((containerSize.width - GAP) / (ITEM_WIDTH + GAP)) || 4;
-  const rowCount = Math.ceil((directoryData?.items.length || 0) / columnCount);
-
   const items = useMemo(() => directoryData?.items || [], [directoryData?.items]);
-
-  const FileGridItem = useCallback(
-    ({
-      columnIndex,
-      rowIndex,
-      style,
-      data,
-    }: {
-      columnIndex: number;
-      rowIndex: number;
-      style: React.CSSProperties;
-      data: { allAlbums: typeof items; columnCount: number; navigate: typeof handleNavigate };
-    }) => {
-      const index = rowIndex * (data.columnCount || columnCount) + columnIndex;
-      const item = data.allAlbums[index];
-
-      if (!item) {
-        return <div style={style} className="p-2" />;
-      }
-
-      return (
-        <div style={style} className="p-2">
-          <FileItem
-            item={item}
-            onClick={() => handleItemClick(item)}
-            onAction={(action) => handleAction(item, action)}
-          />
-        </div>
-      );
-    },
-    [columnCount, handleItemClick, handleAction]
-  );
 
   if (isLoading) {
     return (
@@ -253,25 +189,15 @@ export default function FileBrowserPage() {
       <Breadcrumb path={currentPath} onNavigate={handleNavigate} />
 
       {/* File Grid */}
-      <div className="flex-1 min-h-0" id="files-container">
-        {containerSize.width > 0 && containerSize.height > 0 && items.length > 0 ? (
-          <Grid
-            columnCount={Math.max(columnCount, 1)}
-            columnWidth={ITEM_WIDTH + GAP}
-            height={Math.max(containerSize.height, 400)}
-            rowCount={Math.max(rowCount, 1)}
-            rowHeight={ITEM_HEIGHT + GAP}
-            width={containerSize.width}
-          >
-            {FileGridItem}
-          </Grid>
-        ) : (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-gray-500">
-              {items.length === 0 ? 'No files found' : 'Loading grid...'}
-            </div>
-          </div>
-        )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+        {items.map((item) => (
+          <FileItem
+            key={item.path}
+            item={item}
+            onClick={() => handleItemClick(item)}
+            onAction={(action) => handleAction(item, action)}
+          />
+        ))}
       </div>
 
       {directoryData?.items.length === 0 && (

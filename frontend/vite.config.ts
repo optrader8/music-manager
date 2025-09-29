@@ -24,7 +24,10 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://music-manager-backend:8000',
+        target:
+          process.env.DOCKER_MODE === 'true'
+            ? 'http://music-manager-backend:8000'
+            : 'http://localhost:32000',
         changeOrigin: true,
         secure: false,
         configure: (proxy, options) => {
