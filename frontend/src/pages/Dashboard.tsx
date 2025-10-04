@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Grid, GridImperativeAPI } from 'react-window';
 import { apiClient } from '@/services/apiClient';
 import { musicService } from '@/services/musicService';
 import type { StatsOverview } from '@/types/stats';
@@ -14,13 +13,8 @@ async function fetchOverview(): Promise<StatsOverview> {
 export default function Dashboard() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-
-  const ITEM_WIDTH = 150;
-  const ITEM_HEIGHT = 200;
-  const GAP = 8;
-  const HEADER_HEIGHT = 120;
-  const FOOTER_HEIGHT = 60;
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 48;
 
   const {
     data: overview,
@@ -36,171 +30,25 @@ export default function Dashboard() {
     data: albumsData,
     isLoading: albumsLoading,
     error: albumsError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['albums-infinite', searchQuery],
-    queryFn: ({ pageParam = 1 }) =>
+  } = useQuery({
+    queryKey: ['albums', currentPage, searchQuery],
+    queryFn: () =>
       musicService.getAlbumsWithPagination({
-        page: pageParam,
-        page_size: 100,
+        page: currentPage,
+        page_size: PAGE_SIZE,
         search: searchQuery || undefined,
       }),
-    getNextPageParam: (lastPage) => {
-      if (!lastPage?.pagination) return undefined;
-      return lastPage.pagination.has_next ? lastPage.pagination.page + 1 : undefined;
-    },
-    initialPageParam: 1,
+    keepPreviousData: true,
   });
 
-  const allAlbums = useMemo(() => {
-    if (!albumsData?.pages) return [];
-    return albumsData.pages.flatMap((page) => page?.items || []);
-  }, [albumsData]);
+  const albums = albumsData?.items || [];
+  const totalAlbums = albumsData?.pagination?.total || 0;
+  const totalPages = Math.ceil(totalAlbums / PAGE_SIZE);
 
-  const totalAlbums = albumsData?.pages[0]?.pagination?.total || 0;
-
-  // Debug logging
-  console.log('Dashboard state:', {
-    overviewLoading,
-    overviewError,
-    overview,
-    containerSize,
-    allAlbums: allAlbums.length,
-    albumsLoading,
-    albumsError,
-  });
-
-  useEffect(() => {
-    const updateSize = () => {
-      const container = document.getElementById('albums-container');
-      if (container) {
-        const rect = container.getBoundingClientRect();
-        console.log('Container rect:', rect);
-        setContainerSize({ width: rect.width, height: rect.height });
-      }
-    };
-
-    // Initial size update with delay to ensure DOM is rendered
-    const timeoutId = setTimeout(updateSize, 100);
-
-    window.addEventListener('resize', updateSize);
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('resize', updateSize);
-    };
-  }, [allAlbums.length]); // Re-run when albums data changes
-
-  const columnCount = Math.max(
-    1,
-    Math.floor((containerSize.width - GAP) / (ITEM_WIDTH + GAP)) || 1
-  );
-  const gridRef = useRef<GridImperativeAPI>(null);
-
-  const handleScroll = useCallback(
-    ({
-      scrollTop,
-      scrollHeight,
-      clientHeight,
-    }: {
-      scrollTop: number;
-      scrollHeight: number;
-      clientHeight: number;
-    }) => {
-      const threshold = 0.8;
-      const scrollRatio = (scrollTop + clientHeight) / scrollHeight;
-
-      if (scrollRatio > threshold && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-    [hasNextPage, isFetchingNextPage, fetchNextPage]
-  );
-
-  const AlbumItem = useCallback(
-    ({
-      columnIndex,
-      rowIndex,
-      style,
-      data,
-    }: {
-      columnIndex: number;
-      rowIndex: number;
-      style: React.CSSProperties;
-      data?: {
-        allAlbums: (typeof allAlbums)[number][];
-        columnCount: number;
-        navigate: (path: string) => void;
-      };
-    }) => {
-      const { allAlbums: albums, columnCount: cols, navigate: nav } = data || {};
-      const index = rowIndex * (cols || columnCount) + columnIndex;
-      const album = albums ? albums[index] : allAlbums[index];
-
-      if (!album) {
-        return (
-          <div style={style} className="p-1">
-            <div className="w-full h-full bg-gray-100 animate-pulse rounded border border-gray-200"></div>
-          </div>
-        );
-      }
-
-      return (
-        <div style={style} className="p-1">
-          <div
-            className="group cursor-pointer w-full h-full"
-            onClick={() => (nav || navigate)(`/albums/${album.id}`)}
-          >
-            <div className="aspect-square rounded border border-gray-200 overflow-hidden mb-1 bg-gray-100 shadow-sm">
-              <img
-                src={
-                  album.cover_art_url
-                    ? `/api/v1${album.cover_art_url}`
-                    : `/api/v1/albums/${album.id}/cover?size=medium`
-                }
-                alt={album.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                loading="lazy"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  const parent = target.parentElement;
-                  if (parent) {
-                    parent.innerHTML = `
-                    <div class="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
-                      <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                      </svg>
-                    </div>
-                  `;
-                  }
-                }}
-              />
-            </div>
-            <div className="text-xs">
-              <h3 className="font-medium text-gray-900 truncate leading-tight" title={album.title}>
-                {album.title}
-              </h3>
-              <p
-                className="text-gray-600 truncate text-xs leading-tight"
-                title={album.artist?.name}
-              >
-                {album.artist?.name || 'Unknown'}
-              </p>
-              <div className="flex justify-between text-gray-500 text-xs">
-                <span>{album.release_year || '—'}</span>
-                <span className="truncate ml-1" title={album.genre || 'Unknown'}>
-                  {album.genre || '—'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    },
-    [allAlbums, columnCount, navigate]
-  );
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
 
   if (overviewLoading) {
     return (
@@ -229,141 +77,166 @@ export default function Dashboard() {
     );
   }
 
-  if (albumsLoading && allAlbums.length === 0) {
-    return (
-      <div className="h-screen flex flex-col">
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow p-6 animate-pulse">
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (albumsError) {
     return (
-      <div className="h-screen flex flex-col">
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-600">Failed to load dashboard data</p>
-          </div>
+      <div className="p-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-600">Failed to load albums</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* Header */}
-      <div className="flex-none p-6" style={{ height: HEADER_HEIGHT }}>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard</h1>
+    <div className="p-6">
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard</h1>
 
-        {/* Statistics Overview */}
-        <div className="bg-white rounded border border-gray-200 px-4 py-2 mb-3">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-1">
-              <span className="text-sm font-medium text-gray-600">Tracks:</span>
-              <span className="text-sm font-bold text-gray-900">
-                {overview?.total_tracks?.toLocaleString() || 0}
-              </span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <span className="text-sm font-medium text-gray-600">Artists:</span>
-              <span className="text-sm font-bold text-gray-900">
-                {overview?.total_artists?.toLocaleString() || 0}
-              </span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <span className="text-sm font-medium text-gray-600">Albums:</span>
-              <span className="text-sm font-bold text-gray-900">
-                {totalAlbums?.toLocaleString() || 0}
-              </span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <span className="text-sm font-medium text-gray-600">Time:</span>
-              <span className="text-sm font-bold text-gray-900">
-                {overview?.total_duration_hours
-                  ? `${Math.round(overview.total_duration_hours)}h`
-                  : '0h'}
-              </span>
-            </div>
+      {/* Statistics Overview */}
+      <div className="bg-white rounded border border-gray-200 px-4 py-2 mb-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-1">
+            <span className="text-sm font-medium text-gray-600">Tracks:</span>
+            <span className="text-sm font-bold text-gray-900">
+              {overview?.total_tracks?.toLocaleString() || 0}
+            </span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span className="text-sm font-medium text-gray-600">Artists:</span>
+            <span className="text-sm font-bold text-gray-900">
+              {overview?.total_artists?.toLocaleString() || 0}
+            </span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span className="text-sm font-medium text-gray-600">Albums:</span>
+            <span className="text-sm font-bold text-gray-900">
+              {totalAlbums?.toLocaleString() || 0}
+            </span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span className="text-sm font-medium text-gray-600">Time:</span>
+            <span className="text-sm font-bold text-gray-900">
+              {overview?.total_duration_hours
+                ? `${Math.round(overview.total_duration_hours)}h`
+                : '0h'}
+            </span>
           </div>
         </div>
+      </div>
 
-        {/* Search */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Albums ({allAlbums.length.toLocaleString()} loaded)
-          </h2>
-          <input
-            type="text"
-            placeholder="Search albums..."
-            className="w-64 px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      {/* Search and Pagination */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm text-gray-600">
+          Page {currentPage} of {totalPages} ({albums.length} albums)
         </div>
+        <input
+          type="text"
+          placeholder="Search albums..."
+          className="w-64 px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
       </div>
 
       {/* Albums Grid */}
-      <div className="flex-1 px-6 min-h-0" id="albums-container">
-        {containerSize.width > 0 && containerSize.height > 0 && allAlbums.length > 0 ? (
-          <Grid
-            gridRef={gridRef}
-            columnCount={Math.max(columnCount, 1)}
-            columnWidth={ITEM_WIDTH + GAP}
-            defaultHeight={Math.max(containerSize.height - FOOTER_HEIGHT, 200)}
-            rowCount={Math.max(
-              Math.ceil(
-                Math.max(allAlbums.length + (hasNextPage ? columnCount : 0), totalAlbums) /
-                  Math.max(columnCount, 1)
-              ),
-              1
-            )}
-            rowHeight={ITEM_HEIGHT + GAP}
-            defaultWidth={containerSize.width}
-            onResize={handleScroll}
-            cellProps={{ allAlbums, columnCount, navigate }}
-            cellComponent={AlbumItem}
-          />
-        ) : (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-gray-500">
-              {allAlbums.length === 0 && !albumsLoading ? 'No albums found' : 'Loading albums...'}
+      {albumsLoading ? (
+        <div className="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3">
+          {[...Array(PAGE_SIZE)].map((_, i) => (
+            <div key={i} className="w-full">
+              <div className="aspect-square bg-gray-200 rounded animate-pulse mb-1"></div>
+              <div className="h-3 bg-gray-200 rounded mb-1"></div>
+              <div className="h-3 bg-gray-200 rounded w-2/3"></div>
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div
-        className="flex-none bg-white border-t border-gray-200 px-6 py-3"
-        style={{ height: FOOTER_HEIGHT }}
-      >
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Showing {allAlbums.length.toLocaleString()} of {totalAlbums.toLocaleString()} albums
-          </div>
-          <div className="flex items-center space-x-4">
-            {isFetchingNextPage && (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-sm text-gray-600">Loading more...</span>
-              </div>
-            )}
-            <div className="text-sm text-gray-600">
-              {hasNextPage ? 'Scroll to load more' : 'All albums loaded'}
-            </div>
-          </div>
+          ))}
         </div>
+      ) : albums.length > 0 ? (
+        <div className="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3">
+          {albums.map((album) => (
+            <div
+              key={album.id}
+              className="group cursor-pointer"
+              onClick={() => navigate(`/albums/${album.id}`)}
+            >
+              <div className="aspect-square rounded border border-gray-200 overflow-hidden mb-1 bg-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <img
+                  src={
+                    album.cover_art_url
+                      ? `/api/v1${album.cover_art_url}`
+                      : `/api/v1/albums/${album.id}/cover?size=small`
+                  }
+                  alt={album.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    const parent = target.parentElement;
+                    target.style.display = 'none';
+                    if (parent) {
+                      parent.innerHTML = `
+                        <div class="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                          </svg>
+                        </div>
+                      `;
+                    }
+                  }}
+                />
+              </div>
+              <div className="text-xs">
+                <h3
+                  className="font-medium text-gray-900 truncate leading-tight"
+                  title={album.title}
+                >
+                  {album.title}
+                </h3>
+                <p
+                  className="text-gray-600 truncate text-xs leading-tight"
+                  title={album.artist?.name}
+                >
+                  {album.artist?.name || 'Unknown'}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 text-gray-500">No albums found</div>
+      )}
+
+      {/* Pagination */}
+      <div className="flex items-center justify-center space-x-2 mt-6">
+        <button
+          onClick={() => setCurrentPage(1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+        >
+          First
+        </button>
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          disabled={currentPage === 1}
+          className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+        >
+          Prev
+        </button>
+        <span className="px-4 py-1 text-sm">
+          {currentPage} / {totalPages}
+        </span>
+        <button
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+        >
+          Next
+        </button>
+        <button
+          onClick={() => setCurrentPage(totalPages)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+        >
+          Last
+        </button>
       </div>
     </div>
   );

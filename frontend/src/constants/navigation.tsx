@@ -4,10 +4,16 @@ import type { NavigationItem } from '../types/index';
 
 export const navigationItems: NavigationItem[] = [
   {
-    id: 'dashboard',
-    label: 'Dashboard',
+    id: 'folder-albums',
+    label: 'Folder Albums',
     icon: <Home />,
     href: '/',
+  },
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: <BarChart />,
+    href: '/dashboard',
   },
   {
     id: 'server',
@@ -32,7 +38,7 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     id: 'albums',
-    label: 'Albums',
+    label: 'DB Albums',
     icon: <Disc size={24} />,
     href: '/albums',
     active: false,

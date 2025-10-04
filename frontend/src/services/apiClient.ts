@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance } from 'axios';
 
 import { ApiError } from '../types/api';
 
-const apiBaseUrl = 'http://g2.parrot-mine.ts.net:32000/api/v1';
+const apiBaseUrl = import.meta.env.VITE_API_URL || '/api/v1';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: apiBaseUrl,

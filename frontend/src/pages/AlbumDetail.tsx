@@ -57,7 +57,7 @@ export default function AlbumDetail() {
   };
 
   const getAlbumCoverUrl = (albumId: number, size: 'small' | 'medium' | 'large' = 'large') => {
-    return `http://g2.parrot-mine.ts.net:32000/api/v1/albums/${albumId}/cover?size=${size}`;
+    return `/api/v1/albums/${albumId}/cover?size=${size}`;
   };
 
   const handleEditSave = () => {
@@ -115,49 +115,101 @@ export default function AlbumDetail() {
   const { tracks, total_tracks, total_duration, ...album } = albumData;
 
   return (
-    <div className="p-6">
-      {/* Header with navigation */}
-      <div className="flex items-center justify-between mb-6">
-        <Link to="/albums" className="text-blue-600 hover:text-blue-800 flex items-center">
-          ← Back to Albums
-        </Link>
-        <div className="flex items-center space-x-4">
-          {!isEditMode ? (
-            <>
-              <button
-                onClick={() => setIsEditMode(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Edit Album
-              </button>
-              <button
-                onClick={handleDeleteAlbum}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                Delete Album
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={handleEditSave}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-              >
-                Save Changes
-              </button>
-              <button
-                onClick={handleEditCancel}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-              >
-                Cancel
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
+    <div className="p-6 max-w-7xl mx-auto">
       {/* Album Header */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        {/* Action buttons in header */}
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center space-x-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors shadow-sm"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            <span className="font-medium">Back</span>
+          </button>
+
+          <div className="flex items-center space-x-3">
+            {!isEditMode ? (
+              <>
+                <button
+                  onClick={() => console.log('Play album')}
+                  className="flex items-center space-x-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  <span className="font-medium">Play</span>
+                </button>
+                <button
+                  onClick={() => setIsEditMode(true)}
+                  className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 shadow-sm transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  <span className="font-medium">Edit</span>
+                </button>
+                <button
+                  onClick={handleDeleteAlbum}
+                  className="flex items-center space-x-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 shadow-sm transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  <span className="font-medium">Delete</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleEditSave}
+                  className="flex items-center space-x-2 px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-md hover:shadow-lg transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span className="font-medium">Save</span>
+                </button>
+                <button
+                  onClick={handleEditCancel}
+                  className="flex items-center space-x-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 shadow-sm transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                  <span className="font-medium">Cancel</span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
         <div className="flex flex-col lg:flex-row space-y-6 lg:space-y-0 lg:space-x-8">
           {/* Album Cover */}
           <div className="flex-shrink-0">

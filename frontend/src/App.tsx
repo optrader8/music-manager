@@ -11,6 +11,8 @@ import { MusicListPage } from '@/pages/MusicListPage';
 import Albums from '@/pages/Albums';
 import AlbumDetail from '@/pages/AlbumDetail';
 import FileBrowserPage from '@/pages/FileBrowserPage';
+import FolderAlbums from '@/pages/FolderAlbums';
+import AlbumFolderDetail from '@/pages/AlbumFolderDetail';
 
 // Temporary Server Page (will implement later)
 const ServerPage = () => (
@@ -54,8 +56,10 @@ export function App() {
       <BrowserRouter>
         <Layout>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<FolderAlbums />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/folder-albums" element={<FolderAlbums />} />
+            <Route path="/folder-albums/detail" element={<AlbumFolderDetail />} />
             <Route path="/server" element={<ServerPage />} />
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/files" element={<FileBrowserPage />} />
