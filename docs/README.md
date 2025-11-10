@@ -13,6 +13,12 @@ Welcome to the Music Manager documentation. This directory contains comprehensiv
 ### Technical Documentation
 - [Database Insertion Error Analysis](20250923-db-insertion-error-analysis.md) - Analysis of database insertion issues and solutions
 
+### 🔧 Troubleshooting & Diagnostics (NEW)
+- **[빠른_진단_체크리스트.md](빠른_진단_체크리스트.md)** - Quick 5-minute diagnostic checklist (START HERE!)
+- **[현재_프로젝트_문제점_분석.md](현재_프로젝트_문제점_분석.md)** - Current project issue analysis and root cause
+- [음악파일_조회_문제_진단.md](음악파일_조회_문제_진단.md) - Music file query problem diagnosis
+- [Docker_환경_진단.md](Docker_환경_진단.md) - Docker environment diagnostics
+
 ## Quick Navigation
 
 ### For Users
@@ -55,13 +61,49 @@ The Music Manager includes the following major features:
 - Streaming capabilities
 - Playlist management
 
+## Troubleshooting
+
+### 🚨 Music files not showing up?
+
+If you can't see your music library after starting the Docker containers:
+
+1. **Quick Fix (5 minutes)**: Follow [빠른_진단_체크리스트.md](빠른_진단_체크리스트.md)
+2. **Root Cause Analysis**: Read [현재_프로젝트_문제점_분석.md](현재_프로젝트_문제점_분석.md)
+3. **Detailed Diagnostics**: See [음악파일_조회_문제_진단.md](음악파일_조회_문제_진단.md)
+
+**Common Issue (CRITICAL)**: `docker-compose.yml` has wrong path
+```yaml
+# ❌ Wrong
+MUSIC_LIBRARY_PATH=/music
+
+# ✅ Correct
+MUSIC_LIBRARY_PATH=/mnt/nas-music
+```
+
+Quick fix:
+```bash
+# Edit docker-compose.yml, then:
+docker-compose down
+docker-compose up -d
+docker exec music-manager-backend python scripts/scan_music_library.py
+```
+
+### 🐳 Docker issues?
+
+See [Docker_환경_진단.md](Docker_환경_진단.md) for:
+- Container status checks
+- Log analysis
+- Network diagnostics
+- Volume mount issues
+
 ## Support
 
 If you have questions or need help:
 
-1. Check the relevant user guide or API documentation
-2. Review the main project README for setup issues
-3. Submit issues via GitHub Issues for bug reports or feature requests
+1. **Troubleshooting**: Check the diagnostic documents above
+2. **User Guides**: Review the relevant user guide or API documentation
+3. **Setup Issues**: Check the main project README
+4. **Bug Reports**: Submit issues via GitHub Issues
 
 ## Contributing
 
@@ -73,4 +115,5 @@ For development contributions:
 
 ---
 
-*Last updated: 2024-09-27*
+*Last updated: 2025-11-10*
+*Diagnostic documents added for troubleshooting music file query issues*

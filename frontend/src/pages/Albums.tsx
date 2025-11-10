@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useRef, useCallback } from 'react';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { musicService } from '@/services/musicService';
 import AlbumEditModal from '@/components/AlbumEditModal';
@@ -13,24 +13,62 @@ interface AlbumListResponse {
 export default function Albums() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [editingAlbum, setEditingAlbum] = useState<AlbumSummary | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const observerTarget = useRef<HTMLDivElement>(null);
   const pageSize = 24;
 
-  const { data, isLoading, error } = useQuery<AlbumListResponse>({
-    queryKey: ['albums', currentPage, searchQuery, selectedGenre],
-    queryFn: () =>
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery<AlbumListResponse>({
+    queryKey: ['albums', searchQuery, selectedGenre],
+    queryFn: ({ pageParam = 1 }) =>
       musicService.getAlbumsWithPagination({
-        page: currentPage,
+        page: pageParam as number,
         page_size: pageSize,
         search: searchQuery || undefined,
         genre: selectedGenre || undefined,
       }),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.has_next) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
   });
+
+  // Intersection Observer for infinite scroll
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [target] = entries;
+      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
+
+  React.useEffect(() => {
+    const element = observerTarget.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(handleObserver, {
+      threshold: 0.1,
+      rootMargin: '100px',
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [handleObserver]);
 
   const updateAlbumMutation = useMutation({
     mutationFn: ({ albumId, data }: { albumId: number; data: Partial<AlbumSummary> }) =>
@@ -85,6 +123,10 @@ export default function Albums() {
     return year ? year.toString() : 'Unknown';
   };
 
+  // Combine all pages into a single array
+  const allAlbums = data?.pages.flatMap((page) => page.items) ?? [];
+  const totalAlbums = data?.pages[0]?.pagination.total ?? 0;
+
   if (isLoading) {
     return (
       <div className="p-6">
@@ -137,23 +179,17 @@ export default function Albums() {
             placeholder="Search albums..."
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <input
             type="text"
             placeholder="Filter by genre..."
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={selectedGenre}
-            onChange={(e) => {
-              setSelectedGenre(e.target.value);
-              setCurrentPage(1);
-            }}
+            onChange={(e) => setSelectedGenre(e.target.value)}
           />
           <div className="text-sm text-gray-600 flex items-center">
-            Showing {data?.pagination.total || 0} albums
+            Showing {allAlbums.length} of {totalAlbums} albums
           </div>
         </div>
       </div>
@@ -161,7 +197,7 @@ export default function Albums() {
       {/* Albums Content */}
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {data?.items.map((album) => (
+          {allAlbums.map((album) => (
             <div
               key={album.id}
               onClick={() => handleAlbumClick(album.id)}
@@ -217,7 +253,7 @@ export default function Albums() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {data?.items.map((album) => (
+              {allAlbums.map((album) => (
                 <tr key={album.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <img
@@ -276,34 +312,18 @@ export default function Albums() {
         </div>
       )}
 
-      {/* Pagination */}
-      {data && data.pagination.total_pages > 1 && (
-        <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-gray-700">
-            Showing page {data.pagination.page} of {data.pagination.total_pages}(
-            {data.pagination.total} total albums)
-          </div>
+      {/* Infinite Scroll Observer Target */}
+      <div ref={observerTarget} className="h-10 flex items-center justify-center">
+        {isFetchingNextPage && (
           <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={!data.pagination.has_previous}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            <span className="px-3 py-1 text-sm font-medium text-gray-700">
-              Page {currentPage} of {data.pagination.total_pages}
-            </span>
-            <button
-              onClick={() => setCurrentPage(Math.min(data.pagination.total_pages, currentPage + 1))}
-              disabled={!data.pagination.has_next}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span className="text-sm text-gray-600">Loading more albums...</span>
           </div>
-        </div>
-      )}
+        )}
+        {!hasNextPage && allAlbums.length > 0 && (
+          <div className="text-sm text-gray-500">No more albums to load</div>
+        )}
+      </div>
 
       {/* Album Edit Modal */}
       <AlbumEditModal
