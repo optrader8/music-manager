@@ -6,6 +6,7 @@ Welcome to the Music Manager documentation. This directory contains comprehensiv
 
 ### User Guides
 - [File Browser User Guide](file-browser-guide.md) - Complete guide for using the file browser feature to manage music files
+- **[Navidrome 연결 가이드](Navidrome_연결_가이드.md)** - Connect to Navidrome server via Tailscale Funnel and SubSonic clients (NEW)
 
 ### API Documentation
 - [File Browser API](file-browser-api.md) - REST API documentation for file browser endpoints
@@ -110,6 +111,29 @@ See [Docker_환경_진단.md](Docker_환경_진단.md) for:
 - Network diagnostics
 - Volume mount issues
 
+## 🎵 Navidrome Integration
+
+This project can work alongside Navidrome for enhanced music streaming capabilities:
+
+### Server Information
+- **Navidrome URL**: https://nas-1.parrot-mine.ts.net
+- **Access**: Via Tailscale Funnel (HTTPS)
+- **Compatible Clients**: play:Sub, DSub, Sonixd, Sublime Music, etc.
+
+### Usage Guide
+See [Navidrome 연결 가이드](Navidrome_연결_가이드.md) for:
+- Web browser access
+- Mobile app connection (iOS/Android)
+- Desktop client setup
+- SubSonic API testing
+- Integration with Music Manager
+
+### Complementary Features
+- **Music Manager**: File management, tag editing, database management
+- **Navidrome**: Mobile streaming, SubSonic API, external access
+
+Both systems can share the same music library (`/mnt/nas-music`) while providing different features!
+
 ## Support
 
 If you have questions or need help:
@@ -130,5 +154,6 @@ For development contributions:
 ---
 
 *Last updated: 2025-11-10*
+*Navidrome connection guide added for Tailscale Funnel integration*
 *SubSonic API analysis added - streaming and album listing capabilities confirmed*
 *Diagnostic documents added for troubleshooting music file query issues*
