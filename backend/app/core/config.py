@@ -22,6 +22,12 @@ class Settings(BaseSettings):
     file_browser_max_file_size: str = "100MB"
     file_browser_cache_ttl: int = 300
 
+    # Navidrome integration settings
+    navidrome_enabled: bool = False
+    navidrome_url: str = ""
+    navidrome_username: str = ""
+    navidrome_password: str = ""
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

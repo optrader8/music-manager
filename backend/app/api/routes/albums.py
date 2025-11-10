@@ -18,8 +18,9 @@ from app.schemas import (
     AlbumWithTracks,
     PaginationMeta,
 )
-from app.services import AlbumService, StreamingService
+from app.services import AlbumService, StreamingService, create_navidrome_album_service
 from app.services.streaming_service import CoverSize
+from app.core.config import settings
 
 router = APIRouter(prefix="/albums", tags=["albums"])
 
@@ -36,7 +37,6 @@ async def list_albums(
     sort: AlbumSortOptions = Query(AlbumSortOptions.RECENTLY_ADDED),
     session: Session = Depends(get_db),
 ) -> AlbumListResponse:
-    service = AlbumService(session)
     filters = AlbumFilters(
         search=search,
         artist_id=artist_id,
@@ -44,11 +44,25 @@ async def list_albums(
         year_from=year_from,
         year_to=year_to,
     )
-    items, total = service.get_albums(
-        pagination=pagination,
-        filters=filters,
-        sort=sort,
-    )
+
+    # Try to use Navidrome service if enabled
+    navidrome_service = create_navidrome_album_service()
+
+    if navidrome_service:
+        # Use Navidrome as data source
+        items, total = navidrome_service.get_albums(
+            pagination=pagination,
+            filters=filters,
+            sort=sort,
+        )
+    else:
+        # Fall back to local database
+        service = AlbumService(session)
+        items, total = service.get_albums(
+            pagination=pagination,
+            filters=filters,
+            sort=sort,
+        )
 
     meta = build_pagination_metadata(total=total, params=pagination)
     response.headers["X-Total-Count"] = str(total)
