@@ -12,8 +12,9 @@ Welcome to the Music Manager documentation. This directory contains comprehensiv
 
 ### Technical Documentation
 - [Database Insertion Error Analysis](20250923-db-insertion-error-analysis.md) - Analysis of database insertion issues and solutions
+- **[SubSonic API 분석](SubSonic_API_분석.md)** - SubSonic API implementation status, album listing, and streaming capabilities (NEW)
 
-### 🔧 Troubleshooting & Diagnostics (NEW)
+### 🔧 Troubleshooting & Diagnostics
 - **[빠른_진단_체크리스트.md](빠른_진단_체크리스트.md)** - Quick 5-minute diagnostic checklist (START HERE!)
 - **[현재_프로젝트_문제점_분석.md](현재_프로젝트_문제점_분석.md)** - Current project issue analysis and root cause
 - [음악파일_조회_문제_진단.md](음악파일_조회_문제_진단.md) - Music file query problem diagnosis
@@ -56,10 +57,23 @@ The Music Manager includes the following major features:
 - Genre, artist, and album analytics
 - Detailed music collection insights
 
-### 🎧 Playback & Streaming (Planned)
-- Web-based music player
-- Streaming capabilities
-- Playlist management
+### 🎧 Playback & Streaming
+- **SubSonic API Support** (Fully Implemented)
+  - Compatible with SubSonic/OpenSubsonic clients
+  - HTTP Range requests for seeking
+  - Album and artist browsing
+  - Music streaming and download
+  - Search functionality
+  - Playlist management
+- Web-based music player (Planned)
+
+### 🔌 SubSonic API Integration (NEW)
+- **REST API**: `/rest/*` endpoints
+- **Authentication**: Token-based and password authentication
+- **Streaming**: Full support with HTTP Range requests
+- **Album Listing**: Available via getArtist and search endpoints
+- **Compatible Clients**: DSub, play:Sub, Ultrasonic, Sonixd, Sublime Music, etc.
+- See [SubSonic API 분석](SubSonic_API_분석.md) for detailed information
 
 ## Troubleshooting
 
@@ -116,4 +130,5 @@ For development contributions:
 ---
 
 *Last updated: 2025-11-10*
+*SubSonic API analysis added - streaming and album listing capabilities confirmed*
 *Diagnostic documents added for troubleshooting music file query issues*
