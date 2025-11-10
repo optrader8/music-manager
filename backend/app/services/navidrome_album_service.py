@@ -8,6 +8,7 @@ from app.schemas import (
     AlbumSortOptions,
     AlbumSummary,
 )
+from app.schemas.artist import ArtistRead
 from app.services.navidrome_client import NavidromeClient, NavidromeAlbum
 from app.core.config import settings
 
@@ -102,18 +103,27 @@ class NavidromeAlbumService:
         if navidrome_album.cover_art:
             cover_art_url = self.client.get_cover_art_url(navidrome_album.cover_art, size=300)
 
+        # Convert Navidrome's string ID to int (or hash if not numeric)
+        album_id = int(navidrome_album.id) if navidrome_album.id.isdigit() else hash(navidrome_album.id) % 2147483647
+        artist_id = int(navidrome_album.artist_id) if navidrome_album.artist_id and navidrome_album.artist_id.isdigit() else hash(navidrome_album.artist_id or navidrome_album.artist) % 2147483647
+
+        # Create ArtistRead object for the album
+        artist = ArtistRead(
+            id=artist_id,
+            name=navidrome_album.artist,
+            sort_name=navidrome_album.artist,
+            created_at=datetime.now(),
+        )
+
         return AlbumSummary(
-            id=int(navidrome_album.id) if navidrome_album.id.isdigit() else hash(navidrome_album.id) % 2147483647,
+            id=album_id,
             title=navidrome_album.name,
-            artist_name=navidrome_album.artist,
+            artist_id=artist_id,
+            artist=artist,
             release_year=navidrome_album.year,
             genre=navidrome_album.genre,
             cover_art_url=cover_art_url,
-            total_tracks=navidrome_album.song_count,
-            total_duration=float(navidrome_album.duration) if navidrome_album.duration else None,
             created_at=navidrome_album.created or datetime.now(),
-            # Artist ID - convert Navidrome's string ID to int
-            artist_id=int(navidrome_album.artist_id) if navidrome_album.artist_id and navidrome_album.artist_id.isdigit() else None,
         )
 
 
